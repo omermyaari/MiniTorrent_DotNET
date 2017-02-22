@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<User xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Username>Omer</Username>
+  <Password>Yaari</Password>
+  <ServerIP>10.0.0.1</ServerIP>
+  <ServerPort>1005</ServerPort>
+  <LocalPort>9003</LocalPort>
+  <SharedFolderPath>C:\Users\omer\Pictures\Camera Roll</SharedFolderPath>
+  <DownloadFolderPath>C:\Users\omer\.AndroidStudio2.2</DownloadFolderPath>
+</User>

@@ -1,0 +1,14 @@
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\bin\Debug\PeerUI.exe.config
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\bin\Debug\PeerUI.exe
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\bin\Debug\PeerUI.pdb
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\PeerUI.csprojResolveAssemblyReference.cache
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\MainWindow.g.cs
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\App.g.cs
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\PeerUI_MarkupCompile.cache
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\PeerUI_MarkupCompile.lref
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\MainWindow.baml
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\PeerUI.g.resources
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\PeerUI.Properties.Resources.resources
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\PeerUI.csproj.GenerateResource.Cache
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\PeerUI.exe
+c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\PeerUI.pdb

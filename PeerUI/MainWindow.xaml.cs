@@ -32,7 +32,7 @@ namespace PeerUI {
         private string sharedFolderPath;
         private string downloadFolderPath;
 
-        private bool configExists;
+        private bool configExists;//test test
 
         private User user;
 

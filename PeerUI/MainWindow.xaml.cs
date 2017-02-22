@@ -31,7 +31,13 @@ namespace PeerUI {
         private int localPort;
         private string sharedFolderPath;
         private string downloadFolderPath;
-        
+
+        private bool configExists;
+
+        private User user;
+
+        XmlSerializer SerializerObj = new XmlSerializer(typeof(User));
+
         public MainWindow() {
             InitializeComponent();
             listViewFiles.DataContext = tabControl;
@@ -53,8 +59,8 @@ namespace PeerUI {
 
         //  Saves the current input settings.
         private void buttonApply_Click(object sender, RoutedEventArgs e) {
-            getDetails();
-            var user = new User {
+            getDetailsFromFields();
+            user = new User {
                 Username = username,
                 Password = password,
                 ServerIP = serverIP,
@@ -72,15 +78,24 @@ namespace PeerUI {
         }
 
         //  TODO validator?
-        private void getDetails() {
+        private void getDetailsFromFields() {
             username = textboxUsername.Text;
-            password = textboxPassword.Text;
+            password = passwordboxPassword.Password;
             sharedFolderPath = textboxSharedFolder.Text;
             downloadFolderPath = textboxDownloadFolder.Text;
             serverIP = textboxServerIP.Text;
-            //IPAddress.TryParse(textboxServerIP.Text, out serverIP);
             Int32.TryParse(textboxServerPort.Text, out serverPort);
             Int32.TryParse(textboxLocalPort.Text, out localPort);
+        }
+
+        private void loadDetailsFromUser() {
+            textboxUsername.Text = user.Username;
+            passwordboxPassword.Password = user.Password;
+            textboxSharedFolder.Text = user.SharedFolderPath;
+            textboxDownloadFolder.Text = user.DownloadFolderPath;
+            textboxServerIP.Text = user.ServerIP;
+            textboxServerPort.Text = Convert.ToString(user.ServerPort);
+            textboxLocalPort.Text = Convert.ToString(user.LocalPort);
         }
 
         private void clearSettings() {
@@ -95,16 +110,28 @@ namespace PeerUI {
         }
 
         private void saveConfigToXml(User user) {
-            XmlSerializer SerializerObj = new XmlSerializer(typeof(User));
-            TextWriter WriteFileStream = new StreamWriter("MyConfig.xml");
+            var WriteFileStream = new StreamWriter("MyConfig.xml");
             SerializerObj.Serialize(WriteFileStream, user);
             WriteFileStream.Close();
-            /*using (XmlWriter writer = XmlWriter.Create("MyConfig.xml")) {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("Settings");
+        }
 
-                for
-            }*/
+        private void loadConfigFromXml() {
+            var reader = new StreamReader("MyConfig.xml");
+            user = (User)SerializerObj.Deserialize(reader);
+            reader.Close();
+            loadDetailsFromUser();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e) {
+            if (configExists = File.Exists("MyConfig.xml")) {
+                loadConfigFromXml();
+                //  TODO config xml to settings
+            }
+            else {
+                MessageBox.Show("Config file does not exist, please fill the settings.", "Error");
+                settingsTab.IsSelected = true;
+                //  TODO change tab to settings and bring up a message to user
+            }
         }
     }
 }

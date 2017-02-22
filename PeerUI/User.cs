@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using System.Net;
 
 namespace PeerUI {
-
+    //test
     [Serializable]
     public class User {
 
         public string Username {
             get; set;
         }
-
+        
         public string Password {
             get; set;
         }

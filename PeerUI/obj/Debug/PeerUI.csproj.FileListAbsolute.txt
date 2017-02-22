@@ -12,3 +12,6 @@ c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\Peer
 c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\PeerUI.csproj.GenerateResource.Cache
 c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\PeerUI.exe
 c:\users\omer\documents\visual studio 2015\Projects\PeerUI\PeerUI\obj\Debug\PeerUI.pdb
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\PeerUI.exe.config
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\PeerUI\obj\Debug\PeerUI.exe
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\PeerUI\obj\Debug\PeerUI.pdb

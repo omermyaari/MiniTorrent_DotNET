@@ -27,4 +27,4 @@ namespace PeerUI.DataClasses {
             get; set;
         }
     }
-} //
+} 

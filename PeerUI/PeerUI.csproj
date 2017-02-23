@@ -56,7 +56,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="User.cs" />
+    <Compile Include="DataClasses\Handshake.cs" />
+    <Compile Include="DataTransfer\DataTransfer.cs" />
+    <Compile Include="DataClasses\User.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

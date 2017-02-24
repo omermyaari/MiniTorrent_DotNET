@@ -12,6 +12,8 @@ namespace PeerUI
         public long StartPosition { set; get; }
         public long Size { set; get; }
 
+        public Segment() { }
+
         public Segment(string fileName, long position, long size)
         {
             FileName = fileName;

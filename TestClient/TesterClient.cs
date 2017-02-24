@@ -19,7 +19,6 @@ namespace TestClient
         {
 
             Socket client = null;
-            string FileName = "1.doc";
             string RemoteIP = "10.0.0.144";
             int RemotePort = 4080;
             try

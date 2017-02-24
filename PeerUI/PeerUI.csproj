@@ -56,7 +56,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="User.cs" />
+    <Compile Include="Communication\DownloadManager.cs" />
+    <Compile Include="Entities\dataFile.cs" />
+    <Compile Include="Entities\Segment.cs" />
+    <Compile Include="Communication\TransferManager.cs" />
+    <Compile Include="Entities\User.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

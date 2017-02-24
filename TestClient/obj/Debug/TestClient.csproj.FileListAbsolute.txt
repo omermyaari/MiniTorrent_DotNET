@@ -1,0 +1,6 @@
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\TestClient\bin\Debug\TestClient.exe.config
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\TestClient\bin\Debug\TestClient.exe
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\TestClient\bin\Debug\TestClient.pdb
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\TestClient\obj\Debug\TestClient.csprojResolveAssemblyReference.cache
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\TestClient\obj\Debug\TestClient.exe
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\TestClient\obj\Debug\TestClient.pdb

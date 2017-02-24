@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PeerUI.Properties {
+namespace Class1.Properties {
 
 
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

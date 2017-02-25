@@ -57,7 +57,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Communication\DownloadManager.cs" />
-    <Compile Include="Entities\dataFile.cs" />
+    <Compile Include="Entities\DataFile.cs" />
     <Compile Include="Entities\Segment.cs" />
     <Compile Include="Communication\UploadManager.cs" />
     <Compile Include="Entities\User.cs" />

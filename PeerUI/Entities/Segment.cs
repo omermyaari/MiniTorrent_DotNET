@@ -12,7 +12,7 @@ namespace PeerUI
     {
         public string FileName { set; get; }
         public long StartPosition { set; get; }
-        public long SegmentSize { set; get; }
+        public long Size { set; get; }
 
         public Segment() { }
 
@@ -20,7 +20,7 @@ namespace PeerUI
         {
             FileName = fileName;
             StartPosition = position;
-            SegmentSize = size;
+            Size = size;
         }
     }
 }

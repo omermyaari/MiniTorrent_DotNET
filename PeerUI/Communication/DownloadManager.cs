@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -10,9 +11,8 @@ using System.Windows;
 
 namespace PeerUI
 {
-    class DownloadManager
+    public class DownloadManager
     {
-        Socket clientSocket = null;
         DataFile file; //the Array of users is inside
 
         byte[] fileResult;
@@ -49,15 +49,16 @@ namespace PeerUI
 
         private void startDownloading(Segment segment, User user)
         {
+            Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            NetworkStream nfs = new NetworkStream(clientSocket);
             try
             {
                 IPAddress ipAddress = IPAddress.Parse(user.UserIP);
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, user.LocalPort);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 clientSocket.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), clientSocket);      // Connect to the remote endpoint.
                 bool success = connectDone.WaitOne(5000, false);
                 MessageBox.Show("result: " + success);
+                SendFileInfo(segment, nfs);
                 GetSegment(segment, clientSocket);
             }
             catch (Exception error)
@@ -66,8 +67,10 @@ namespace PeerUI
             }
             finally
             {
-                if (clientSocket != null)///
-                    clientSocket.Close();///
+                if (clientSocket != null)
+                    clientSocket.Close();
+                if (nfs != null)
+                    nfs.Close();
             }
         }
 
@@ -83,6 +86,25 @@ namespace PeerUI
             catch (Exception e) { MessageBox.Show(e.ToString()); }
         }
 
+        //  Sends the requested segment info to the relevant peer.
+        private void SendFileInfo(Segment segment, NetworkStream nfs) {
+            StreamWriter streamWriter = new StreamWriter(nfs);
+            try {
+                streamWriter.AutoFlush = true;
+                streamWriter.WriteLine(segment.FileName + "#" + segment.StartPosition + "#" + segment.Size);
+                streamWriter.Flush();
+                streamWriter.Close();
+                Console.WriteLine("File INFO sent to server successfully !\n\n");
+            }
+            catch (Exception ed) {
+                Console.WriteLine("A Exception occured in transfer in TESTER CLIENT" + ed.ToString());
+            }
+            finally {
+                if (streamWriter != null)
+                    streamWriter.Close();
+            }
+        }
+
         private void GetSegment(Segment segment, Socket clientSocket)
         {
             NetworkStream nfs = new NetworkStream(clientSocket);
@@ -92,7 +114,7 @@ namespace PeerUI
             try
             {
                 //loop till the Full bytes have been read
-                while (i < segment.SegmentSize)
+                while (i < segment.Size)
                 {
                     byte[] buffer = new byte[100];
 

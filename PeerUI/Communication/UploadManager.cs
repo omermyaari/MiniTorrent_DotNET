@@ -78,7 +78,7 @@ namespace PeerUI
 
                     segment.FileName = fileInfo[(int)SegmentInfo.FileName];
                     segment.StartPosition = Int32.Parse(fileInfo[(int)SegmentInfo.StartPosition]);
-                    segment.SegmentSize = Int32.Parse(fileInfo[(int)SegmentInfo.Size]);
+                    segment.Size = Int32.Parse(fileInfo[(int)SegmentInfo.Size]);
 
             /*  
 
@@ -106,7 +106,7 @@ namespace PeerUI
 
                 MessageBox.Show("The name is: " + segment.FileName + "\n" +
                                 "The start position is: " + segment.StartPosition + "\n" +
-                                "The size of segment is: " + segment.SegmentSize + "\n" +
+                                "The size of segment is: " + segment.Size + "\n" +
                                 "File INFO received successfully !");
             }
             catch (Exception ed)
@@ -124,7 +124,7 @@ namespace PeerUI
                 //TODO check file existence of the file???
                 NetworkStream nfs = new NetworkStream(socket);
                 //  FileInfo ftemp = new FileInfo(FileName);
-                long total = segment.SegmentSize;
+                long total = segment.Size;
                 long totalSent = 0;
 
                 int len = 0;

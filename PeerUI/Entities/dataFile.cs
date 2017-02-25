@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PeerUI
 {
-    class DataFile
+    public class DataFile
     {
         public string FileName { get; set; }
         public long FileSize { get; set; }

@@ -33,6 +33,7 @@ namespace PeerUI {
         private string sharedFolderPath;
         private string downloadFolderPath;
 
+        private Thread currentThread;
         private bool configExists;
         private User user;
         XmlSerializer SerializerObj = new XmlSerializer(typeof(User));
@@ -136,7 +137,8 @@ namespace PeerUI {
             {
                 loadConfigFromXml();
                 //  TODO config xml to settings
-                UploadManager.StartListening(user.LocalPort, user.SharedFolderPath);
+                currentThread = new Thread(new ParameterizedThreadStart(UploadManager.StartListening));
+                new Thread(()=> UploadManager.StartListening(user.LocalPort, user.SharedFolderPath)).Start();
                 /////////////////////////////////////////////////////////////////
             }
             else

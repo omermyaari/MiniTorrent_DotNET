@@ -61,7 +61,7 @@ namespace PeerUI
             Socket listener = (Socket)ar.AsyncState;
             Socket handler = listener.EndAccept(ar);
 
-       //     MessageBox.Show("Connected to client at "+ handler.RemoteEndPoint.ToString());
+            MessageBox.Show("Connected to client at " + handler.RemoteEndPoint.ToString());
 
             GetFileInfo(handler);
             SendFile(handler);
@@ -72,38 +72,40 @@ namespace PeerUI
             NetworkStream nfs = new NetworkStream(socket);
             try
             {
-                StreamReader streamReader = new StreamReader(nfs);
-                string str = streamReader.ReadLine();
-                string[] fileInfo = str.Split('#');
+                    StreamReader streamReader = new StreamReader(nfs);
+                    string str = streamReader.ReadLine();
+                    string[] fileInfo = str.Split('#');
 
-                Segment segment = new Segment();
+                    segment.FileName = fileInfo[(int)SegmentInfo.FileName];
+                    segment.StartPosition = Int32.Parse(fileInfo[(int)SegmentInfo.StartPosition]);
+                    segment.SegmentSize = Int32.Parse(fileInfo[(int)SegmentInfo.Size]);
 
-                segment.FileName = fileInfo[(int)SegmentInfo.FileName];
-                segment.StartPosition = Int32.Parse(fileInfo[(int)SegmentInfo.StartPosition]);
-                segment.SegmentSize = Int32.Parse(fileInfo[(int)SegmentInfo.Size]);
+            /*  
 
-                /* byte[] bufferName = new byte[10];
-                 byte[] bufferPosition = new byte[8];
-                 byte[] bufferSize = new byte[8];
+                byte[] bufferName = new byte[10];
+                byte[] bufferPosition = new byte[8];
+                byte[] bufferSize = new byte[8];
 
-                 string cmd = "FILEOK";
-                 Byte[] sender = new Byte[1024]; ;
-                 sender = Encoding.ASCII.GetBytes(cmd);
+                string cmd = "FILEOK";
+                Byte[] sender = new Byte[1024]; ;
+                sender = Encoding.ASCII.GetBytes(cmd);
 
-                 nfs.Read(bufferName, 0, bufferName.Length);
-                 nfs.Write(sender, 0, sender.Length);
-                 nfs.Read(bufferPosition, 0, bufferPosition.Length);
-                 nfs.Write(sender, 0, sender.Length);
-                 nfs.Read(bufferSize, 0, bufferSize.Length);
-                 
-                 segment.FileName = Encoding.UTF8.GetString(bufferName).TrimEnd('\0');
-                 segment.StartPosition = BitConverter.ToInt32(bufferPosition, 0);
-                 segment.SegmentSize = BitConverter.ToInt32(bufferSize, 0);*/
+               */
 
-                streamReader.Close();
+          /*      nfs.Read(bufferName, 0, bufferName.Length);
+                nfs.Write(sender, 0, sender.Length);
+                nfs.Read(bufferPosition, 0, bufferPosition.Length);
+                nfs.Write(sender, 0, sender.Length);
+                nfs.Read(bufferSize, 0, bufferSize.Length);*/
 
-                MessageBox.Show("The name is: " + segment.FileName + "\n" +        
-                                "The start position is: " + segment.StartPosition + "\n" +     
+            /*    segment.FileName = Encoding.UTF8.GetString(bufferName).TrimEnd('\0');
+                segment.StartPosition = BitConverter.ToInt32(bufferPosition, 0);
+                segment.SegmentSize = BitConverter.ToInt32(bufferSize, 0);*/
+
+                  streamReader.Close();
+
+                MessageBox.Show("The name is: " + segment.FileName + "\n" +
+                                "The start position is: " + segment.StartPosition + "\n" +
                                 "The size of segment is: " + segment.SegmentSize + "\n" +
                                 "File INFO received successfully !");
             }
@@ -116,7 +118,7 @@ namespace PeerUI
 
         static void SendFile(Socket socket)
         {
-            FileStream fin = null;           
+            FileStream fin = null;
             try
             {
                 //TODO check file existence of the file???
@@ -124,11 +126,11 @@ namespace PeerUI
                 //  FileInfo ftemp = new FileInfo(FileName);
                 long total = segment.StartPosition + segment.SegmentSize;
                 long ToatlSent = 0;
-                
+
                 int len = 0;
                 byte[] buffer = new byte[100];
                 //Open the file requested for download 
-                fin = new FileStream(sharedFolder+"\\"+segment.FileName, FileMode.Open, FileAccess.Read);
+                fin = new FileStream(sharedFolder + "\\" + segment.FileName, FileMode.Open, FileAccess.Read);
                 fin.Seek(segment.StartPosition, 0);
                 //One way of transfer over sockets is Using a NetworkStream 
                 //It provides some useful ways to transfer data 

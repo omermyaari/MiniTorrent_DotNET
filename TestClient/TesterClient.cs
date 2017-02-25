@@ -12,14 +12,14 @@ namespace TestClient
     {
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
 
-        public static Segment segment = new Segment { FileName = "Fuck.txt", startPosition = 50, size = 100 };
+        public static Segment segment = new Segment { FileName = "Fuck.txt", startPosition = 1, size = 50 };
 
         [STAThread]
         static void Main(string[] args)
         {
 
             Socket client = null;
-            string RemoteIP = "192.168.30.88";
+            string RemoteIP = "192.168.43.165";
             int RemotePort = 4080;
             try
             {
@@ -62,7 +62,7 @@ namespace TestClient
             {
                 NetworkStream nfs = new NetworkStream(socket);
 
-                /*       byte[] bufferName = new byte[10];
+              /*         byte[] bufferName = new byte[10];
                        bufferName = Encoding.ASCII.GetBytes(segment.FileName);
 
                        byte[] bufferPosition = new byte[8];
@@ -80,9 +80,13 @@ namespace TestClient
                        nfs.Write(bufferSize, 0, bufferName.Length);*/
 
                 StreamWriter streamWriter = new StreamWriter(nfs);
-
+                streamWriter.AutoFlush = true;
                 string segmentStr = segment.FileName + "#" + segment.startPosition + "#" + segment.size;
-                streamWriter.Write(segmentStr);
+                
+                streamWriter.WriteLine(segmentStr);
+
+                streamWriter.Flush();
+                streamWriter.Close();
                 
 
                 Console.WriteLine("File INFO sent to server successfully !\n\n");

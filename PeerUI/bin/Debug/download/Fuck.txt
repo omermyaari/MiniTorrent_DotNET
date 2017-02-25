@@ -1,5 +1,0 @@
-Student's will get a date and time to install and protect their project in the lab. 
-On the specified time (5-10.1.2017 tentative) you should be ready to demonstrate the project, 
-answer questions, explain code flow, and add simple code functionality to the project. 
-And simple implementation subjects of the course.  
-Make sure the DB file has at least 5 records in each table.

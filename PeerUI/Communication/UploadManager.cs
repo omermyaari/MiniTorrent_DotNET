@@ -28,9 +28,9 @@ namespace PeerUI
             IPAddress ipAddress = Dns.Resolve(Dns.GetHostName()).AddressList[0];
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, localPort);
 
-            MessageBox.Show("Binding port " + localPort + " at local address " + ipAddress.ToString());
+            //MessageBox.Show("Binding port " + localPort + " at local address " + ipAddress.ToString());
             Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); // Create a TCP/IP  socket.
-            MessageBox.Show("Waiting for a connection...\n\n");
+            //MessageBox.Show("Waiting for a connection...\n\n");
 
             // Bind the  socket to the local endpoint and listen for incoming connections.
             try
@@ -47,7 +47,7 @@ namespace PeerUI
             }
             catch (Exception e) { MessageBox.Show(e.ToString()); }
 
-            MessageBox.Show("\nHit enter to continue...");
+            //MessageBox.Show("\nHit enter to continue...");
             Console.Read();
         }
 
@@ -61,7 +61,7 @@ namespace PeerUI
             Socket listener = (Socket)ar.AsyncState;
             Socket handler = listener.EndAccept(ar);
 
-            MessageBox.Show("Connected to client at " + handler.RemoteEndPoint.ToString());
+            //MessageBox.Show("Connected to client at " + handler.RemoteEndPoint.ToString());
 
             GetFileInfo(handler);
             SendFile(handler);
@@ -104,10 +104,10 @@ namespace PeerUI
 
                 streamReader.Close();
 
-                MessageBox.Show("The name is: " + segment.FileName + "\n" +
-                                "The start position is: " + segment.StartPosition + "\n" +
-                                "The size of segment is: " + segment.Size + "\n" +
-                                "File INFO received successfully !");
+                //MessageBox.Show("The name is: " + segment.FileName + "\n" +
+                //                "The start position is: " + segment.StartPosition + "\n" +
+                //                "The size of segment is: " + segment.Size + "\n" +
+                //                "File INFO received successfully !");
             }
             catch (Exception ed)
             {
@@ -128,7 +128,7 @@ namespace PeerUI
                 long totalSent = 0;
 
                 int len = 0;
-                byte[] buffer = new byte[100];
+                byte[] buffer = new byte[1024*4];
                 //Open the file requested for download 
                 fin = new FileStream(sharedFolder + "\\" + segment.FileName, FileMode.Open, FileAccess.Read);
                 fin.Seek(segment.StartPosition, 0);
@@ -138,16 +138,16 @@ namespace PeerUI
                 while (totalSent < total && nfs.CanWrite)
                 {
                     //Read from the File (len contains the number of bytes read)
-                    len = fin.Read(buffer, 0, buffer.Length);
+                    len = fin.Read(buffer, 0, (int)segment.Size);
 
-                    MessageBox.Show("len =  " + len + "\n");
+                    //MessageBox.Show("len =  " + len + "\n");
                     //Write the Bytes on the Socket
                     nfs.Write(buffer, 0, len);
                     //Increase the bytes Read counter
                     totalSent = totalSent + len;
-                    MessageBox.Show("wrote: " + totalSent);
+                    //MessageBox.Show("wrote: " + totalSent);
                 }
-                MessageBox.Show("File sent to server successfully !\n\n");
+                //MessageBox.Show("File sent to server successfully !\n\n");
             }
             catch (Exception ed)
             {

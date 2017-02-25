@@ -157,12 +157,23 @@ namespace PeerUI {
                 Password = "Os",
                 ServerIP = "10.0.0.1",
                 ServerPort = 8888,
-                LocalPort = 4090,
+                LocalPort = 4080,
                 DownloadFolderPath = @"C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\Download",
                 SharedFolderPath = @"C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\Share"
             };
+            User tempUser2 = new User {
+                UserIP = "192.168.43.124",
+                Username = "Vit",
+                Password = "Os",
+                ServerIP = "10.0.0.1",
+                ServerPort = 8888,
+                LocalPort = 4081,
+                DownloadFolderPath = @"C:\Users\omer\Source\Repos\MiniTorrent_DotNET_test\PeerUI\bin\Debug\Download",
+                SharedFolderPath = @"C:\Users\omer\Source\Repos\MiniTorrent_DotNET_test\PeerUI\bin\Debug\Share"
+            };
             usersList.Add(tempUser);
-            new Thread(() => new DownloadManager(new DataFile("Fuck.txt", 1548, usersList), downloadFolderPath)).Start();
+            usersList.Add(tempUser2);
+            new Thread(() => new DownloadManager(new DataFile("Fuck.txt", 1933, usersList), downloadFolderPath)).Start();
         }
     }
 }

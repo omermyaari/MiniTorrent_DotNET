@@ -40,9 +40,12 @@ namespace PeerUI
             for (int i = 0; i <= dataFile.UsersList.Count; i++) 
             {
                 //open threads to download segments ()
-                Thread downloadingThread =  new Thread(()=> startDownloading(new Segment(dataFile.FileName, segmentSize * i, segmentSize), dataFile.UsersList[i]));
+                downloadDone[i] = new AutoResetEvent(false);
+                Thread downloadingThread =  new Thread(()=> startDownloading(new Segment(i, dataFile.FileName, segmentSize * i, segmentSize), dataFile.UsersList[i]));
                 downloadingThread.Start();
             }
+            WaitHandle.WaitAll(downloadDone);
+            fileStream.Close();
         }
 
         private void startDownloading(Segment segment, User user)
@@ -128,8 +131,8 @@ namespace PeerUI
                     }
                     Console.WriteLine("wrote: " + totalReceived);
                 }
-
-                Console.WriteLine("file received successfully !");
+                downloadDone[segment.Id].Set();
+                Console.WriteLine("file segment received successfully !");
             }
             catch (Exception ed) {
                 Console.WriteLine("A Exception occured in file transfer in Tester File Receiving!" + ed.Message);

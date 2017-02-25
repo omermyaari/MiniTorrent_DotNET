@@ -11,5 +11,11 @@ namespace PeerUI
         public string FileName { get; set; }
         public long FileSize { get; set; }
         public List<User> UsersList { get; set; }
+
+        public DataFile(string FileName, long FileSize, List<User> UsersList) {
+            this.FileName = FileName;
+            this.FileSize = FileSize;
+            this.UsersList = UsersList;
+        }
     }
 }

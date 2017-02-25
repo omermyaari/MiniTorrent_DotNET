@@ -150,7 +150,9 @@ namespace PeerUI {
         }
 
         private void buttonDownload_Click(object sender, RoutedEventArgs e) {
-
+            List <User> usersList = new List<User>();
+            usersList.Add(user);
+            new Thread(() => new DownloadManager(new DataFile("Fuck.txt", 385, usersList), downloadFolderPath)).Start();
         }
     }
 }

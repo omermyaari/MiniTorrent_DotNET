@@ -42,7 +42,8 @@ namespace PeerUI
             for (int i = 0; i <= file.UsersList.Count; i++) 
             {
                 //open threads to download segments ()
-                startDownloading(new Segment(file.FileName, segmentSize * i, segmentSize), file.UsersList[i]);
+                Thread downloadingThread =  new Thread(()=> startDownloading(new Segment(file.FileName, segmentSize * i, segmentSize), file.UsersList[i]));
+                downloadingThread.Start();
             }
         }
 

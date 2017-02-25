@@ -13,36 +13,34 @@ namespace PeerUI
 {
     public class DownloadManager
     {
-        DataFile file; //the Array of users is inside
-
-        byte[] fileResult;
-
+        DataFile dataFile; //the Array of users is inside
+        FileStream fileStream;
         private string DownloadFolder { set; get; }
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
+        private static AutoResetEvent[] downloadDone;
 
 
-        public DownloadManager(DataFile file, string folder)
+        public DownloadManager(DataFile dataFile, string folder)
         {
-            this.file = file;
+            this.dataFile = dataFile;
             DownloadFolder = folder;
-
-            fileResult = new byte[file.FileSize];
-
+            downloadDone = new AutoResetEvent[dataFile.UsersList.Count];
+            fileStream = new FileStream(DownloadFolder + @"\" + dataFile.FileName, FileMode.Create, FileAccess.Write);
             DownloadFile();
         }
 
         private void DownloadFile()
         {
             //TODO check amount of segments!!!
-            long segmentSize = file.FileSize / file.UsersList.Count;
+            long segmentSize = dataFile.FileSize / dataFile.UsersList.Count;
 
            // long segmentCount = file.FileSize / segmentSize;
            // if (file.FileSize % segmentSize > 0) segmentCount++;
 
-            for (int i = 0; i <= file.UsersList.Count; i++) 
+            for (int i = 0; i <= dataFile.UsersList.Count; i++) 
             {
                 //open threads to download segments ()
-                Thread downloadingThread =  new Thread(()=> startDownloading(new Segment(file.FileName, segmentSize * i, segmentSize), file.UsersList[i]));
+                Thread downloadingThread =  new Thread(()=> startDownloading(new Segment(dataFile.FileName, segmentSize * i, segmentSize), dataFile.UsersList[i]));
                 downloadingThread.Start();
             }
         }
@@ -59,7 +57,8 @@ namespace PeerUI
                 bool success = connectDone.WaitOne(5000, false);
                 MessageBox.Show("result: " + success);
                 SendFileInfo(segment, nfs);
-                GetSegment(segment, clientSocket);
+                GetFileSegment(segment, nfs);
+                
             }
             catch (Exception error)
             {
@@ -105,42 +104,43 @@ namespace PeerUI
             }
         }
 
-        private void GetSegment(Segment segment, Socket clientSocket)
-        {
-            NetworkStream nfs = new NetworkStream(clientSocket);
-
-            long i = 1;
-            long rby = 0;
-            try
-            {
+        private void GetFileSegment(Segment segment, NetworkStream nfs) {
+            int memoryStreamCapacity = (4 * 1024) ^ 2;
+            FileStream fileStream = new FileStream(DownloadFolder + @"\Fuck.txt", FileMode.Create, FileAccess.Write);
+            MemoryStream memoryStream = new MemoryStream(memoryStreamCapacity);
+            //long size=fi.Length ;
+            int bytesReceived = 1;  //  Current batch of bytes received.
+            long totalReceived = 0; //  Total bytes received so far.
+            long totalReadInMemory = 0;
+            try {
                 //loop till the Full bytes have been read
-                while (i < segment.Size)
-                {
-                    byte[] buffer = new byte[100];
-
+                while (bytesReceived > 0) {
+                    byte[] buffer = new byte[4 * 1024];
                     //Read from the Network Stream
-                    i = nfs.Read(buffer, 0, buffer.Length);
-
-                    for (int j = 0; j < buffer.Length; j++)
-                    {
-
+                    bytesReceived = nfs.Read(buffer, 0, buffer.Length);
+                    memoryStream.Write(buffer, 0, (int)bytesReceived);
+                    totalReadInMemory += bytesReceived;
+                    totalReceived = totalReceived + bytesReceived;
+                    if (totalReadInMemory == memoryStreamCapacity) {
+                        WriteToDisk(memoryStream, segment.StartPosition + totalReceived);
+                        memoryStream = new MemoryStream(memoryStreamCapacity);
+                        totalReadInMemory = 0;
                     }
-
-                    rby = rby + i;
-                    Console.WriteLine("wrote: " + rby);
+                    Console.WriteLine("wrote: " + totalReceived);
                 }
 
                 Console.WriteLine("file received successfully !");
             }
-            catch (Exception ed)
-            {
+            catch (Exception ed) {
                 Console.WriteLine("A Exception occured in file transfer in Tester File Receiving!" + ed.Message);
 
             }
-            finally
-            {
-              //  if (fout != null)
-              //      fout.Close();
+        }
+
+        private void WriteToDisk(MemoryStream memoryStream, long position) {
+            lock (fileStream) {
+                fileStream.Seek(position, 0);
+                memoryStream.WriteTo(fileStream);
             }
         }
     }

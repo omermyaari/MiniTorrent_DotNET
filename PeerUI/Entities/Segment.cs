@@ -10,6 +10,7 @@ namespace PeerUI
 
     public class Segment
     {
+        public int Id { get; set; }
         public string FileName { set; get; }
         public long StartPosition { set; get; }
         public long Size { set; get; }

@@ -151,8 +151,18 @@ namespace PeerUI {
 
         private void buttonDownload_Click(object sender, RoutedEventArgs e) {
             List <User> usersList = new List<User>();
-            usersList.Add(user);
-            new Thread(() => new DownloadManager(new DataFile("Fuck.txt", 385, usersList), downloadFolderPath)).Start();
+            User tempUser = new User {
+                UserIP = "192.168.43.165",
+                Username = "Vit",
+                Password = "Os",
+                ServerIP = "10.0.0.1",
+                ServerPort = 8888,
+                LocalPort = 4090,
+                DownloadFolderPath = @"C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\Download",
+                SharedFolderPath = @"C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\Share"
+            };
+            usersList.Add(tempUser);
+            new Thread(() => new DownloadManager(new DataFile("Fuck.txt", 1548, usersList), downloadFolderPath)).Start();
         }
     }
 }

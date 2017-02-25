@@ -72,8 +72,8 @@ namespace PeerUI {
             };
             saveConfigToXml(user);
             ///////////////////////////////////////////////////////////
-            UploadManager.StartListening(localPort, sharedFolderPath);
-
+            currentThread = new Thread(() => UploadManager.StartListening(localPort, sharedFolderPath));
+            currentThread.Start();
         }
 
         //  Clears the config settings.
@@ -137,8 +137,8 @@ namespace PeerUI {
             {
                 loadConfigFromXml();
                 //  TODO config xml to settings
-                currentThread = new Thread(new ParameterizedThreadStart(UploadManager.StartListening));
-                new Thread(()=> UploadManager.StartListening(user.LocalPort, user.SharedFolderPath)).Start();
+                currentThread = new Thread(()=> UploadManager.StartListening(user.LocalPort, user.SharedFolderPath));
+                currentThread.Start();
                 /////////////////////////////////////////////////////////////////
             }
             else

@@ -102,7 +102,7 @@ namespace PeerUI
                 segment.StartPosition = BitConverter.ToInt32(bufferPosition, 0);
                 segment.SegmentSize = BitConverter.ToInt32(bufferSize, 0);*/
 
-                  streamReader.Close();
+                streamReader.Close();
 
                 MessageBox.Show("The name is: " + segment.FileName + "\n" +
                                 "The start position is: " + segment.StartPosition + "\n" +
@@ -124,8 +124,8 @@ namespace PeerUI
                 //TODO check file existence of the file???
                 NetworkStream nfs = new NetworkStream(socket);
                 //  FileInfo ftemp = new FileInfo(FileName);
-                long total = segment.StartPosition + segment.SegmentSize;
-                long ToatlSent = 0;
+                long total = segment.SegmentSize;
+                long totalSent = 0;
 
                 int len = 0;
                 byte[] buffer = new byte[100];
@@ -135,7 +135,7 @@ namespace PeerUI
                 //One way of transfer over sockets is Using a NetworkStream 
                 //It provides some useful ways to transfer data 
 
-                while (ToatlSent < total && nfs.CanWrite)
+                while (totalSent < total && nfs.CanWrite)
                 {
                     //Read from the File (len contains the number of bytes read)
                     len = fin.Read(buffer, 0, buffer.Length);
@@ -144,8 +144,8 @@ namespace PeerUI
                     //Write the Bytes on the Socket
                     nfs.Write(buffer, 0, len);
                     //Increase the bytes Read counter
-                    ToatlSent = ToatlSent + len;
-                    MessageBox.Show("wrote: " + ToatlSent);
+                    totalSent = totalSent + len;
+                    MessageBox.Show("wrote: " + totalSent);
                 }
                 MessageBox.Show("File sent to server successfully !\n\n");
             }

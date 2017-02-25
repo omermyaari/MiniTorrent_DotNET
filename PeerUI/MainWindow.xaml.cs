@@ -148,5 +148,9 @@ namespace PeerUI {
                 //  TODO change tab to settings and bring up a message to user
             }
         }
+
+        private void buttonDownload_Click(object sender, RoutedEventArgs e) {
+
+        }
     }
 }

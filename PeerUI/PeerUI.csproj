@@ -59,7 +59,7 @@
     <Compile Include="Communication\DownloadManager.cs" />
     <Compile Include="Entities\dataFile.cs" />
     <Compile Include="Entities\Segment.cs" />
-    <Compile Include="Communication\TransferManager.cs" />
+    <Compile Include="Communication\UploadManager.cs" />
     <Compile Include="Entities\User.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

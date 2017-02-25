@@ -19,7 +19,7 @@ namespace TestClient
         {
 
             Socket client = null;
-            string RemoteIP = "10.0.0.144";
+            string RemoteIP = "192.168.30.88";
             int RemotePort = 4080;
             try
             {
@@ -60,22 +60,30 @@ namespace TestClient
 
             try
             {
-                byte[] bufferName = new byte[10];
-                bufferName = Encoding.ASCII.GetBytes(segment.FileName);
-
-                byte[] bufferPosition = new byte[8];
-                bufferPosition = BitConverter.GetBytes(segment.startPosition);
-
-                byte[] bufferSize = new byte[8];
-                bufferSize = BitConverter.GetBytes(segment.size);
-
                 NetworkStream nfs = new NetworkStream(socket);
 
-                nfs.Write(bufferName, 0, bufferName.Length);
-                nfs.Read(bufferName, 0, bufferName.Length);
-                nfs.Write(bufferPosition, 0, bufferName.Length);
-                nfs.Read(bufferName, 0, bufferName.Length);
-                nfs.Write(bufferSize, 0, bufferName.Length);
+                /*       byte[] bufferName = new byte[10];
+                       bufferName = Encoding.ASCII.GetBytes(segment.FileName);
+
+                       byte[] bufferPosition = new byte[8];
+                       bufferPosition = BitConverter.GetBytes(segment.startPosition);
+
+                       byte[] bufferSize = new byte[8];
+                       bufferSize = BitConverter.GetBytes(segment.size);
+
+                       
+
+                       nfs.Write(bufferName, 0, bufferName.Length);
+                       nfs.Read(bufferName, 0, bufferName.Length);
+                       nfs.Write(bufferPosition, 0, bufferName.Length);
+                       nfs.Read(bufferName, 0, bufferName.Length);
+                       nfs.Write(bufferSize, 0, bufferName.Length);*/
+
+                StreamWriter streamWriter = new StreamWriter(nfs);
+
+                string segmentStr = segment.FileName + "#" + segment.startPosition + "#" + segment.size;
+                streamWriter.Write(segmentStr);
+                
 
                 Console.WriteLine("File INFO sent to server successfully !\n\n");
             }

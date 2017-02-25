@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace PeerUI
 {
-    class Segment
+    public enum SegmentInfo {FileName, StartPosition, Size};
+
+    public class Segment
     {
         public string FileName { set; get; }
         public long StartPosition { set; get; }
-        public long Size { set; get; }
+        public long SegmentSize { set; get; }
 
         public Segment() { }
 
@@ -18,7 +20,7 @@ namespace PeerUI
         {
             FileName = fileName;
             StartPosition = position;
-            Size = size;
+            SegmentSize = size;
         }
     }
 }

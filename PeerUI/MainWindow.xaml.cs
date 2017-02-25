@@ -71,7 +71,7 @@ namespace PeerUI {
             };
             saveConfigToXml(user);
             ///////////////////////////////////////////////////////////
-            TransferManager.StartListening(localPort, sharedFolderPath);
+            UploadManager.StartListening(localPort, sharedFolderPath);
 
         }
 
@@ -136,7 +136,7 @@ namespace PeerUI {
             {
                 loadConfigFromXml();
                 //  TODO config xml to settings
-                TransferManager.StartListening(user.LocalPort, user.SharedFolderPath);
+                UploadManager.StartListening(user.LocalPort, user.SharedFolderPath);
                 /////////////////////////////////////////////////////////////////
             }
             else

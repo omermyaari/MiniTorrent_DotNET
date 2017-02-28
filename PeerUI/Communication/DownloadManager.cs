@@ -80,6 +80,7 @@ namespace PeerUI
             finally
             {
                 if (clientSocket != null) {
+                    clientSocket.Shutdown(SocketShutdown.Both);
                     clientSocket.Close();
                     Console.WriteLine("Socket closed at downloader.");
                 }

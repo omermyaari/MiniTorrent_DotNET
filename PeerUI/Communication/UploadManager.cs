@@ -10,117 +10,83 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace PeerUI
-{
-    class UploadManager
-    {
-        public static int localPort;
-        public static string sharedFolder;
-        public static Segment segment;
+namespace PeerUI {
+    public class UploadManager {
+        private int localPort;
+        private string sharedFolder;
+        private ManualResetEvent clientConnected = new ManualResetEvent(false); // Thread signal.
+        private bool keepAccepting;
 
-        public static ManualResetEvent allDone = new ManualResetEvent(false); // Thread signal.
+        public void StopListening() {
+            keepAccepting = false;
+            clientConnected.Set();
+        }
 
-        public static void StartListening(int port, string folder)
-        {
+        public void StartListening(int port, string folder) {
+            keepAccepting = true;
             localPort = port;
             sharedFolder = folder;
-
             IPAddress ipAddress = Dns.Resolve(Dns.GetHostName()).AddressList[0];
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, localPort);
-
-            //MessageBox.Show("Binding port " + localPort + " at local address " + ipAddress.ToString());
             Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); // Create a TCP/IP  socket.
-            //MessageBox.Show("Waiting for a connection...\n\n");
-
             // Bind the  socket to the local endpoint and listen for incoming connections.
-            try
-            {
+            try {
                 listener.Bind(localEndPoint);
                 listener.Listen(8); //pending connections queue
-                while (true)
-                {
-                    allDone.Reset();  // Set the event to  nonsignaled state.
+                while (keepAccepting) {
+                    clientConnected.Reset();  // Set the event to  nonsignaled state.
                     // Start  an asynchronous socket to listen for connections.
                     listener.BeginAccept(new AsyncCallback(AcceptCallback), listener);
-                    allDone.WaitOne();  // Wait until a connection is made before continuing.
+                    clientConnected.WaitOne();  // Wait until a connection is made before continuing.
                 }
             }
             catch (Exception e) { MessageBox.Show(e.ToString()); }
-
-            //MessageBox.Show("\nHit enter to continue...");
-            Console.Read();
+            finally {
+                listener.Close();
+            }
         }
 
-        public static void AcceptCallback(IAsyncResult ar)
-        {
+        public void AcceptCallback(IAsyncResult ar) {
             // Signal the main thread to continue.
-            allDone.Set();
-            segment = new Segment();
+            clientConnected.Set();
+            Segment segment = new Segment();
 
             // Get the socket that handles the client request.
-            Socket listener = (Socket)ar.AsyncState;
-            Socket handler = listener.EndAccept(ar);
+            try {
+                Socket listener = (Socket)ar.AsyncState;
+                Socket handler = listener.EndAccept(ar);
+                GetFileInfo(handler, segment);
+                SendFile(handler, segment);
+            }
+            catch (ObjectDisposedException objectDisposedException) {
+                Console.WriteLine(objectDisposedException.Message); //  Dont really need to take care of this exception,
+            }                                                       //  its like a signal that says the connection closed.
 
-            //MessageBox.Show("Connected to client at " + handler.RemoteEndPoint.ToString());
-
-            GetFileInfo(handler);
-            SendFile(handler);
         }
 
-        static void GetFileInfo(Socket socket)
-        {
+        private void GetFileInfo(Socket socket, Segment segment) {
             NetworkStream nfs = new NetworkStream(socket);
-            try
-            {
-                    StreamReader streamReader = new StreamReader(nfs);
-                    string str = streamReader.ReadLine();
-                    string[] fileInfo = str.Split('#');
-
-                    segment.FileName = fileInfo[(int)SegmentInfo.FileName];
-                    segment.StartPosition = Int32.Parse(fileInfo[(int)SegmentInfo.StartPosition]);
-                    segment.Size = Int32.Parse(fileInfo[(int)SegmentInfo.Size]);
-
-            /*  
-
-                byte[] bufferName = new byte[10];
-                byte[] bufferPosition = new byte[8];
-                byte[] bufferSize = new byte[8];
-
-                string cmd = "FILEOK";
-                Byte[] sender = new Byte[1024]; ;
-                sender = Encoding.ASCII.GetBytes(cmd);
-
-               */
-
-          /*      nfs.Read(bufferName, 0, bufferName.Length);
-                nfs.Write(sender, 0, sender.Length);
-                nfs.Read(bufferPosition, 0, bufferPosition.Length);
-                nfs.Write(sender, 0, sender.Length);
-                nfs.Read(bufferSize, 0, bufferSize.Length);*/
-
-            /*    segment.FileName = Encoding.UTF8.GetString(bufferName).TrimEnd('\0');
-                segment.StartPosition = BitConverter.ToInt32(bufferPosition, 0);
-                segment.SegmentSize = BitConverter.ToInt32(bufferSize, 0);*/
-
+            try {
+                StreamReader streamReader = new StreamReader(nfs);
+                string str = streamReader.ReadLine();
+                string[] fileInfo = str.Split('#');
+                segment.FileName = fileInfo[(int)SegmentInfo.FileName];
+                segment.StartPosition = Int32.Parse(fileInfo[(int)SegmentInfo.StartPosition]);
+                segment.Size = Int32.Parse(fileInfo[(int)SegmentInfo.Size]);
                 streamReader.Close();
-
-                //MessageBox.Show("The name is: " + segment.FileName + "\n" +
-                //                "The start position is: " + segment.StartPosition + "\n" +
-                //                "The size of segment is: " + segment.Size + "\n" +
-                //                "File INFO received successfully !");
             }
-            catch (Exception ed)
-            {
+            catch (Exception ed) {
                 MessageBox.Show("A Exception occured in file transfer in TRANSFERE MANAGER" + ed.Message);
             }
-            finally { if (nfs != null) nfs.Close(); }
+            finally {
+                //if (nfs != null) 
+                //   nfs.Close();
+            }
         }
 
-        static void SendFile(Socket socket)
-        {
+        private void SendFile(Socket socket, Segment segment) {
             FileStream fin = null;
-            try
-            {
+            try {
                 //TODO check file existence of the file???
                 NetworkStream nfs = new NetworkStream(socket);
                 //  FileInfo ftemp = new FileInfo(FileName);
@@ -128,15 +94,14 @@ namespace PeerUI
                 long totalSent = 0;
 
                 int len = 0;
-                byte[] buffer = new byte[1024*4];
+                byte[] buffer = new byte[1024 * 4];
                 //Open the file requested for download 
                 fin = new FileStream(sharedFolder + "\\" + segment.FileName, FileMode.Open, FileAccess.Read);
                 fin.Seek(segment.StartPosition, 0);
                 //One way of transfer over sockets is Using a NetworkStream 
                 //It provides some useful ways to transfer data 
 
-                while (totalSent < total && nfs.CanWrite)
-                {
+                while (totalSent < total && nfs.CanWrite) {
                     //Read from the File (len contains the number of bytes read)
                     len = fin.Read(buffer, 0, (int)segment.Size);
 
@@ -145,12 +110,9 @@ namespace PeerUI
                     nfs.Write(buffer, 0, len);
                     //Increase the bytes Read counter
                     totalSent = totalSent + len;
-                    //MessageBox.Show("wrote: " + totalSent);
                 }
-                //MessageBox.Show("File sent to server successfully !\n\n");
             }
-            catch (Exception ed)
-            {
+            catch (Exception ed) {
                 MessageBox.Show("A Exception occured in transfer the FILE in UPLOAD MANAGER!" + ed.ToString());
             }
             finally { if (fin != null) fin.Close(); }

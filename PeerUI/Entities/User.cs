@@ -10,7 +10,7 @@ namespace PeerUI {
     [Serializable]
     public class User {
 
-        public string UserIP///////////////////////////
+        public string UserIP
         {
             get; set;
         }

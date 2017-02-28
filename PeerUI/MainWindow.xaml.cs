@@ -32,8 +32,8 @@ namespace PeerUI {
         private int localPort;
         private string sharedFolderPath;
         private string downloadFolderPath;
-
-        private Thread currentThread;
+        private UploadManager uploadManager = new UploadManager();
+        private Thread uploadManagerThread;
         private bool configExists;
         private User user;
         XmlSerializer SerializerObj = new XmlSerializer(typeof(User));
@@ -71,9 +71,10 @@ namespace PeerUI {
                 DownloadFolderPath = downloadFolderPath
             };
             saveConfigToXml(user);
-            ///////////////////////////////////////////////////////////
-            currentThread = new Thread(() => UploadManager.StartListening(localPort, sharedFolderPath));
-            currentThread.Start();
+            if (uploadManagerThread.ThreadState == ThreadState.Running)
+                uploadManager.StopListening();
+            uploadManagerThread = new Thread(() => uploadManager.StartListening(localPort, sharedFolderPath));
+            uploadManagerThread.Start();
         }
 
         //  Clears the config settings.
@@ -137,9 +138,8 @@ namespace PeerUI {
             {
                 loadConfigFromXml();
                 //  TODO config xml to settings
-                currentThread = new Thread(()=> UploadManager.StartListening(user.LocalPort, user.SharedFolderPath));
-                currentThread.Start();
-                /////////////////////////////////////////////////////////////////
+                uploadManagerThread = new Thread(()=> uploadManager.StartListening(user.LocalPort, user.SharedFolderPath));
+                uploadManagerThread.Start();
             }
             else
             {
@@ -152,14 +152,14 @@ namespace PeerUI {
         private void buttonDownload_Click(object sender, RoutedEventArgs e) {
             List <User> usersList = new List<User>();
             User tempUser = new User {
-                UserIP = "192.168.43.165",
+                UserIP = "192.168.43.124",
                 Username = "Vit",
                 Password = "Os",
                 ServerIP = "10.0.0.1",
                 ServerPort = 8888,
                 LocalPort = 4080,
-                DownloadFolderPath = @"C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\Download",
-                SharedFolderPath = @"C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\Share"
+                DownloadFolderPath = @"C:\temp\download1",
+                SharedFolderPath = @"C:\temp\share1"
             };
             User tempUser2 = new User {
                 UserIP = "192.168.43.124",
@@ -168,12 +168,12 @@ namespace PeerUI {
                 ServerIP = "10.0.0.1",
                 ServerPort = 8888,
                 LocalPort = 4081,
-                DownloadFolderPath = @"C:\Users\omer\Source\Repos\MiniTorrent_DotNET_test\PeerUI\bin\Debug\Download",
-                SharedFolderPath = @"C:\Users\omer\Source\Repos\MiniTorrent_DotNET_test\PeerUI\bin\Debug\Share"
+                DownloadFolderPath = @"C:\temp\download2",
+                SharedFolderPath = @"C:\temp\share2"
             };
             usersList.Add(tempUser);
             usersList.Add(tempUser2);
-            new Thread(() => new DownloadManager(new DataFile("Fuck.txt", 1933, usersList), downloadFolderPath)).Start();
+            new Thread(() => new DownloadManager(new DataFile("Fuck.txt", 15504, usersList), downloadFolderPath)).Start();
         }
     }
 }

@@ -13,11 +13,13 @@ namespace PeerUI
 {
     public class DownloadManager
     {
-        DataFile dataFile; //the Array of users is inside
-        FileStream fileStream;
-        private string DownloadFolder { set; get; }
-        private static ManualResetEvent connectDone = new ManualResetEvent(false);
-        private static AutoResetEvent[] downloadDone;
+        public string DownloadFolder {
+            set; get;
+        }
+        private DataFile dataFile; //the Array of users is inside
+        private FileStream fileStream;
+        private ManualResetEvent connectDone = new ManualResetEvent(false);
+        private AutoResetEvent[] downloadDone;
 
 
         public DownloadManager(DataFile dataFile, string folder)
@@ -25,7 +27,7 @@ namespace PeerUI
             this.dataFile = dataFile;
             DownloadFolder = folder;
             downloadDone = new AutoResetEvent[dataFile.UsersList.Count];
-            fileStream = new FileStream(@"C:\temp\" + dataFile.FileName, FileMode.Create, FileAccess.Write);
+            fileStream = new FileStream(folder + "\\" + dataFile.FileName, FileMode.Create, FileAccess.Write);
             DownloadFile();
         }
 
@@ -41,11 +43,12 @@ namespace PeerUI
             {
                 //open threads to download segments ()
                 downloadDone[i] = new AutoResetEvent(false);
-                Segment seg = new Segment(i, dataFile.FileName, segmentSize * i, segmentSize);
+                //Segment seg = new Segment(i, dataFile.FileName, segmentSize * i, segmentSize);
                 //Thread downloadingThread = new Thread(() => startDownloading(seg, dataFile.UsersList[i]));
-                startDownloading(seg, dataFile.UsersList[i]);
-                //Thread downloadingThread =  new Thread(()=> startDownloading(new Segment(i, dataFile.FileName, segmentSize * i, segmentSize), dataFile.UsersList[i]));
-                //downloadingThread.Start();
+                //startDownloading(seg, dataFile.UsersList[i]);
+                int j = i;
+                Thread downloadingThread =  new Thread(()=> startDownloading(new Segment(j, dataFile.FileName, segmentSize * j, segmentSize), dataFile.UsersList[j]));
+                downloadingThread.Start();
             }
             WaitHandle.WaitAll(downloadDone);
             fileStream.Close();
@@ -77,7 +80,7 @@ namespace PeerUI
             }
         }
 
-        private static void ConnectCallback(IAsyncResult ar)
+        private void ConnectCallback(IAsyncResult ar)
         {
             try
             {
@@ -132,14 +135,19 @@ namespace PeerUI
                         memoryStream = new MemoryStream(memoryStreamCapacity);
                         totalReadInMemory = 0;
                     }
-                    Console.WriteLine("wrote: " + totalReceived);
+                    Console.WriteLine("wrote: " + totalReceived + "from server " + segment.Id);
                 }
                 downloadDone[segment.Id].Set();
                 Console.WriteLine("file segment received successfully !");
             }
             catch (Exception ed) {
                 Console.WriteLine("A Exception occured in file transfer in Tester File Receiving!" + ed.Message);
-
+            }
+            finally {
+                //if (nfs != null)
+                //    nfs.Close();
+               // if (memoryStream != null)
+               //     memoryStream.Close();
             }
         }
 

@@ -4,7 +4,7 @@
   <Password>Os</Password>
   <ServerIP>10.0.0.1</ServerIP>
   <ServerPort>8888</ServerPort>
-  <LocalPort>4080</LocalPort>
+  <LocalPort>7777</LocalPort>
   <SharedFolderPath>C:\Users\omer\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\shared</SharedFolderPath>
   <DownloadFolderPath>C:\Users\omer\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\download</DownloadFolderPath>
 </User>

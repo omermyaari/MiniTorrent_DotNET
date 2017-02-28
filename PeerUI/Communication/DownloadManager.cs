@@ -35,9 +35,9 @@ namespace PeerUI
         {
             //TODO check amount of segments!!!
             long segmentSize = dataFile.FileSize / dataFile.UsersList.Count;
-
-           // long segmentCount = file.FileSize / segmentSize;
-           // if (file.FileSize % segmentSize > 0) segmentCount++;
+            long segmentSizeMod = dataFile.FileSize % dataFile.UsersList.Count;
+            // long segmentCount = file.FileSize / segmentSize;
+            // if (file.FileSize % segmentSize > 0) segmentCount++;
 
             for (int i = 0; i < dataFile.UsersList.Count; i++) 
             {
@@ -47,7 +47,12 @@ namespace PeerUI
                 //Thread downloadingThread = new Thread(() => startDownloading(seg, dataFile.UsersList[i]));
                 //startDownloading(seg, dataFile.UsersList[i]);
                 int j = i;
-                Thread downloadingThread =  new Thread(()=> startDownloading(new Segment(j, dataFile.FileName, segmentSize * j, segmentSize), dataFile.UsersList[j]));
+                Thread downloadingThread;
+                //  Check if the users count doesnt divide file size evenly, let the last uploading peer send the remainder.
+                if (j == dataFile.UsersList.Count - 1 && (dataFile.FileSize % dataFile.UsersList.Count != 0))
+                    downloadingThread = new Thread(() => startDownloading(new Segment(j, dataFile.FileName, segmentSize * j, segmentSize + segmentSizeMod), dataFile.UsersList[j]));
+                else
+                    downloadingThread =  new Thread(()=> startDownloading(new Segment(j, dataFile.FileName, segmentSize * j, segmentSize), dataFile.UsersList[j]));
                 downloadingThread.Start();
             }
             WaitHandle.WaitAll(downloadDone);
@@ -64,10 +69,9 @@ namespace PeerUI
                 clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 clientSocket.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), clientSocket);      // Connect to the remote endpoint.
                 bool success = connectDone.WaitOne(5000, false);
-                //MessageBox.Show("result: " + success);
                 SendFileInfo(segment, clientSocket);
                 GetFileSegment(segment, clientSocket);
-                
+
             }
             catch (Exception error)
             {
@@ -75,8 +79,10 @@ namespace PeerUI
             }
             finally
             {
-                //if (clientSocket != null)
-                //    clientSocket.Close();
+                if (clientSocket != null) {
+                    clientSocket.Close();
+                    Console.WriteLine("Socket closed at downloader.");
+                }
             }
         }
 
@@ -100,15 +106,10 @@ namespace PeerUI
                 streamWriter.AutoFlush = true;
                 streamWriter.WriteLine(segment.FileName + "#" + segment.StartPosition + "#" + segment.Size);
                 streamWriter.Flush();
-                //streamWriter.Close();
                 Console.WriteLine("File INFO sent to server successfully !\n\n");
             }
             catch (Exception ed) {
                 Console.WriteLine("A Exception occured in transfer in TESTER CLIENT" + ed.ToString());
-            }
-            finally {
-             //   if (streamWriter != null)
-             //       streamWriter.Close();
             }
         }
 
@@ -130,9 +131,11 @@ namespace PeerUI
                     memoryStream.Write(buffer, 0, (int)bytesReceived);
                     totalReadInMemory += bytesReceived;
                     totalReceived = totalReceived + bytesReceived;
-                    if (totalReadInMemory == memoryStreamCapacity || totalReceived == segment.Size) {
+                    if (totalReceived == segment.Size)
+                        WriteToDisk(memoryStream, segment.StartPosition);
+                    else if (totalReadInMemory == memoryStreamCapacity) {
                         WriteToDisk(memoryStream, segment.StartPosition + totalReceived - bytesReceived);
-                        memoryStream = new MemoryStream(memoryStreamCapacity);
+                        memoryStream.Flush();
                         totalReadInMemory = 0;
                     }
                     Console.WriteLine("wrote: " + totalReceived + "from server " + segment.Id);
@@ -144,10 +147,8 @@ namespace PeerUI
                 Console.WriteLine("A Exception occured in file transfer in Tester File Receiving!" + ed.Message);
             }
             finally {
-                //if (nfs != null)
-                //    nfs.Close();
-               // if (memoryStream != null)
-               //     memoryStream.Close();
+               if (memoryStream != null)
+                    memoryStream.Close();
             }
         }
 

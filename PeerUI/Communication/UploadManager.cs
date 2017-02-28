@@ -40,7 +40,9 @@ namespace PeerUI {
                     clientConnected.WaitOne();  // Wait until a connection is made before continuing.
                 }
             }
-            catch (Exception e) { MessageBox.Show(e.ToString()); }
+            catch (Exception e) {
+                MessageBox.Show(e.ToString());
+            }
             finally {
                 listener.Close();
             }
@@ -50,17 +52,21 @@ namespace PeerUI {
             // Signal the main thread to continue.
             clientConnected.Set();
             Segment segment = new Segment();
-
+            Socket handler = null;
             // Get the socket that handles the client request.
             try {
                 Socket listener = (Socket)ar.AsyncState;
-                Socket handler = listener.EndAccept(ar);
+                handler = listener.EndAccept(ar);
                 GetFileInfo(handler, segment);
                 SendFile(handler, segment);
             }
             catch (ObjectDisposedException objectDisposedException) {
                 Console.WriteLine(objectDisposedException.Message); //  Dont really need to take care of this exception,
             }                                                       //  its like a signal that says the connection closed.
+            finally {
+                //handler.Close();
+                //MessageBox.Show("Socket closed at uploader.");
+            }
 
         }
 
@@ -78,17 +84,14 @@ namespace PeerUI {
             catch (Exception ed) {
                 MessageBox.Show("A Exception occured in file transfer in TRANSFERE MANAGER" + ed.Message);
             }
-            finally {
-                //if (nfs != null) 
-                //   nfs.Close();
-            }
         }
 
         private void SendFile(Socket socket, Segment segment) {
             FileStream fin = null;
+            NetworkStream nfs = null;
             try {
                 //TODO check file existence of the file???
-                NetworkStream nfs = new NetworkStream(socket);
+                nfs = new NetworkStream(socket);
                 //  FileInfo ftemp = new FileInfo(FileName);
                 long total = segment.Size;
                 long totalSent = 0;
@@ -103,8 +106,10 @@ namespace PeerUI {
 
                 while (totalSent < total && nfs.CanWrite) {
                     //Read from the File (len contains the number of bytes read)
-                    len = fin.Read(buffer, 0, (int)segment.Size);
-
+                    if (buffer.Length < total - totalSent)
+                        len = fin.Read(buffer, 0, buffer.Length);
+                    else
+                        len = fin.Read(buffer, 0, (int)(total - totalSent));
                     //MessageBox.Show("len =  " + len + "\n");
                     //Write the Bytes on the Socket
                     nfs.Write(buffer, 0, len);
@@ -115,7 +120,12 @@ namespace PeerUI {
             catch (Exception ed) {
                 MessageBox.Show("A Exception occured in transfer the FILE in UPLOAD MANAGER!" + ed.ToString());
             }
-            finally { if (fin != null) fin.Close(); }
+            finally {
+                if (fin != null)
+                    fin.Close();
+                //if (nfs != null)
+                //    nfs.Close();
+            }
         }
     }
 }

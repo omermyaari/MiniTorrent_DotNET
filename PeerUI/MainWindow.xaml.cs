@@ -71,7 +71,7 @@ namespace PeerUI {
                 DownloadFolderPath = downloadFolderPath
             };
             saveConfigToXml(user);
-            if (uploadManagerThread.ThreadState == ThreadState.Running)
+            if (uploadManagerThread.IsAlive)
                 uploadManager.StopListening();
             uploadManagerThread = new Thread(() => uploadManager.StartListening(localPort, sharedFolderPath));
             uploadManagerThread.Start();
@@ -125,11 +125,13 @@ namespace PeerUI {
         private void loadConfigFromXml()////////////////////////////
         {
             var reader = new StreamReader("MyConfig.xml");
-            User tmpUser = new User();
-            tmpUser = (User)SerializerObj.Deserialize(reader);
-            user = tmpUser;
+            user = (User)SerializerObj.Deserialize(reader);
             reader.Close();
             loadDetailsFromUser();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            uploadManager.StopListening();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -173,7 +175,7 @@ namespace PeerUI {
             };
             usersList.Add(tempUser);
             usersList.Add(tempUser2);
-            new Thread(() => new DownloadManager(new DataFile("Fuck.txt", 15504, usersList), downloadFolderPath)).Start();
+            new Thread(() => new DownloadManager(new DataFile("DSC_8319.jpg", 7806444, usersList), user.DownloadFolderPath)).Start();
         }
     }
 }

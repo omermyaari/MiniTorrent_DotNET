@@ -40,7 +40,9 @@ namespace PeerUI {
 
         public MainWindow() {
             InitializeComponent();
-            listViewFiles.DataContext = tabControl;
+            listViewSearch.DataContext = tabControl;
+            listViewSearch.SizeChanged += ListViewSearch_SizeChanged;
+            listViewLibrary.SizeChanged += ListViewLibrary_SizeChanged;
         }
 
         private void buttonSharedFolder_Click(object sender, RoutedEventArgs e) {
@@ -173,9 +175,41 @@ namespace PeerUI {
                 DownloadFolderPath = @"C:\temp\download2",
                 SharedFolderPath = @"C:\temp\share2"
             };
+            User tempUser3 = new User {
+                UserIP = "192.168.43.124",
+                Username = "Vit",
+                Password = "Os",
+                ServerIP = "10.0.0.1",
+                ServerPort = 8888,
+                LocalPort = 4082,
+                DownloadFolderPath = @"C:\temp\download2",
+                SharedFolderPath = @"C:\temp\share2"
+            };
             usersList.Add(tempUser);
             usersList.Add(tempUser2);
+            usersList.Add(tempUser3);
             new Thread(() => new DownloadManager(new DataFile("DSC_8319.jpg", 7806444, usersList), user.DownloadFolderPath)).Start();
+        }
+
+        private void ListViewSearch_SizeChanged(object sender, SizeChangedEventArgs e) {
+            var newWidth = listViewSearch.ActualWidth / gridViewSearchHeaders.Columns.Count;
+            foreach (var column in gridViewSearchHeaders.Columns) {
+                column.Width = newWidth;
+            }
+        }
+
+        private void ListViewLibrary_SizeChanged(object sender, SizeChangedEventArgs e) {
+            var newWidth = listViewLibrary.ActualWidth / gridViewLibraryHeaders.Columns.Count;
+            foreach (var column in gridViewLibraryHeaders.Columns) {
+                column.Width = newWidth;
+            }
+        }
+
+        private void HandleColumnHeaderSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs) {
+            if (sizeChangedEventArgs.NewSize.Width <= 60) {
+                sizeChangedEventArgs.Handled = true;
+                ((GridViewColumnHeader)sender).Column.Width = 60;
+            }
         }
     }
 }

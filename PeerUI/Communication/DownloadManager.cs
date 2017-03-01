@@ -16,36 +16,35 @@ namespace PeerUI
         public string DownloadFolder {
             set; get;
         }
-        private DataFile dataFile; //the Array of users is inside
+        private DataFile dataFile; //   the Array of users is inside
         private FileStream fileStream;
         private ManualResetEvent connectDone = new ManualResetEvent(false);
         private AutoResetEvent[] downloadDone;
+        private bool socketConnected = false;
 
+        public DownloadManager(DataFile dataFile, string folder) {
+            try {
+                this.dataFile = dataFile;
+                DownloadFolder = folder;
+                downloadDone = new AutoResetEvent[dataFile.UsersList.Count];
+                fileStream = new FileStream(folder + "\\" + dataFile.FileName, FileMode.Create, FileAccess.Write);
+                DownloadFile();
+            }
+            //  IOException to catch if the fileStream cannot open the file for writing.
+            catch (IOException ioException) {
+               // MessageBox.Show("Io exception was thrown, cannot open file stream at downloader.");
+            }
 
-        public DownloadManager(DataFile dataFile, string folder)
-        {
-            this.dataFile = dataFile;
-            DownloadFolder = folder;
-            downloadDone = new AutoResetEvent[dataFile.UsersList.Count];
-            fileStream = new FileStream(folder + "\\" + dataFile.FileName, FileMode.Create, FileAccess.Write);
-            DownloadFile();
         }
 
+        //  Starts the downloading process.
         private void DownloadFile()
         {
-            //TODO check amount of segments!!!
             long segmentSize = dataFile.FileSize / dataFile.UsersList.Count;
             long segmentSizeMod = dataFile.FileSize % dataFile.UsersList.Count;
-            // long segmentCount = file.FileSize / segmentSize;
-            // if (file.FileSize % segmentSize > 0) segmentCount++;
-
             for (int i = 0; i < dataFile.UsersList.Count; i++) 
             {
-                //open threads to download segments ()
                 downloadDone[i] = new AutoResetEvent(false);
-                //Segment seg = new Segment(i, dataFile.FileName, segmentSize * i, segmentSize);
-                //Thread downloadingThread = new Thread(() => startDownloading(seg, dataFile.UsersList[i]));
-                //startDownloading(seg, dataFile.UsersList[i]);
                 int j = i;
                 Thread downloadingThread;
                 //  Check if the users count doesnt divide file size evenly, let the last uploading peer send the remainder.
@@ -59,6 +58,7 @@ namespace PeerUI
             fileStream.Close();
         }
 
+        //  Starts the segment downloading thread.
         private void startDownloading(Segment segment, User user)
         {
             Socket clientSocket = null;
@@ -87,6 +87,18 @@ namespace PeerUI
             }
         }
 
+        //  Checks if the socket is connected.
+        private void IsSocketConnected(Socket s) {
+            Thread.Sleep(200);
+            bool part1 = s.Poll(1000, SelectMode.SelectRead);
+            bool part2 = (s.Available == 0);
+            if (part1 && part2)
+                socketConnected = false;
+            else
+                socketConnected = true;
+        }
+
+        //  Connects to the uploading peer.
         private void ConnectCallback(IAsyncResult ar)
         {
             try
@@ -101,6 +113,9 @@ namespace PeerUI
 
         //  Sends the requested segment info to the relevant peer.
         private void SendFileInfo(Segment segment, Socket clientSocket) {
+            socketConnected = false;
+            while (!socketConnected)
+                IsSocketConnected(clientSocket);
             NetworkStream nfs = new NetworkStream(clientSocket);
             StreamWriter streamWriter = new StreamWriter(nfs);
             try {
@@ -114,7 +129,11 @@ namespace PeerUI
             }
         }
 
+        //  Downloads the file segment.
         private void GetFileSegment(Segment segment, Socket clientSocket) {
+            socketConnected = false;
+            while (!socketConnected)
+                IsSocketConnected(clientSocket);
             NetworkStream nfs = new NetworkStream(clientSocket);
             int memoryStreamCapacity = (4 * 1024) ^ 2;
             //FileStream fileStream = new FileStream(DownloadFolder + @"\Fuck.txt", FileMode.Create, FileAccess.Write);
@@ -124,7 +143,6 @@ namespace PeerUI
             long totalReceived = 0; //  Total bytes received so far.
             long totalReadInMemory = 0;
             try {
-                //loop till the Full bytes have been read
                 while (totalReceived < segment.Size) {
                     byte[] buffer = new byte[4 * 1024];
                     //Read from the Network Stream
@@ -153,10 +171,14 @@ namespace PeerUI
             }
         }
 
+        //  Writes the data to the disk when the memory stream has been filled,
+        //  or the file has been downloaded fully
         private void WriteToDisk(MemoryStream memoryStream, long position) {
             lock (fileStream) {
-                fileStream.Seek(position, 0);
-                memoryStream.WriteTo(fileStream);
+                if (fileStream != null && fileStream.CanWrite) {
+                    fileStream.Seek(position, 0);
+                    memoryStream.WriteTo(fileStream);
+                }
             }
         }
     }

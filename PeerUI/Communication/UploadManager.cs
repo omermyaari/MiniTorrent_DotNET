@@ -123,8 +123,12 @@ namespace PeerUI {
             finally {
                 if (fin != null)
                     fin.Close();
-                //if (nfs != null)
-                //    nfs.Close();
+                if (nfs != null)
+                    nfs.Close();
+                if (socket != null) {
+                    socket.Shutdown(SocketShutdown.Both);
+                    socket.Close();
+                }
             }
         }
     }

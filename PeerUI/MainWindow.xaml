@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MiniTorrent" Height="350" Width="525" Closing="Window_Closing">
     <TabControl Name="tabControl">
-        <TabItem Name="mainTab" Header="Main">
+        <TabItem Name="searchTab" Header="Search">
             <DockPanel>
                 <DockPanel Margin="0, 10, 0, 0" LastChildFill="False" HorizontalAlignment="Center" DockPanel.Dock="Top">
                     <Label Name="labelFileName" Content="File Name:" Margin="0, 0, 10, 0"/>
@@ -16,22 +16,44 @@
                     <Button Name="buttonDownload" Content="Download" Width="100" Click="buttonDownload_Click"/>
 
                 </DockPanel>
-                <ListView Name ="listViewFiles" Margin="5, 10, 5, 5">
-                        <ListView.Resources>
-                            <Style TargetType="{x:Type GridViewColumnHeader}">
-                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                <Setter Property="Width" Value="150"/>
-                            </Style>
-                        </ListView.Resources>
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
-                                <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Age}"/>
-                                <GridViewColumn Header="Size" DisplayMemberBinding="{Binding Mail}"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </DockPanel>
+                <ListView x:Name ="listViewSearch" Margin="5, 10, 5, 5" HorizontalAlignment='Stretch'>
+                    <ListView.View>
+                        <GridView x:Name="gridViewSearchHeaders">
+                            <GridViewColumn>
+                                <GridViewColumnHeader Content="Name" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                            </GridViewColumn>
+                            <GridViewColumn>
+                                <GridViewColumnHeader Content="Type" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                            </GridViewColumn>
+                            <GridViewColumn>
+                                <GridViewColumnHeader Content="Size" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </DockPanel>
+        </TabItem>
+        <TabItem Name="libraryTab" Header="Library">
+            <DockPanel>
+                <ListView Name ="listViewLibrary" Margin="5, 10, 5, 5" HorizontalAlignment='Stretch'>
+                    <ListView.View>
+                        <GridView x:Name="gridViewLibraryHeaders">
+                            <GridViewColumn>
+                                <GridViewColumnHeader Content="Name" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                            </GridViewColumn>
+                            <GridViewColumn>
+                                <GridViewColumnHeader Content="Progress" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                            </GridViewColumn>
+                            <GridViewColumn>
+                                <GridViewColumnHeader Content="Size" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                            </GridViewColumn>
+                            <GridViewColumn>
+                                <GridViewColumnHeader Content="Speed" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </DockPanel>
         </TabItem>
         <TabItem Name="settingsTab" Header="Settings">
             <StackPanel Orientation="Vertical"  HorizontalAlignment="Center" VerticalAlignment="Center">

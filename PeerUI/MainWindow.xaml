@@ -12,21 +12,26 @@
                 <DockPanel Margin="0, 10, 0, 0" LastChildFill="False" HorizontalAlignment="Center" DockPanel.Dock="Top">
                     <Label Name="labelFileName" Content="File Name:" Margin="0, 0, 10, 0"/>
                     <TextBox Name="textboxSearch" Margin="0, 0, 30, 0" Width="160"/>
-                    <Button Name="buttonSearch" Content="Search" Margin="0, 0, 30, 0" Width="100"/>
+                    <Button Name="buttonSearch" Content="Search" Margin="0, 0, 30, 0" Width="100" Click="buttonSearch_Click"/>
                     <Button Name="buttonDownload" Content="Download" Width="100" Click="buttonDownload_Click"/>
 
                 </DockPanel>
                 <ListView x:Name ="listViewSearch" Margin="5, 10, 5, 5" HorizontalAlignment='Stretch'>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView x:Name="gridViewSearchHeaders">
-                            <GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Name}">
                                 <GridViewColumnHeader Content="Name" SizeChanged="HandleColumnHeaderSizeChanged"/>
                             </GridViewColumn>
-                            <GridViewColumn>
-                                <GridViewColumnHeader Content="Type" SizeChanged="HandleColumnHeaderSizeChanged"/>
-                            </GridViewColumn>
-                            <GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Size}">
                                 <GridViewColumnHeader Content="Size" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                            </GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Peers}">
+                                <GridViewColumnHeader Content="Peers" SizeChanged="HandleColumnHeaderSizeChanged"/>
                             </GridViewColumn>
                         </GridView>
                     </ListView.View>
@@ -42,10 +47,10 @@
                                 <GridViewColumnHeader Content="Name" SizeChanged="HandleColumnHeaderSizeChanged"/>
                             </GridViewColumn>
                             <GridViewColumn>
-                                <GridViewColumnHeader Content="Progress" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                                <GridViewColumnHeader Content="Size" SizeChanged="HandleColumnHeaderSizeChanged"/>
                             </GridViewColumn>
                             <GridViewColumn>
-                                <GridViewColumnHeader Content="Size" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                                <GridViewColumnHeader Content="Progress" SizeChanged="HandleColumnHeaderSizeChanged"/>
                             </GridViewColumn>
                             <GridViewColumn>
                                 <GridViewColumnHeader Content="Speed" SizeChanged="HandleColumnHeaderSizeChanged"/>

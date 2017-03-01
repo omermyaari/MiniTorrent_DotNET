@@ -1,22 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Net;
-using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 using System.Threading;
+using PeerUI.Entities;
 
 namespace PeerUI {
     /// <summary>
@@ -207,6 +196,12 @@ namespace PeerUI {
                 sizeChangedEventArgs.Handled = true;
                 ((GridViewColumnHeader)sender).Column.Width = 60;
             }
+        }
+
+        private void buttonSearch_Click(object sender, RoutedEventArgs e) {
+            List<SearchFileProperty> items = new List<SearchFileProperty>();
+            items.Add(new SearchFileProperty("Fuck", 15, 15));
+            listViewSearch.ItemsSource = items;
         }
     }
 }

@@ -41,8 +41,8 @@ namespace PeerUI {
         public MainWindow() {
             InitializeComponent();
             listViewSearch.DataContext = tabControl;
-            listViewSearch.SizeChanged += ListViewSearch_SizeChanged;
-            listViewLibrary.SizeChanged += ListViewLibrary_SizeChanged;
+            listViewSearch.SizeChanged += ListView_SizeChanged;
+            listViewLibrary.SizeChanged += ListView_SizeChanged;
         }
 
         private void buttonSharedFolder_Click(object sender, RoutedEventArgs e) {
@@ -191,20 +191,17 @@ namespace PeerUI {
             new Thread(() => new DownloadManager(new DataFile("DSC_8319.jpg", 7806444, usersList), user.DownloadFolderPath)).Start();
         }
 
-        private void ListViewSearch_SizeChanged(object sender, SizeChangedEventArgs e) {
-            var newWidth = listViewSearch.ActualWidth / gridViewSearchHeaders.Columns.Count;
-            foreach (var column in gridViewSearchHeaders.Columns) {
+        //  Event to change the ListView's columns width when the ListView's size changes.
+        private void ListView_SizeChanged(object sender, SizeChangedEventArgs e) {
+            ListView listView = sender as ListView;
+            GridView gridView = listView.View as GridView;
+            var newWidth = listView.ActualWidth / gridView.Columns.Count;
+            foreach (var column in gridView.Columns) {
                 column.Width = newWidth;
             }
         }
 
-        private void ListViewLibrary_SizeChanged(object sender, SizeChangedEventArgs e) {
-            var newWidth = listViewLibrary.ActualWidth / gridViewLibraryHeaders.Columns.Count;
-            foreach (var column in gridViewLibraryHeaders.Columns) {
-                column.Width = newWidth;
-            }
-        }
-
+        //  Event to handle column minimum size.
         private void HandleColumnHeaderSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs) {
             if (sizeChangedEventArgs.NewSize.Width <= 60) {
                 sizeChangedEventArgs.Handled = true;

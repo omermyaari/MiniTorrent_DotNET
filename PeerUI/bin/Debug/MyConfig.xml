@@ -5,6 +5,6 @@
   <ServerIP>10.0.0.1</ServerIP>
   <ServerPort>8888</ServerPort>
   <LocalPort>7734</LocalPort>
-  <SharedFolderPath>C:\Users\omer\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\shared</SharedFolderPath>
-  <DownloadFolderPath>C:\Users\omer\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\download</DownloadFolderPath>
+  <SharedFolderPath>C:\temp\tempShareFolder1</SharedFolderPath>
+  <DownloadFolderPath>C:\temp\tempDownloadFolder1</DownloadFolderPath>
 </User>

@@ -1,0 +1,6 @@
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWcfServiceLibrary\bin\Debug\TorrentWcfServiceLibrary.dll.config
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWcfServiceLibrary\bin\Debug\TorrentWcfServiceLibrary.dll
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWcfServiceLibrary\bin\Debug\TorrentWcfServiceLibrary.pdb
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWcfServiceLibrary\obj\Debug\TorrentWcfServiceLibrary.csprojResolveAssemblyReference.cache
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWcfServiceLibrary\obj\Debug\TorrentWcfServiceLibrary.dll
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWcfServiceLibrary\obj\Debug\TorrentWcfServiceLibrary.pdb

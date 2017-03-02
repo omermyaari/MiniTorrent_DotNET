@@ -6,6 +6,8 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Threading;
 using PeerUI.Entities;
+using PeerUI.Communication;
+using PeerUI.ServiceReference1;
 
 namespace PeerUI {
     /// <summary>
@@ -26,6 +28,7 @@ namespace PeerUI {
         private bool configExists;
         private User user;
         XmlSerializer SerializerObj = new XmlSerializer(typeof(User));
+        WCFClient wcfClient;
 
         public MainWindow() {
             InitializeComponent();
@@ -113,7 +116,7 @@ namespace PeerUI {
             WriteFileStream.Close();
         }
 
-        private void loadConfigFromXml()////////////////////////////
+        private void loadConfigFromXml()
         {
             var reader = new StreamReader("MyConfig.xml");
             user = (User)SerializerObj.Deserialize(reader);
@@ -123,6 +126,7 @@ namespace PeerUI {
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             uploadManager.StopListening();
+            wcfClient.GenerateSignOutRequest(user);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -130,7 +134,7 @@ namespace PeerUI {
             if (configExists = File.Exists("MyConfig.xml"))
             {
                 loadConfigFromXml();
-                //  TODO config xml to settings
+                wcfClient = new WCFClient(user);
                 uploadManagerThread = new Thread(()=> uploadManager.StartListening(user.LocalPort, user.SharedFolderPath));
                 uploadManagerThread.Start();
             }
@@ -138,7 +142,6 @@ namespace PeerUI {
             {
                 MessageBox.Show("Config file does not exist, please fill the settings.", "Error");
                 settingsTab.IsSelected = true;
-                //  TODO change tab to settings and bring up a message to user
             }
         }
 
@@ -198,9 +201,12 @@ namespace PeerUI {
             }
         }
 
+        //  Searches the main server for files shared by all connected peers.
         private void buttonSearch_Click(object sender, RoutedEventArgs e) {
+            ServiceReference1.TorrentWcfServiceClient tc = new ServiceReference1.TorrentWcfServiceClient();
+            CompositeType ct = tc.GetPeers(wcfClient.GenerateFileRequest(user, textboxSearch.Text));
             List<SearchFileProperty> items = new List<SearchFileProperty>();
-            items.Add(new SearchFileProperty("Fuck", 15, 15));
+            items.Add(new SearchFileProperty(ct.FileName, ct.FileSize, ct.PeerList.Keys.Count));
             listViewSearch.ItemsSource = items;
         }
     }

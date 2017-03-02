@@ -10,10 +10,7 @@ namespace TorrentWcfServiceLibrary {
     [ServiceContract]
     public interface ITorrentWcfService {
         [OperationContract]
-        string GetData(int value);
-
-        [OperationContract]
-        List<SearchResult> GetPeers(string FileName);
+        List<SearchResult> SearchFile(string FileName);
     }
 
     [DataContract]

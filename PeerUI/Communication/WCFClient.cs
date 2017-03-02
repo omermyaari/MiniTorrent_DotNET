@@ -79,8 +79,9 @@ namespace PeerUI.Communication {
             return xmlSignOutRequest.ToString();
         }
 
+        //  Generates a file request from the user and sends it to the server, then returning the result to the user.
         public List<TorrentWcfServiceLibrary.SearchResult> FileRequest(string FileName) {
-            return proxy.GetPeers(GenerateFileRequest(user, FileName));
+            return proxy.SearchFile(GenerateFileRequest(user, FileName));
         }
     }
 }

@@ -54,3 +54,5 @@ C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\PeerUI\obj\Debug\MainWindow.baml
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\PeerUI\obj\Debug\PeerUI.g.resources
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\PeerUI\obj\Debug\PeerUI.Properties.Resources.resources
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\PeerUI\obj\Debug\PeerUI.csproj.GenerateResource.Cache
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\TorrentWcfServiceLibrary.dll
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\TorrentWcfServiceLibrary.pdb

@@ -7,7 +7,7 @@ using System.IO;
 using System.Threading;
 using PeerUI.Entities;
 using PeerUI.Communication;
-using PeerUI.ServiceReference1;
+using TorrentWcfServiceLibrary;
 
 namespace PeerUI {
     /// <summary>
@@ -27,8 +27,8 @@ namespace PeerUI {
         private Thread uploadManagerThread;
         private bool configExists;
         private User user;
-        XmlSerializer SerializerObj = new XmlSerializer(typeof(User));
-        WCFClient wcfClient;
+        private XmlSerializer SerializerObj = new XmlSerializer(typeof(User));
+        private WCFClient wcfClient;
 
         public MainWindow() {
             InitializeComponent();
@@ -203,10 +203,11 @@ namespace PeerUI {
 
         //  Searches the main server for files shared by all connected peers.
         private void buttonSearch_Click(object sender, RoutedEventArgs e) {
-            ServiceReference1.TorrentWcfServiceClient tc = new ServiceReference1.TorrentWcfServiceClient();
-            CompositeType ct = tc.GetPeers(wcfClient.GenerateFileRequest(user, textboxSearch.Text));
+            List<SearchResult> searchResults = wcfClient.FileRequest(textboxSearch.Text);
             List<SearchFileProperty> items = new List<SearchFileProperty>();
-            items.Add(new SearchFileProperty(ct.FileName, ct.FileSize, ct.PeerList.Keys.Count));
+            foreach (SearchResult sr in searchResults) {
+                items.Add(new SearchFileProperty(sr.FileName, sr.FileSize, sr.PeerList.Keys.Count));
+            }
             listViewSearch.ItemsSource = items;
         }
     }

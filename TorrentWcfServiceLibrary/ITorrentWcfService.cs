@@ -13,11 +13,11 @@ namespace TorrentWcfServiceLibrary {
         string GetData(int value);
 
         [OperationContract]
-        CompositeType GetPeers(string FileName);
+        List<SearchResult> GetPeers(string FileName);
     }
 
     [DataContract]
-    public class CompositeType {
+    public class SearchResult {
 
         [DataMember]
         public string FileName {

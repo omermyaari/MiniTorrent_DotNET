@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
-using PeerUI.ServiceReference1;
+using TorrentWcfServiceLibrary;
 
 namespace PeerUI.Communication {
     public class WCFClient {
         private User user;
         private ITorrentWcfService proxy;
-        ChannelFactory<ITorrentWcfService> factory;
+        private ChannelFactory<ITorrentWcfService> factory;
 
         public WCFClient(User user) {
             this.user = user;
@@ -23,7 +20,7 @@ namespace PeerUI.Communication {
         private void ConnectToWcfServer() {
             try {
                 EndpointAddress ep = new EndpointAddress(@"http://" + user.ServerIP + ":"
-    + user.ServerPort + @"/Wcf/TorrentService");
+       + user.ServerPort + @"/Wcf");
                 factory = new ChannelFactory<ITorrentWcfService>(new BasicHttpBinding(), ep);
                 proxy = factory.CreateChannel();
             }
@@ -32,15 +29,16 @@ namespace PeerUI.Communication {
                     factory.Abort();
                 }
             }
-
         }
 
+        //  Closes the connection to the main server.
         public void DisconnectFromWcfServer() {
+            GenerateSignOutRequest(user);
             factory.Close();
         }
 
         //  Generates a xml file request to send to the main server.
-        public string GenerateFileRequest(User user, string FileName) {
+        private string GenerateFileRequest(User user, string FileName) {
             XDocument xmlFileRequest = new XDocument(
                 new XDeclaration("1.0", "UTF-8", null),
                 new XElement("FileRequest",
@@ -79,6 +77,10 @@ namespace PeerUI.Communication {
             new XElement("Password", user.Password)
                 ));
             return xmlSignOutRequest.ToString();
+        }
+
+        public List<TorrentWcfServiceLibrary.SearchResult> FileRequest(string FileName) {
+            return proxy.GetPeers(GenerateFileRequest(user, FileName));
         }
     }
 }

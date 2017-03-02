@@ -2,9 +2,9 @@
 <User xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Username>Vit</Username>
   <Password>Os</Password>
-  <ServerIP>10.0.0.1</ServerIP>
-  <ServerPort>8888</ServerPort>
-  <LocalPort>7734</LocalPort>
+  <ServerIP>10.7.107.3</ServerIP>
+  <ServerPort>8089</ServerPort>
+  <LocalPort>8011</LocalPort>
   <SharedFolderPath>C:\temp\tempShareFolder1</SharedFolderPath>
   <DownloadFolderPath>C:\temp\tempDownloadFolder1</DownloadFolderPath>
 </User>

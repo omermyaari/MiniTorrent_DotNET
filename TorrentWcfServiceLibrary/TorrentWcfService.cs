@@ -12,18 +12,21 @@ namespace TorrentWcfServiceLibrary {
             return string.Format("You entered: {0}", value);
         }
 
-        public CompositeType GetPeers(string FileName) {
+        public List<SearchResult> GetPeers(string FileName) {
             if (FileName == null) {
                 throw new ArgumentNullException("Null string received at web service.");
             }
-            var ct = new CompositeType {
-                FileName = FileName,
+            List<SearchResult> searchResults = new List<SearchResult>();
+            //  TODO generate list from db;
+            var sr = new SearchResult {
+                FileName = "Shitfuckdickface",
                 FileSize = 1955,
                 PeerList = new Dictionary<string, string> {
                     {"10.0.0.1", "4001"}
                 }
             };
-            return ct;
+            searchResults.Add(sr);
+            return searchResults;
         }
     }
 }

@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeerUI", "PeerUI\PeerUI.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorrentWcfServiceLibrary", "TorrentWcfServiceLibrary\TorrentWcfServiceLibrary.csproj", "{EC139056-6F2D-402B-B518-3584136A9275}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WCFServer", "WCFServer\WCFServer.csproj", "{57CAC50A-A36B-4184-BAF0-EE1506F2AC54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,10 @@ Global
 		{EC139056-6F2D-402B-B518-3584136A9275}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC139056-6F2D-402B-B518-3584136A9275}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC139056-6F2D-402B-B518-3584136A9275}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57CAC50A-A36B-4184-BAF0-EE1506F2AC54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57CAC50A-A36B-4184-BAF0-EE1506F2AC54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57CAC50A-A36B-4184-BAF0-EE1506F2AC54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57CAC50A-A36B-4184-BAF0-EE1506F2AC54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

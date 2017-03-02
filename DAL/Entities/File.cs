@@ -11,10 +11,10 @@ namespace DAL.Entities
         public string Name { get; set; }
         public long Size { get; set; }
 
-        public File(string name, long size)
+        public File(string Name, long Size)
         {
-            Name = name;
-            Size = size;
+            this.Name = Name;
+            this.Size = Size;
 
         }
     }

@@ -9,14 +9,14 @@ namespace DAL.Entities
     class Peer
     {
         public string Name { get; set; }
-        public string IP { get; set; }
+        public string Ip { get; set; }
         public string Port { get; set; }
 
-        public Peer(string name, string ip, string port)
+        public Peer(string Name, string Ip, string Port)
         {
-            Name = name;
-            IP = ip;
-            Port = port;
+            this.Name = Name;
+            this.Ip = Ip;
+            this.Port = Port;
         }
     }
 }

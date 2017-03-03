@@ -58,3 +58,5 @@ C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\TorrentWcfServic
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\TorrentWcfServiceLibrary.pdb
 C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\TorrentWcfServiceLibrary.dll
 C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\TorrentWcfServiceLibrary.pdb
+C:\Users\omer\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\TorrentWcfServiceLibrary.dll
+C:\Users\omer\Source\Repos\MiniTorrent_DotNET\PeerUI\bin\Debug\TorrentWcfServiceLibrary.pdb

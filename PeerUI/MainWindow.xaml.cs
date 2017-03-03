@@ -56,7 +56,7 @@ namespace PeerUI {
             getDetailsFromFields();
             user = new User
             {
-                Username = username,
+                Name = username,
                 Password = password,
                 ServerIP = serverIP,
                 ServerPort = serverPort,
@@ -90,7 +90,7 @@ namespace PeerUI {
 
         private void loadDetailsFromUser()
         {
-            textboxUsername.Text = user.Username;
+            textboxUsername.Text = user.Name;
             passwordboxPassword.Password = user.Password;
             textboxSharedFolder.Text = user.SharedFolderPath;
             textboxDownloadFolder.Text = user.DownloadFolderPath;
@@ -149,7 +149,7 @@ namespace PeerUI {
             List <User> usersList = new List<User>();
             User tempUser = new User {
                 UserIP = "192.168.43.124",
-                Username = "Vit",
+                Name = "Vit",
                 Password = "Os",
                 ServerIP = "10.0.0.1",
                 ServerPort = 8888,
@@ -159,7 +159,7 @@ namespace PeerUI {
             };
             User tempUser2 = new User {
                 UserIP = "192.168.43.124",
-                Username = "Vit",
+                Name = "Vit",
                 Password = "Os",
                 ServerIP = "10.0.0.1",
                 ServerPort = 8888,
@@ -169,7 +169,7 @@ namespace PeerUI {
             };
             User tempUser3 = new User {
                 UserIP = "192.168.43.124",
-                Username = "Vit",
+                Name = "Vit",
                 Password = "Os",
                 ServerIP = "10.0.0.1",
                 ServerPort = 8888,
@@ -203,10 +203,10 @@ namespace PeerUI {
 
         //  Searches the main server for files shared by all connected peers.
         private void buttonSearch_Click(object sender, RoutedEventArgs e) {
-            List<SearchResult> searchResults = wcfClient.FileRequest(textboxSearch.Text);
+            List<ServiceDataFile> searchResults = wcfClient.FileRequest(textboxSearch.Text);
             List<SearchFileProperty> items = new List<SearchFileProperty>();
-            foreach (SearchResult sr in searchResults) {
-                items.Add(new SearchFileProperty(sr.FileName, sr.FileSize, sr.PeerList.Keys.Count));
+            foreach (ServiceDataFile sdf in searchResults) {
+                items.Add(new SearchFileProperty(sdf.Name, sdf.Size, sdf.PeerList.Count));
             }
             listViewSearch.ItemsSource = items;
         }

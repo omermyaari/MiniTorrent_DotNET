@@ -42,7 +42,7 @@ namespace DAL
         }
 
         //TODO Check Peer existense and fileSize
-        public static void AddFile(Entities.File file, Entities.Peer peer, bool alreadyConnected = false)
+        public static void AddFile(Entities.DBFile file, Entities.DBPeer peer, bool alreadyConnected = false)
         {
             SqlCommand command = null;
             try
@@ -148,9 +148,9 @@ namespace DAL
             return isExist;
         }
 
-        public static List<Entities.Peer> GetPeersByFile(string fileName, bool alreadyConnected = false)
+        public static List<Entities.DBPeer> GetPeersByFile(string fileName, bool alreadyConnected = false)
         {
-            List<Entities.Peer> peers = new List<Entities.Peer>();
+            List<Entities.DBPeer> peers = new List<Entities.DBPeer>();
 
             // Initialize a data reader
             SqlDataReader reader = null;
@@ -173,7 +173,7 @@ namespace DAL
                 reader = command.ExecuteReader();
 
                 while (reader.Read())
-                    peers.Add(new Entities.Peer( "name",reader.GetString(0),reader.GetString(1) ));
+                    peers.Add(new Entities.DBPeer( "name",reader.GetString(0),reader.GetString(1) ));
 
                 // Close the data reader
                 reader.Close();

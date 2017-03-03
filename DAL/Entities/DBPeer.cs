@@ -6,15 +6,18 @@ using System.Threading.Tasks;
 
 namespace DAL.Entities
 {
-    class Peer
+    public class DBPeer
     {
         public string Name { get; set; }
+        public string Password { get; set; }
         public string Ip { get; set; }
-        public string Port { get; set; }
+        public int Port { get; set; }
+        public bool IsOnline { get; set; }
 
-        public Peer(string Name, string Ip, string Port)
+        public DBPeer(string Name, string Password, string Ip, int Port)
         {
             this.Name = Name;
+            this.Password = Password;
             this.Ip = Ip;
             this.Port = Port;
         }

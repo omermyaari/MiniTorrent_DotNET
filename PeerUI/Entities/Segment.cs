@@ -17,12 +17,12 @@ namespace PeerUI
 
         public Segment() { }
 
-        public Segment(int id, string fileName, long position, long size)
+        public Segment(int Id, string FileName, long StartPosition, long Size)
         {
-            Id = id;
-            FileName = fileName;
-            StartPosition = position;
-            Size = size;
+            this.Id = Id;
+            this.FileName = FileName;
+            this.StartPosition = StartPosition;
+            this.Size = Size;
         }
     }
 }

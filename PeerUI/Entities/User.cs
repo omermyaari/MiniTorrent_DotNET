@@ -15,7 +15,7 @@ namespace PeerUI {
             get; set;
         }
 
-        public string Username {
+        public string Name {
             get; set;
         }
         

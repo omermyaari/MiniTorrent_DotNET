@@ -14,10 +14,10 @@ namespace DAL
             Console.WriteLine("start");
             DBAccess.ResetTables();
             
-            DBAccess.AddFile(new Entities.File("aaa", 1234567), new Entities.Peer("Vit", "127.0.0.1", "7777"));
+            DBAccess.AddFile(new Entities.DBFile("aaa", 1234567), new Entities.DBPeer("Vit", "127.0.0.1", "7777"));
      //       DBAccess.AddFile(new Entities.File("aaa", 1234567), new Entities.Peer("Os", "127.0.0.1", "7778"));
 
-            List<Entities.Peer> peers = new List<Entities.Peer>();
+            List<Entities.DBPeer> peers = new List<Entities.DBPeer>();
             peers = DBAccess.GetPeersByFile("aaa");
             foreach (var item in peers)
             {

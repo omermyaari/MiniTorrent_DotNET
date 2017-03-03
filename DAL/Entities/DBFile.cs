@@ -6,16 +6,20 @@ using System.Threading.Tasks;
 
 namespace DAL.Entities
 {
-    class File
+    public class DBFile
     {
+        private static long id = 0;
+
+        public long ID { get; private set; }
         public string Name { get; set; }
         public long Size { get; set; }
 
-        public File(string Name, long Size)
+
+        public DBFile(string Name, long Size)
         {
+            ID = id++;
             this.Name = Name;
             this.Size = Size;
-
         }
     }
 }

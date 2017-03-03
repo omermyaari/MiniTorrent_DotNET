@@ -14,3 +14,11 @@ C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\TorrentWcfSe
 C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.csprojResolveAssemblyReference.cache
 C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.exe
 C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.pdb
+C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\WCFServer.exe.config
+C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\WCFServer.exe
+C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\WCFServer.pdb
+C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\TorrentWcfServiceLibrary.dll
+C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\TorrentWcfServiceLibrary.pdb
+C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.csprojResolveAssemblyReference.cache
+C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.exe
+C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.pdb

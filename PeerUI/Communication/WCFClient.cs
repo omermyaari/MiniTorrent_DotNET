@@ -67,7 +67,6 @@ namespace PeerUI.Communication {
             }
             return xmlSignInRequest.ToString();
         }
-
         //  Generates a xml sign out request to send to the main server.
         public string GenerateSignOutRequest(User user) {
             XDocument xmlSignOutRequest = new XDocument(

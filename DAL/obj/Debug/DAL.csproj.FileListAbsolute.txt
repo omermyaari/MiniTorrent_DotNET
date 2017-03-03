@@ -34,3 +34,5 @@ C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\TorrentWcfServiceLi
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.csprojResolveAssemblyReference.cache
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.exe
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.pdb
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\TorrentWcfServiceLibrary.dll
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\TorrentWcfServiceLibrary.pdb

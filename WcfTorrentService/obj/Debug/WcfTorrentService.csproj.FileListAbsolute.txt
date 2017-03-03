@@ -1,0 +1,8 @@
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WcfTorrentService\bin\WcfTorrentService.dll.config
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WcfTorrentService\bin\WcfTorrentService.dll
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WcfTorrentService\bin\WcfTorrentService.pdb
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WcfTorrentService\bin\PeerUI.exe
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WcfTorrentService\bin\PeerUI.pdb
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WcfTorrentService\obj\Debug\WcfTorrentService.csprojResolveAssemblyReference.cache
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WcfTorrentService\obj\Debug\WcfTorrentService.dll
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WcfTorrentService\obj\Debug\WcfTorrentService.pdb

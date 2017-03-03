@@ -1,0 +1,15 @@
+E:\SUJEET\SaleProject\SaleProject\obj\Debug\ResolveAssemblyReference.cache
+E:\SUJEET\SaleProject\SaleProject\bin\SaleProject.dll
+E:\SUJEET\SaleProject\SaleProject\bin\SaleProject.pdb
+E:\SUJEET\SaleProject\SaleProject\obj\Debug\SaleProject.dll
+E:\SUJEET\SaleProject\SaleProject\obj\Debug\SaleProject.pdb
+D:\Gnosis\WCFSample-noexe\SaleProject\SaleProject\bin\SaleProject.dll
+D:\Gnosis\WCFSample-noexe\SaleProject\SaleProject\bin\SaleProject.pdb
+D:\Gnosis\WCFSample-noexe\SaleProject\SaleProject\obj\Debug\ResolveAssemblyReference.cache
+D:\Gnosis\WCFSample-noexe\SaleProject\SaleProject\obj\Debug\SaleProject.dll
+D:\Gnosis\WCFSample-noexe\SaleProject\SaleProject\obj\Debug\SaleProject.pdb
+C:\Users\sujeet.bhujbal\Downloads\SaleProject\SaleProject\SaleProject\bin\SaleProject.dll
+C:\Users\sujeet.bhujbal\Downloads\SaleProject\SaleProject\SaleProject\bin\SaleProject.pdb
+C:\Users\sujeet.bhujbal\Downloads\SaleProject\SaleProject\SaleProject\obj\Debug\SaleProject.csprojResolveAssemblyReference.cache
+C:\Users\sujeet.bhujbal\Downloads\SaleProject\SaleProject\SaleProject\obj\Debug\SaleProject.dll
+C:\Users\sujeet.bhujbal\Downloads\SaleProject\SaleProject\SaleProject\obj\Debug\SaleProject.pdb

@@ -45,6 +45,7 @@ namespace PeerUI {
         public void updateDownloadProgress(string fileName, long fileSize, long position, long time) {
             var fileProgressProperty = new FileProgressProperty(TransferType.Download.ToString(), fileName, fileSize, ((float)position / (float)fileSize) * 100 + "%", ((float)position / (float)((float)time / 1000)) / 1024 + "KB/s");
             FileProgressProperty tempFileProgressProperty;
+            //Console.WriteLine("UPDATE2222@@@@@@@@@@@@@@@@@" + fileProgressProperty.Speed + " " + fileProgressProperty.Progress + " " + time);
             if ((tempFileProgressProperty = observableLibraryFile.Where(x => x.Name == fileName && x.Size == fileSize).FirstOrDefault()) == null) {
                 this.Dispatcher.Invoke((Action)delegate {
                     observableLibraryFile.Add(fileProgressProperty);
@@ -53,6 +54,7 @@ namespace PeerUI {
             else {
                 this.Dispatcher.Invoke((Action)delegate {
                     if (position != 0) {
+                        //Console.WriteLine("UPDATE@@@@@@@@@@@@@@@@@" + fileProgressProperty.Speed + " " + fileProgressProperty.Progress + " " + time);
                         tempFileProgressProperty.Speed = fileProgressProperty.Speed;
                         tempFileProgressProperty.Progress = fileProgressProperty.Progress;
                         tempFileProgressProperty.ElapsedTime = time;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,7 +33,7 @@ namespace PeerUI.Entities {
             }
             set {
                 progress = value;
-                this.OnPropertyChanged("Progress");
+                OnPropertyChanged();
             }
         }
 
@@ -42,7 +43,7 @@ namespace PeerUI.Entities {
             }
             set {
                 speed = value;
-                this.OnPropertyChanged("Speed");
+                OnPropertyChanged();
             }
         }
 
@@ -52,7 +53,7 @@ namespace PeerUI.Entities {
             }
             set {
                 elapsedTime = value / 1000;
-                this.OnPropertyChanged("ElapsedTime");
+                OnPropertyChanged();
             }
         }
 
@@ -76,10 +77,9 @@ namespace PeerUI.Entities {
             return other != null && other.Name == this.Name && other.Size == this.Size;
         }
 
-        protected void OnPropertyChanged(string propertyName) {
-            var eventHandler = this.PropertyChanged;
-            if (eventHandler != null) {
-                eventHandler(this, new PropertyChangedEventArgs(propertyName));
+        public void OnPropertyChanged([CallerMemberName] String propertyName = "") {
+            if (PropertyChanged != null) {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
     }

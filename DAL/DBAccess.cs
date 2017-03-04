@@ -12,7 +12,7 @@ namespace DAL {
     public class DBAccess {
         private const string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentDB2.mdf;Integrated Security=True;Connect Timeout=30";
         private static Connection connection = new Connection(connectionString);
-        private static long IdCounter = 0;
+        public static long IdCounter = 0;
 
         public static int PeersConnected {
             get; private set;
@@ -39,6 +39,30 @@ namespace DAL {
                 connection.Close();
             }
             PeersConnected = 0;
+        }
+
+        public static void UpdateLastId(bool alreadyConnected = false) {
+            SqlDataReader reader = null;
+            try {
+                if (!alreadyConnected)
+                    connection.Open();
+
+                SqlCommand command = new SqlCommand(
+                "SELECT FileId " +
+                "FROM [DataFiles] " +
+                "ORDER BY FileId DESC;" , connection.DatabaseConnection);
+                reader = command.ExecuteReader(); // Execute the getting command
+                if (reader.Read())
+                    IdCounter = reader.GetInt64(0) + 1;
+            }
+            catch (Exception e) {
+                Console.WriteLine("ERROR: " + e.Message);
+            }
+            finally {
+                reader.Close();
+                if (!alreadyConnected)
+                    connection.Close();
+            }
         }
 
         //  Checks if the given peer username and password are correct.

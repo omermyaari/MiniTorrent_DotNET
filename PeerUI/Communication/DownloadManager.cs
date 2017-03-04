@@ -160,12 +160,12 @@ namespace PeerUI
                     totalReceived = totalReceived + bytesReceived;
                     if (totalReceived == segment.Size)
                         WriteToDisk(memoryStream, segment.StartPosition);
-                    else if (totalReadInMemory == memoryStreamCapacity) {
+                    else if (totalReadInMemory >= memoryStreamCapacity) {
                         WriteToDisk(memoryStream, segment.StartPosition + totalReceived - bytesReceived);
                         memoryStream.Flush();
                         totalReadInMemory = 0;
                     }
-                    Console.WriteLine("wrote: " + totalReceived + "from server " + segment.Id);
+                    //Console.WriteLine("wrote: " + totalReceived + "from server " + segment.Id);
                 }
                 downloadDone[segment.Id].Set();
                 Console.WriteLine("file segment received successfully !");

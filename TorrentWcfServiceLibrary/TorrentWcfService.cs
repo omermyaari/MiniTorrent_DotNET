@@ -31,6 +31,8 @@ namespace TorrentWcfServiceLibrary {
         
         //  User sign in method
         public string UserSignIn(ServiceMessage serviceMessage) {
+            if (DAL.DBAccess.IdCounter == 0)
+                DAL.DBAccess.UpdateLastId();
             var peer = new DBPeer(serviceMessage.UserName, serviceMessage.UserPassword, 
                 serviceMessage.UserIP, serviceMessage.UserPort);
             if (DAL.DBAccess.CheckPeerAuth(peer)) {

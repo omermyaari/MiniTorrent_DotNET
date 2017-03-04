@@ -41,19 +41,30 @@
         <TabItem Name="libraryTab" Header="Library">
             <DockPanel>
                 <ListView Name ="listViewLibrary" Margin="5, 10, 5, 5" HorizontalAlignment='Stretch'>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView x:Name="gridViewLibraryHeaders">
-                            <GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Type}">
+                                <GridViewColumnHeader Content="Type" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                            </GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Name}">
                                 <GridViewColumnHeader Content="Name" SizeChanged="HandleColumnHeaderSizeChanged"/>
                             </GridViewColumn>
-                            <GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Size}">
                                 <GridViewColumnHeader Content="Size" SizeChanged="HandleColumnHeaderSizeChanged"/>
                             </GridViewColumn>
-                            <GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Progress}">
                                 <GridViewColumnHeader Content="Progress" SizeChanged="HandleColumnHeaderSizeChanged"/>
                             </GridViewColumn>
-                            <GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Speed}">
                                 <GridViewColumnHeader Content="Speed" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                            </GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding ElapsedTime}">
+                                <GridViewColumnHeader Content="Elapsed Time" SizeChanged="HandleColumnHeaderSizeChanged"/>
                             </GridViewColumn>
                         </GridView>
                     </ListView.View>

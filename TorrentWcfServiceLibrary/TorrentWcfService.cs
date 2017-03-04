@@ -17,7 +17,8 @@ namespace TorrentWcfServiceLibrary {
                 case MessageHeader.UserSignIn:
                     return UserSignIn(serviceMessage);
                 case MessageHeader.UserSignOut:
-                    DBPeer dbPeer = new DBPeer(serviceMessage.UserName, serviceMessage.UserPassword, null, 0);
+                    DBPeer dbPeer = new DBPeer(serviceMessage.UserName, serviceMessage.UserPassword, serviceMessage.UserIP, serviceMessage.UserPort);
+                    Console.WriteLine("Client IP: " + serviceMessage.UserIP + " Port: " + serviceMessage.UserPort + " Disconnected.");
                     DAL.DBAccess.SetPeerStatus(dbPeer, false);
                     return null;
                 case MessageHeader.FileRequest:
@@ -27,20 +28,20 @@ namespace TorrentWcfServiceLibrary {
                     return null;
             }
         }
-
+        
         //  User sign in method
         public string UserSignIn(ServiceMessage serviceMessage) {
             var peer = new DBPeer(serviceMessage.UserName, serviceMessage.UserPassword, 
                 serviceMessage.UserIP, serviceMessage.UserPort);
-            if (DAL.DBAccess.PeerExists(peer)) {
+            if (DAL.DBAccess.CheckPeerAuth(peer)) {
                 DAL.DBAccess.SetPeerStatus(peer, true);
                 foreach (ServiceDataFile sdf in serviceMessage.FilesList) {
                     DBFile tempDBFile = new DBFile(sdf.Name, sdf.Size);
                     DAL.DBAccess.AddFile(tempDBFile, peer);
                 }
                 serviceMessage.Header = MessageHeader.ConnectionSuccessful;
+                Console.WriteLine("Client IP: " + serviceMessage.UserIP + " Port: " + serviceMessage.UserPort + " Connected.");
                 return SerializeMessage(serviceMessage);
-
             }
             else {
                 serviceMessage.Header = MessageHeader.ConnectionFailed;

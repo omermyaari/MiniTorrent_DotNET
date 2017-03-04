@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using TorrentWcfServiceLibrary;
 
 namespace PeerUI
 {
@@ -16,18 +18,22 @@ namespace PeerUI
         public string DownloadFolder {
             set; get;
         }
-        private DataFile dataFile; //   the Array of users is inside
+        public static event TransferProgressDelegate transferProgressEvent;
+        private static Stopwatch stopWatch = new Stopwatch();
+        private ServiceDataFile serviceDataFile; 
         private FileStream fileStream;
         private ManualResetEvent connectDone = new ManualResetEvent(false);
         private AutoResetEvent[] downloadDone;
         private bool socketConnected = false;
 
-        public DownloadManager(DataFile dataFile, string folder) {
+        public DownloadManager(ServiceDataFile serviceDataFile, string folder, TransferProgressDelegate progressDelegate) {
             try {
-                this.dataFile = dataFile;
+                this.serviceDataFile = serviceDataFile;
                 DownloadFolder = folder;
-                downloadDone = new AutoResetEvent[dataFile.UsersList.Count];
-                fileStream = new FileStream(folder + "\\" + dataFile.FileName, FileMode.Create, FileAccess.Write);
+                downloadDone = new AutoResetEvent[serviceDataFile.PeerList.Count];
+                fileStream = new FileStream(folder + "\\" + serviceDataFile.Name, FileMode.Create, FileAccess.Write);
+                transferProgressEvent += progressDelegate;
+
                 DownloadFile();
             }
             //  IOException to catch if the fileStream cannot open the file for writing.
@@ -40,32 +46,34 @@ namespace PeerUI
         //  Starts the downloading process.
         private void DownloadFile()
         {
-            long segmentSize = dataFile.FileSize / dataFile.UsersList.Count;
-            long segmentSizeMod = dataFile.FileSize % dataFile.UsersList.Count;
-            for (int i = 0; i < dataFile.UsersList.Count; i++) 
+            long segmentSize = serviceDataFile.Size / serviceDataFile.PeerList.Count;
+            long segmentSizeMod = serviceDataFile.Size % serviceDataFile.PeerList.Count;
+            stopWatch.Start();
+            for (int i = 0; i < serviceDataFile.PeerList.Count; i++) 
             {
                 downloadDone[i] = new AutoResetEvent(false);
                 int j = i;
                 Thread downloadingThread;
                 //  Check if the users count doesnt divide file size evenly, let the last uploading peer send the remainder.
-                if (j == dataFile.UsersList.Count - 1 && (dataFile.FileSize % dataFile.UsersList.Count != 0))
-                    downloadingThread = new Thread(() => startDownloading(new Segment(j, dataFile.FileName, segmentSize * j, segmentSize + segmentSizeMod), dataFile.UsersList[j]));
+                if (j == serviceDataFile.PeerList.Count - 1 && (serviceDataFile.Size % serviceDataFile.PeerList.Count != 0))
+                    downloadingThread = new Thread(() => startDownloading(new Segment(j, serviceDataFile.Name, segmentSize * j, segmentSize + segmentSizeMod), serviceDataFile.PeerList[j]));
                 else
-                    downloadingThread =  new Thread(()=> startDownloading(new Segment(j, dataFile.FileName, segmentSize * j, segmentSize), dataFile.UsersList[j]));
+                    downloadingThread =  new Thread(()=> startDownloading(new Segment(j, serviceDataFile.Name, segmentSize * j, segmentSize), serviceDataFile.PeerList[j]));
                 downloadingThread.Start();
             }
             WaitHandle.WaitAll(downloadDone);
+            stopWatch.Stop();
             fileStream.Close();
         }
 
         //  Starts the segment downloading thread.
-        private void startDownloading(Segment segment, User user)
+        private void startDownloading(Segment segment, PeerAddress peerAddress)
         {
             Socket clientSocket = null;
             try
             {
-                IPAddress ipAddress = IPAddress.Parse(user.UserIP);
-                IPEndPoint remoteEP = new IPEndPoint(ipAddress, user.LocalPort);
+                IPAddress ipAddress = IPAddress.Parse(peerAddress.Ip);
+                IPEndPoint remoteEP = new IPEndPoint(ipAddress, peerAddress.Port);
                 clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 clientSocket.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), clientSocket);      // Connect to the remote endpoint.
                 bool success = connectDone.WaitOne(5000, false);
@@ -135,7 +143,7 @@ namespace PeerUI
             while (!socketConnected)
                 IsSocketConnected(clientSocket);
             NetworkStream nfs = new NetworkStream(clientSocket);
-            int memoryStreamCapacity = (4 * 1024) ^ 2;
+            int memoryStreamCapacity = (4 * 1024) * 10;
             //FileStream fileStream = new FileStream(DownloadFolder + @"\Fuck.txt", FileMode.Create, FileAccess.Write);
             MemoryStream memoryStream = new MemoryStream(memoryStreamCapacity);
             //long size=fi.Length ;
@@ -178,6 +186,7 @@ namespace PeerUI
                 if (fileStream != null && fileStream.CanWrite) {
                     fileStream.Seek(position, 0);
                     memoryStream.WriteTo(fileStream);
+                    transferProgressEvent(serviceDataFile.Name, serviceDataFile.Size, position, stopWatch.ElapsedMilliseconds);
                 }
             }
         }

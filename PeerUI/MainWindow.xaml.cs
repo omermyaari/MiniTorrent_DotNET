@@ -8,11 +8,14 @@ using System.Threading;
 using PeerUI.Entities;
 using PeerUI.Communication;
 using TorrentWcfServiceLibrary;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace PeerUI {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    public delegate void TransferProgressDelegate(string fileName, long fileSize, long position, long time);
     public partial class MainWindow : Window {
 
         private string username;
@@ -29,12 +32,37 @@ namespace PeerUI {
         private User user;
         private XmlSerializer SerializerObj = new XmlSerializer(typeof(User));
         private WCFClient wcfClient;
+        private List<ServiceDataFile> searchResults;
+        private List<FileProgressProperty> libraryFiles = new List<FileProgressProperty>();
+        private ObservableCollection<FileProgressProperty> observableLibraryFile = new ObservableCollection<FileProgressProperty>();
 
         public MainWindow() {
             InitializeComponent();
-            listViewSearch.DataContext = tabControl;
             listViewSearch.SizeChanged += ListView_SizeChanged;
             listViewLibrary.SizeChanged += ListView_SizeChanged;
+        }
+
+        public void updateDownloadProgress(string fileName, long fileSize, long position, long time) {
+            var fileProgressProperty = new FileProgressProperty(TransferType.Download.ToString(), fileName, fileSize, ((float)position / (float)fileSize) * 100 + "%", ((float)position / (float)((float)time / 1000)) / 1024 + "KB/s");
+            FileProgressProperty tempFileProgressProperty;
+            if ((tempFileProgressProperty = observableLibraryFile.Where(x => x.Name == fileName && x.Size == fileSize).FirstOrDefault()) == null) {
+                this.Dispatcher.Invoke((Action)delegate {
+                    observableLibraryFile.Add(fileProgressProperty);
+                });
+            }
+            else {
+                this.Dispatcher.Invoke((Action)delegate {
+                    if (position != 0) {
+                        tempFileProgressProperty.Speed = fileProgressProperty.Speed;
+                        tempFileProgressProperty.Progress = fileProgressProperty.Progress;
+                        tempFileProgressProperty.ElapsedTime = time;
+                    }
+                    else {
+                        tempFileProgressProperty.Progress = 100 + "%";
+                    }
+
+                });
+            }
         }
 
         private void buttonSharedFolder_Click(object sender, RoutedEventArgs e) {
@@ -132,6 +160,8 @@ namespace PeerUI {
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
+            buttonDownload.IsEnabled = false;
+            listViewLibrary.ItemsSource = observableLibraryFile;
             if (configExists = File.Exists("MyConfig.xml")) {
                 loadConfigFromXml();
                 wcfClient = new WCFClient(user);
@@ -142,44 +172,6 @@ namespace PeerUI {
                 MessageBox.Show("Config file does not exist, please fill the settings.", "Error");
                 settingsTab.IsSelected = true;
             }
-        }
-
-        private void buttonDownload_Click(object sender, RoutedEventArgs e) {
-            List <User> usersList = new List<User>();
-            User tempUser = new User {
-                UserIP = "192.168.43.124",
-                Name = "Vit",
-                Password = "Os",
-                ServerIP = "10.0.0.1",
-                ServerPort = 8888,
-                LocalPort = 4080,
-                DownloadFolderPath = @"C:\temp\download1",
-                SharedFolderPath = @"C:\temp\share1"
-            };
-            User tempUser2 = new User {
-                UserIP = "192.168.43.124",
-                Name = "Vit",
-                Password = "Os",
-                ServerIP = "10.0.0.1",
-                ServerPort = 8888,
-                LocalPort = 4081,
-                DownloadFolderPath = @"C:\temp\download2",
-                SharedFolderPath = @"C:\temp\share2"
-            };
-            User tempUser3 = new User {
-                UserIP = "192.168.43.124",
-                Name = "Vit",
-                Password = "Os",
-                ServerIP = "10.0.0.1",
-                ServerPort = 8888,
-                LocalPort = 4082,
-                DownloadFolderPath = @"C:\temp\download2",
-                SharedFolderPath = @"C:\temp\share2"
-            };
-            usersList.Add(tempUser);
-            usersList.Add(tempUser2);
-            usersList.Add(tempUser3);
-            new Thread(() => new DownloadManager(new DataFile("DSC_8319.jpg", 7806444, usersList), user.DownloadFolderPath)).Start();
         }
 
         //  Event to change the ListView's columns width when the ListView's size changes.
@@ -200,14 +192,26 @@ namespace PeerUI {
             }
         }
 
+        private void buttonDownload_Click(object sender, RoutedEventArgs e) {
+            SearchFileProperty searchFileProperty = (SearchFileProperty)listViewSearch.SelectedItem;
+            foreach (ServiceDataFile sdf in searchResults) {
+                if (sdf.Name == searchFileProperty.Name && sdf.Size == searchFileProperty.Size)
+                    new Thread(() => new DownloadManager(sdf, user.DownloadFolderPath, new TransferProgressDelegate(updateDownloadProgress))).Start();
+            }
+        }
+
         //  Searches the main server for files shared by all connected peers.
         private void buttonSearch_Click(object sender, RoutedEventArgs e) {
-            List<ServiceDataFile> searchResults = wcfClient.FileRequest(textboxSearch.Text);
+            searchResults = wcfClient.FileRequest(textboxSearch.Text);
             List<SearchFileProperty> items = new List<SearchFileProperty>();
             foreach (ServiceDataFile sdf in searchResults) {
                 items.Add(new SearchFileProperty(sdf.Name, sdf.Size, sdf.PeerList.Count));
             }
             listViewSearch.ItemsSource = items;
+            if (items.Count > 0)
+                buttonDownload.IsEnabled = true;
+            else
+                buttonDownload.IsEnabled = false;
         }
     }
 }

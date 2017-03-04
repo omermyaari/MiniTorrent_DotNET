@@ -10,7 +10,7 @@ using DAL.Entities;
 
 namespace DAL {
     public class DBAccess {
-        private const string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentDB2.mdf;Integrated Security=True;Connect Timeout=30";
+        private const string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentDB2.mdf;Integrated Security=True;Connect Timeout=30";
         private static Connection connection = new Connection(connectionString);
         private static long IdCounter = 0;
 
@@ -40,7 +40,37 @@ namespace DAL {
             }
             PeersConnected = 0;
         }
-        
+
+        //  Checks if the given peer username and password are correct.
+        public static bool CheckPeerAuth(DBPeer peer, bool alreadyConnected = false) {
+            bool LoginOk = false;
+            SqlDataReader reader = null;
+            try {
+                if (!alreadyConnected)
+                    connection.Open();
+
+                SqlCommand command = new SqlCommand(
+                "SELECT * " +
+                "FROM [Peers] " +
+                "WHERE PeerName = @peerName " +
+                "AND PeerPassword = @peerPassword;", connection.DatabaseConnection);
+                command.Parameters.Add("@peerName", System.Data.SqlDbType.NVarChar).Value = peer.Name;
+                command.Parameters.Add("@peerPassword", System.Data.SqlDbType.NVarChar).Value = peer.Password;
+                reader = command.ExecuteReader(); // Execute the getting command
+
+                LoginOk = reader.Read();
+            }
+            catch (Exception e) {
+                Console.WriteLine("ERROR: " + e.Message);
+            }
+            finally {
+                reader.Close();
+                if (!alreadyConnected)
+                    connection.Close();
+            }
+            return LoginOk;
+        }
+
         //  Registers a new peer (used by the ASP.Net website).
         public static void RegisterPeer(DBPeer peer) {
             SqlCommand command = null;
@@ -69,15 +99,13 @@ namespace DAL {
             }
         }
 
+        //  Adds a file shared by a peer to the database.
         public static void AddFile(DBFile file, DBPeer peer, bool alreadyConnected = false) {
             SqlCommand command = null;
             try {
                 // Connect to the database
                 if (!alreadyConnected)
                     connection.Open();
-
-                //if (!PeerExists(peer, true))
-                //    return;
 
                 long fileId = FileExists(file, true);
                 //  If file doesnt exist, add it to the DataFiles table and add the peer's name
@@ -162,10 +190,8 @@ namespace DAL {
                 SqlCommand command = new SqlCommand(
                 "SELECT * " +
                 "FROM [Peers] " +
-                "WHERE PeerName = @peerName " +
-                "AND PeerPassword = @peerPassword;", connection.DatabaseConnection);
+                "WHERE PeerName = @peerName;", connection.DatabaseConnection);
                 command.Parameters.Add("@peerName", System.Data.SqlDbType.NVarChar).Value = peer.Name;
-                command.Parameters.Add("@peerPassword", System.Data.SqlDbType.NVarChar).Value = peer.Password;
                 reader = command.ExecuteReader(); // Execute the getting command
 
                 isExist = reader.Read();
@@ -260,7 +286,36 @@ namespace DAL {
             }
             return searchFileResult;
         }
+        /*
+        public static bool CheckPeerOnline(DBPeer peer, bool alreadyConnected = false) {
+            SqlDataReader reader = null;
+            bool IsOnline = false;
+            try {
+                // Connect to the database
+                if (!alreadyConnected)
+                    connection.Open();
 
+                SqlCommand command = null;
+                command = new SqlCommand(
+                "SELECT PeerIsOnline " +
+                "FROM [Peers] " +
+                "WHERE [dbo].[Peers].[PeerName] = @PeerName;", connection.DatabaseConnection);
+                command.Parameters.Add("@PeerName", System.Data.SqlDbType.NVarChar).Value = peer.Name;
+                reader = command.ExecuteReader(); // Execute the getting command
+                while (reader.Read()) {
+                    IsOnline = reader.GetBoolean(0);
+                }
+            }
+            catch (Exception e) {
+                Console.WriteLine("ERROR: " + e.Message);
+            }
+            finally {
+                if (!alreadyConnected)
+                    connection.Close();
+            }
+            return IsOnline;
+        }
+        */
         //  Sets the status of the given peer name (online or offline) with the given bool.
         public static void SetPeerStatus(DBPeer peer, bool online, bool alreadyConnected = false) {
             try {
@@ -268,18 +323,18 @@ namespace DAL {
                 if (!alreadyConnected)
                     connection.Open();
                 SqlCommand command = null;
-                if (online) {
-                    command = new SqlCommand(
-                    "UPDATE Peers " +
-                    "SET PeerIsOnline = 1, PeerIP = @PeerIP, PeerPort = @PeerPort " +
-                    "WHERE PeerName = @PeerName " +
-                    "AND PeerPassword = @PeerPassword;", connection.DatabaseConnection);
-                    command.Parameters.Add("@PeerIP", System.Data.SqlDbType.NVarChar, peer.Ip.Length).Value = peer.Ip;
-                    command.Parameters.Add("@PeerPort", System.Data.SqlDbType.Int).Value = peer.Port;
-                    command.Parameters.Add("@PeerName", System.Data.SqlDbType.VarChar, peer.Name.Length).Value = peer.Name;
-                    command.Parameters.Add("@PeerPassword", System.Data.SqlDbType.VarChar, peer.Password.Length).Value = peer.Password;
-                }
-                else {
+                command = new SqlCommand(
+                "UPDATE Peers " +
+                "SET PeerIsOnline = @PeerIsOnline, PeerIP = @PeerIP, PeerPort = @PeerPort " +
+                "WHERE PeerName = @PeerName " +
+                "AND PeerPassword = @PeerPassword;", connection.DatabaseConnection);
+                command.Parameters.Add("@PeerIP", System.Data.SqlDbType.NVarChar, peer.Ip.Length).Value = peer.Ip;
+                command.Parameters.Add("@PeerIsOnline", System.Data.SqlDbType.Bit, peer.Ip.Length).Value = online;
+                command.Parameters.Add("@PeerPort", System.Data.SqlDbType.Int).Value = peer.Port;
+                command.Parameters.Add("@PeerName", System.Data.SqlDbType.VarChar, peer.Name.Length).Value = peer.Name;
+                command.Parameters.Add("@PeerPassword", System.Data.SqlDbType.VarChar, peer.Password.Length).Value = peer.Password;
+
+                /*else {
                     command = new SqlCommand(
                     "UPDATE Peers " +
                     "SET PeerIsOnline = 0 " +
@@ -288,7 +343,7 @@ namespace DAL {
                     command.Parameters.Add("@PeerName", System.Data.SqlDbType.VarChar, peer.Name.Length).Value = peer.Name;
                     command.Parameters.Add("@PeerPassword", System.Data.SqlDbType.VarChar, peer.Password.Length).Value = peer.Password;
                 }
-                
+                */
                 command.ExecuteNonQuery();
             }
             catch (Exception e) {

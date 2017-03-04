@@ -86,24 +86,30 @@ namespace PeerUI.Communication {
 
         //  Generates a xml sign in request to send to the main server.
         private ServiceMessage GenerateSignInRequest() {
-            var directoryInfo = new DirectoryInfo(user.SharedFolderPath);
-            var sharedFilesInfo = directoryInfo.GetFiles("*");
-            var serviceMessage = new ServiceMessage();
-            serviceMessage.Header = MessageHeader.UserSignIn;
-            serviceMessage.UserName = user.Name;
-            serviceMessage.UserPassword = user.Password;
-            serviceMessage.UserIP = user.UserIP;
-            serviceMessage.UserPort = user.LocalPort;
-            serviceMessage.FilesList = new List<ServiceDataFile>();
-            foreach (FileInfo fi in sharedFilesInfo) {
-                ServiceDataFile tempDataFile = new ServiceDataFile {
-                    Name = fi.Name,
-                    Size = fi.Length
-                };
-                serviceMessage.FilesList.Add(tempDataFile);
+            try {
+                var directoryInfo = new DirectoryInfo(user.SharedFolderPath);
+                var sharedFilesInfo = directoryInfo.GetFiles("*");
+                var serviceMessage = new ServiceMessage();
+                serviceMessage.Header = MessageHeader.UserSignIn;
+                serviceMessage.UserName = user.Name;
+                serviceMessage.UserPassword = user.Password;
+                serviceMessage.UserIP = user.UserIP;
+                serviceMessage.UserPort = user.LocalPort;
+                serviceMessage.FilesList = new List<ServiceDataFile>();
+                foreach (FileInfo fi in sharedFilesInfo) {
+                    ServiceDataFile tempDataFile = new ServiceDataFile {
+                        Name = fi.Name,
+                        Size = fi.Length
+                    };
+                    serviceMessage.FilesList.Add(tempDataFile);
+                }
+                return serviceMessage;
             }
+            catch (Exception ex) {
+                Console.WriteLine("Directory not found.");
+            }
+            return null;
 
-            return serviceMessage;
             /*
             XDocument xmlSignInRequest = new XDocument(
                 new XDeclaration("1.0", "UTF-8", null),
@@ -135,6 +141,8 @@ namespace PeerUI.Communication {
             serviceMessage.Header = MessageHeader.UserSignOut;
             serviceMessage.UserName = user.Name;
             serviceMessage.UserPassword = user.Password;
+            serviceMessage.UserIP = user.UserIP;
+            serviceMessage.UserPort = user.LocalPort;
             return serviceMessage;
         }
 
@@ -152,8 +160,16 @@ namespace PeerUI.Communication {
         //  then returns if the user signed in successfuly.
         private MessageHeader SignIn() {
             var serviceMessage = GenerateSignInRequest();
+            if (serviceMessage == null)
+                return MessageHeader.ConnectionFailed;
             var xmlMessage = SerializeMessage(serviceMessage);
-            xmlMessage = proxy.Request(xmlMessage);
+            try {
+                xmlMessage = proxy.Request(xmlMessage);
+            }
+            catch (Exception ex) {
+                Console.WriteLine("Couldnt connect to server");
+                return MessageHeader.ConnectionFailed;
+            }
             serviceMessage = DeSerializeMessage(xmlMessage);
             return serviceMessage.Header;
         }
@@ -162,7 +178,12 @@ namespace PeerUI.Communication {
         public void SignOut() {
             var serviceMessage = GenerateSignOutRequest();
             var xmlMessage = SerializeMessage(serviceMessage);
-            proxy.Request(xmlMessage);
+            try {
+                proxy.Request(xmlMessage);
+            }
+            catch (Exception ex) {
+                Console.WriteLine("Couldnt connect to server");
+            }
         }
 
         //  DeSerializes string messages received from the main server.

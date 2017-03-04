@@ -65,6 +65,8 @@ namespace PeerUI {
                 DownloadFolderPath = downloadFolderPath
             };
             saveConfigToXml(user);
+            wcfClient.CloseConnection();
+            wcfClient.UpdateConfig(user);
             if (uploadManagerThread.IsAlive)
                 uploadManager.StopListening();
             uploadManagerThread = new Thread(() => uploadManager.StartListening(localPort, sharedFolderPath));
@@ -77,8 +79,7 @@ namespace PeerUI {
         }
 
         //  TODO validator?
-        private void getDetailsFromFields()
-        {
+        private void getDetailsFromFields() {
             username = textboxUsername.Text;
             password = passwordboxPassword.Password;
             sharedFolderPath = textboxSharedFolder.Text;
@@ -88,8 +89,7 @@ namespace PeerUI {
             Int32.TryParse(textboxLocalPort.Text, out localPort);
         }
 
-        private void loadDetailsFromUser()
-        {
+        private void loadDetailsFromUser() {
             textboxUsername.Text = user.Name;
             passwordboxPassword.Password = user.Password;
             textboxSharedFolder.Text = user.SharedFolderPath;
@@ -99,6 +99,7 @@ namespace PeerUI {
             textboxLocalPort.Text = Convert.ToString(user.LocalPort);
         }
 
+        //  Clears the settings in the settings tab.
         private void clearSettings() {
             foreach (var item in gridConfig.Children) {
                 if (item is TextBox) {
@@ -110,14 +111,15 @@ namespace PeerUI {
             textboxSharedFolder.Clear();
         }
 
+        //  Saves settings to the configuration xml file.
         private void saveConfigToXml(User user) {
             TextWriter WriteFileStream = new StreamWriter("MyConfig.xml");
             SerializerObj.Serialize(WriteFileStream, user);
             WriteFileStream.Close();
         }
 
-        private void loadConfigFromXml()
-        {
+        //  Loads settings from the configuration xml file.
+        private void loadConfigFromXml() {
             var reader = new StreamReader("MyConfig.xml");
             user = (User)SerializerObj.Deserialize(reader);
             reader.Close();
@@ -126,20 +128,17 @@ namespace PeerUI {
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             uploadManager.StopListening();
-            wcfClient.GenerateSignOutRequest(user);
+            wcfClient.CloseConnection();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (configExists = File.Exists("MyConfig.xml"))
-            {
+        private void Window_Loaded(object sender, RoutedEventArgs e) {
+            if (configExists = File.Exists("MyConfig.xml")) {
                 loadConfigFromXml();
                 wcfClient = new WCFClient(user);
                 uploadManagerThread = new Thread(()=> uploadManager.StartListening(user.LocalPort, user.SharedFolderPath));
                 uploadManagerThread.Start();
             }
-            else
-            {
+            else {
                 MessageBox.Show("Config file does not exist, please fill the settings.", "Error");
                 settingsTab.IsSelected = true;
             }

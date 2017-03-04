@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <User xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Username>Vit</Username>
-  <Password>Os</Password>
-  <ServerIP>192.168.43.124</ServerIP>
+  <Name>zibi</Name>
+  <Password>bibi</Password>
+  <ServerIP>10.7.107.3</ServerIP>
   <ServerPort>8089</ServerPort>
   <LocalPort>8011</LocalPort>
   <SharedFolderPath>C:\temp\tempShareFolder1</SharedFolderPath>

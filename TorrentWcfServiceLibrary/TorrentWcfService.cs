@@ -18,7 +18,7 @@ namespace TorrentWcfServiceLibrary {
                     return UserSignIn(serviceMessage);
                 case MessageHeader.UserSignOut:
                     DBPeer dbPeer = new DBPeer(serviceMessage.UserName, serviceMessage.UserPassword, null, 0);
-                    UserSignOutDB(dbPeer);
+                    DAL.DBAccess.SetPeerStatus(dbPeer, false);
                     return null;
                 case MessageHeader.FileRequest:
                     serviceMessage = SearchFile(serviceMessage);
@@ -30,14 +30,17 @@ namespace TorrentWcfServiceLibrary {
 
         //  User sign in method
         public string UserSignIn(ServiceMessage serviceMessage) {
-            if (UserSignInCheckDB()) {
-                var DBPeer = new DBPeer(serviceMessage.UserName, serviceMessage.UserPassword, serviceMessage.UserIP, serviceMessage.UserPort);
+            var peer = new DBPeer(serviceMessage.UserName, serviceMessage.UserPassword, 
+                serviceMessage.UserIP, serviceMessage.UserPort);
+            if (DAL.DBAccess.PeerExists(peer)) {
+                DAL.DBAccess.SetPeerStatus(peer, true);
                 foreach (ServiceDataFile sdf in serviceMessage.FilesList) {
                     DBFile tempDBFile = new DBFile(sdf.Name, sdf.Size);
-                    AddFileToDb(tempDBFile, DBPeer);
+                    DAL.DBAccess.AddFile(tempDBFile, peer);
                 }
                 serviceMessage.Header = MessageHeader.ConnectionSuccessful;
                 return SerializeMessage(serviceMessage);
+
             }
             else {
                 serviceMessage.Header = MessageHeader.ConnectionFailed;
@@ -52,7 +55,7 @@ namespace TorrentWcfServiceLibrary {
                 return serviceMessage;
             }
             //  TODO generate list from db;
-            Dictionary<DBFile, List<DBPeer>> DBResults = SearchFilesDB(serviceMessage.FilesList[0].Name);
+            Dictionary<DBFile, List<DBPeer>> DBResults = DAL.DBAccess.SearchFiles(serviceMessage.FilesList[0].Name);
             List <ServiceDataFile> searchResults = new List<ServiceDataFile>();
             foreach (DBFile dbfile in DBResults.Keys) {
                 var sdf = new ServiceDataFile {
@@ -61,12 +64,15 @@ namespace TorrentWcfServiceLibrary {
                 };
                 sdf.PeerList = new List<PeerAddress>();
                 foreach(DBPeer dbpeer in DBResults[dbfile]) {
-                    sdf.PeerList.Add(new PeerAddress {
-                        Ip = dbpeer.Ip,
-                        Port = dbpeer.Port
-                    });
+                    if (dbpeer.IsOnline) {
+                        sdf.PeerList.Add(new PeerAddress {
+                            Ip = dbpeer.Ip,
+                            Port = dbpeer.Port
+                        });
+                    }
                 };
-                searchResults.Add(sdf);
+                if (sdf.PeerList.Count > 0)
+                    searchResults.Add(sdf);
             }
             serviceMessage.FilesList = searchResults;
             return serviceMessage;

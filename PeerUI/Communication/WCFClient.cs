@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.ServiceModel;
 using System.Text;
 using System.Xml.Linq;
@@ -16,7 +17,9 @@ namespace PeerUI.Communication {
 
         public WCFClient(User user) {
             this.user = user;
+            user.UserIP = GetLocalIp();
             CreateConnection();
+            SignIn();
         }
 
         //  Creates a connection to the main server.
@@ -34,15 +37,29 @@ namespace PeerUI.Communication {
             }
         }
 
+        private string GetLocalIp() {
+            var localIPs = Dns.GetHostAddresses(Dns.GetHostName());
+            foreach (IPAddress i in localIPs) {
+                if (i.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork
+                    && !IPAddress.IsLoopback(i)) {
+                    return i.ToString();
+                }
+            }
+            return "192.168.0.0";
+        }
+
         public void UpdateConfig(User user) {
+            SignOut();
             this.user = user;
+            user.UserIP = GetLocalIp();
             CloseConnection();
             CreateConnection();
+            SignIn();
         }
 
         //  Closes the connection to the main server.
         public void CloseConnection() {
-            GenerateSignOutRequest();
+            SignOut();
             factory.Close();
         }
 
@@ -133,7 +150,7 @@ namespace PeerUI.Communication {
 
         //  Generates a sign in request from the user and sends it to the server,
         //  then returns if the user signed in successfuly.
-        public MessageHeader SignIn() {
+        private MessageHeader SignIn() {
             var serviceMessage = GenerateSignInRequest();
             var xmlMessage = SerializeMessage(serviceMessage);
             xmlMessage = proxy.Request(xmlMessage);

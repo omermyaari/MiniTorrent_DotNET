@@ -77,8 +77,8 @@ namespace PeerUI {
                 string str = streamReader.ReadLine();
                 string[] fileInfo = str.Split('#');
                 segment.FileName = fileInfo[(int)SegmentInfo.FileName];
-                segment.StartPosition = Int32.Parse(fileInfo[(int)SegmentInfo.StartPosition]);
-                segment.Size = Int32.Parse(fileInfo[(int)SegmentInfo.Size]);
+                segment.StartPosition = Int64.Parse(fileInfo[(int)SegmentInfo.StartPosition]);
+                segment.Size = Int64.Parse(fileInfo[(int)SegmentInfo.Size]);
                 streamReader.Close();
             }
             catch (Exception ed) {
@@ -95,9 +95,8 @@ namespace PeerUI {
                 //  FileInfo ftemp = new FileInfo(FileName);
                 long total = segment.Size;
                 long totalSent = 0;
-
                 int len = 0;
-                byte[] buffer = new byte[1024 * 4];
+                byte[] buffer = new byte[1024 * 128];
                 //Open the file requested for download 
                 fin = new FileStream(sharedFolder + "\\" + segment.FileName, FileMode.Open, FileAccess.Read);
                 fin.Seek(segment.StartPosition, 0);

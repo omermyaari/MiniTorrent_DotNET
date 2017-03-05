@@ -20,6 +20,7 @@ namespace PeerUI
         }
         public static event TransferProgressDelegate transferProgressEvent;
         private static Stopwatch stopWatch = new Stopwatch();
+        private long totalReceived = 0;
         private ServiceDataFile serviceDataFile; 
         private FileStream fileStream;
         private ManualResetEvent connectDone = new ManualResetEvent(false);
@@ -33,7 +34,6 @@ namespace PeerUI
                 downloadDone = new AutoResetEvent[serviceDataFile.PeerList.Count];
                 fileStream = new FileStream(folder + "\\" + serviceDataFile.Name, FileMode.Create, FileAccess.Write);
                 transferProgressEvent += progressDelegate;
-
                 DownloadFile();
             }
             //  IOException to catch if the fileStream cannot open the file for writing.
@@ -63,7 +63,9 @@ namespace PeerUI
             }
             WaitHandle.WaitAll(downloadDone);
             stopWatch.Stop();
+            stopWatch.Reset();
             fileStream.Close();
+            totalReceived = 0;
         }
 
         //  Starts the segment downloading thread.
@@ -130,7 +132,7 @@ namespace PeerUI
                 streamWriter.AutoFlush = true;
                 streamWriter.WriteLine(segment.FileName + "#" + segment.StartPosition + "#" + segment.Size);
                 streamWriter.Flush();
-                Console.WriteLine("File INFO sent to server successfully !\n\n");
+                //Console.WriteLine("File INFO sent to server successfully !\n\n");
             }
             catch (Exception ed) {
                 Console.WriteLine("A Exception occured in transfer in TESTER CLIENT" + ed.ToString());
@@ -143,51 +145,72 @@ namespace PeerUI
             while (!socketConnected)
                 IsSocketConnected(clientSocket);
             NetworkStream nfs = new NetworkStream(clientSocket);
-            int memoryStreamCapacity = (4 * 1024) * 10;
+            //int memoryStreamCapacity = (4 * 1024) ^ 2;
             //FileStream fileStream = new FileStream(DownloadFolder + @"\Fuck.txt", FileMode.Create, FileAccess.Write);
-            MemoryStream memoryStream = new MemoryStream(memoryStreamCapacity);
+            //MemoryStream memoryStream = new MemoryStream(memoryStreamCapacity);
             //long size=fi.Length ;
             int bytesReceived = 1;  //  Current batch of bytes received.
             long totalReceived = 0; //  Total bytes received so far.
-            long totalReadInMemory = 0;
+            //long totalReadInMemory = 0;
+            byte[] buffer = new byte[128 * 1024];
             try {
                 while (totalReceived < segment.Size) {
-                    byte[] buffer = new byte[4 * 1024];
+                    Array.Clear(buffer, 0, buffer.Length);
                     //Read from the Network Stream
                     bytesReceived = nfs.Read(buffer, 0, buffer.Length);
-                    memoryStream.Write(buffer, 0, (int)bytesReceived);
-                    totalReadInMemory += bytesReceived;
+                    //memoryStream.Write(buffer, 0, (int)bytesReceived);
+                    //totalReadInMemory += bytesReceived;
                     totalReceived = totalReceived + bytesReceived;
-                    if (totalReceived == segment.Size)
-                        WriteToDisk(memoryStream, segment.StartPosition);
-                    else if (totalReadInMemory >= memoryStreamCapacity) {
-                        WriteToDisk(memoryStream, segment.StartPosition + totalReceived - bytesReceived);
-                        memoryStream.Flush();
-                        totalReadInMemory = 0;
-                    }
+                    WriteToDisk2(buffer, segment.StartPosition + totalReceived - bytesReceived, bytesReceived);
+                    UpdateProgress(bytesReceived);
+                    //if (totalReceived == segment.Size)
+                    //    WriteToDisk(memoryStream, segment.StartPosition);
+                    //else if (totalReadInMemory >= memoryStreamCapacity) {
+                    //    WriteToDisk(memoryStream, segment.StartPosition + totalReceived - bytesReceived);
+                    //    totalReadInMemory = 0;
+                   // }
                     //Console.WriteLine("wrote: " + totalReceived + "from server " + segment.Id);
                 }
                 downloadDone[segment.Id].Set();
-                Console.WriteLine("file segment received successfully !");
+                //Console.WriteLine("file segment received successfully !");
             }
             catch (Exception ed) {
                 Console.WriteLine("A Exception occured in file transfer in Tester File Receiving!" + ed.Message);
             }
             finally {
-               if (memoryStream != null)
-                    memoryStream.Close();
+               //if (memoryStream != null)
+               //     memoryStream.Close();
             }
         }
 
         //  Writes the data to the disk when the memory stream has been filled,
         //  or the file has been downloaded fully
-        private void WriteToDisk(MemoryStream memoryStream, long position) {
+        /*private void WriteToDisk(MemoryStream memoryStream, long position) {
             lock (fileStream) {
                 if (fileStream != null && fileStream.CanWrite) {
-                    fileStream.Seek(position, 0);
+                    fileStream.Seek(position, SeekOrigin.Begin);
                     memoryStream.WriteTo(fileStream);
-                    transferProgressEvent(serviceDataFile.Name, serviceDataFile.Size, position, stopWatch.ElapsedMilliseconds);
+                    //transferProgressEvent(serviceDataFile.Name, serviceDataFile.Size, position, stopWatch.ElapsedMilliseconds);
                 }
+            }
+        }
+        */
+        private void WriteToDisk2(byte[] buffer, long position, int amount) {
+            lock (fileStream) {
+                Console.WriteLine("Hello");
+                if (fileStream != null && fileStream.CanWrite) {
+                    fileStream.Seek(position, SeekOrigin.Begin);
+                    fileStream.Write(buffer, 0, amount);
+                    //transferProgressEvent(serviceDataFile.Name, serviceDataFile.Size, position, stopWatch.ElapsedMilliseconds);
+                }
+            }
+        }
+
+        private void UpdateProgress(long bytesReceived) {
+            lock (this) {
+                Console.WriteLine("Hello2");
+                totalReceived += bytesReceived;
+                transferProgressEvent(serviceDataFile.Name, serviceDataFile.Size, totalReceived, stopWatch.ElapsedMilliseconds);
             }
         }
     }

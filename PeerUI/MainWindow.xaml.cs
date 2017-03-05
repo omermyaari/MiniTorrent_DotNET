@@ -43,7 +43,7 @@ namespace PeerUI {
         }
 
         public void updateDownloadProgress(string fileName, long fileSize, long position, long time) {
-            var fileProgressProperty = new FileProgressProperty(TransferType.Download.ToString(), fileName, fileSize, ((float)position / (float)fileSize) * 100 + "%", ((float)position / (float)((float)time / 1000)) / 1024 + "KB/s");
+            var fileProgressProperty = new FileProgressProperty(TransferType.Download.ToString(), fileName, fileSize, (int)(((float)position / fileSize) * 100), (position / ((float)time / 1000)) / 1024 + "KB/s");
             FileProgressProperty tempFileProgressProperty;
             //Console.WriteLine("UPDATE2222@@@@@@@@@@@@@@@@@" + fileProgressProperty.Speed + " " + fileProgressProperty.Progress + " " + time);
             if ((tempFileProgressProperty = observableLibraryFile.Where(x => x.Name == fileName && x.Size == fileSize).FirstOrDefault()) == null) {
@@ -58,9 +58,10 @@ namespace PeerUI {
                         tempFileProgressProperty.Speed = fileProgressProperty.Speed;
                         tempFileProgressProperty.Progress = fileProgressProperty.Progress;
                         tempFileProgressProperty.ElapsedTime = time;
+                        Console.WriteLine("DASDAD" + tempFileProgressProperty.Progress);
                     }
                     else {
-                        tempFileProgressProperty.Progress = 100 + "%";
+                        tempFileProgressProperty.Progress = 100;
                     }
 
                 });

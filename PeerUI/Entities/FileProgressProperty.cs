@@ -11,7 +11,7 @@ namespace PeerUI.Entities {
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private string progress;
+        private int progress;
         private string speed;
         private long elapsedTime;
 
@@ -27,7 +27,7 @@ namespace PeerUI.Entities {
             get; set;
         }
 
-        public string Progress {
+        public int Progress {
             get {
                 return progress;
             }
@@ -57,7 +57,7 @@ namespace PeerUI.Entities {
             }
         }
 
-        public FileProgressProperty(string Type, string Name, long Size, string progress, string speed) {
+        public FileProgressProperty(string Type, string Name, long Size, int progress, string speed) {
             this.Type = Type;
             this.Name = Name;
             this.Size = Size;

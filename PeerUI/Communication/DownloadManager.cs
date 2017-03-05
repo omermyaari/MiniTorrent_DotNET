@@ -109,8 +109,7 @@ namespace PeerUI
         }
 
         //  Connects to the uploading peer.
-        private void ConnectCallback(IAsyncResult ar)
-        {
+        private void ConnectCallback(IAsyncResult ar) {
             try
             {
                 Socket client = (Socket)ar.AsyncState; // Retrieve the socket from the state object.
@@ -152,7 +151,7 @@ namespace PeerUI
             int bytesReceived = 1;  //  Current batch of bytes received.
             long totalReceived = 0; //  Total bytes received so far.
             //long totalReadInMemory = 0;
-            byte[] buffer = new byte[128 * 1024];
+            byte[] buffer = new byte[1024 * 64];
             try {
                 while (totalReceived < segment.Size) {
                     Array.Clear(buffer, 0, buffer.Length);
@@ -197,7 +196,6 @@ namespace PeerUI
         */
         private void WriteToDisk2(byte[] buffer, long position, int amount) {
             lock (fileStream) {
-                Console.WriteLine("Hello");
                 if (fileStream != null && fileStream.CanWrite) {
                     fileStream.Seek(position, SeekOrigin.Begin);
                     fileStream.Write(buffer, 0, amount);
@@ -208,7 +206,6 @@ namespace PeerUI
 
         private void UpdateProgress(long bytesReceived) {
             lock (this) {
-                Console.WriteLine("Hello2");
                 totalReceived += bytesReceived;
                 transferProgressEvent(serviceDataFile.Name, serviceDataFile.Size, totalReceived, stopWatch.ElapsedMilliseconds);
             }

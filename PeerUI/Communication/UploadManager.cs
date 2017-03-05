@@ -96,7 +96,7 @@ namespace PeerUI {
                 long total = segment.Size;
                 long totalSent = 0;
                 int len = 0;
-                byte[] buffer = new byte[1024 * 128];
+                byte[] buffer = new byte[1024 * 64];
                 //Open the file requested for download 
                 fin = new FileStream(sharedFolder + "\\" + segment.FileName, FileMode.Open, FileAccess.Read);
                 fin.Seek(segment.StartPosition, 0);

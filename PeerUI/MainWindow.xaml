@@ -57,8 +57,13 @@
                             <GridViewColumn DisplayMemberBinding="{Binding Size}">
                                 <GridViewColumnHeader Content="Size" SizeChanged="HandleColumnHeaderSizeChanged"/>
                             </GridViewColumn>
-                            <GridViewColumn DisplayMemberBinding="{Binding Progress}">
+                            <GridViewColumn>
                                 <GridViewColumnHeader Content="Progress" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ProgressBar Maximum="100" Minimum="0" Value="{Binding Progress}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
                             </GridViewColumn>
                             <GridViewColumn DisplayMemberBinding="{Binding Speed}">
                                 <GridViewColumnHeader Content="Speed" SizeChanged="HandleColumnHeaderSizeChanged"/>

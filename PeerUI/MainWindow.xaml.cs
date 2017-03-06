@@ -47,13 +47,13 @@ namespace PeerUI {
             try {
                 FileProgressProperty tempFileProgressProperty;
                 if ((tempFileProgressProperty = observableLibraryFile.Where(x => x.TransferId == transferId).FirstOrDefault()) == null) {
-                    this.Dispatcher.Invoke((Action)delegate {
+                    Dispatcher.Invoke((Action)delegate {
                         var fileProgressProperty = new FileProgressProperty(transferId, type.ToString(), fileName, fileSize, (((float)position / fileSize) * 100), (position / ((float)time / 1000)) / 1024 + "KB/s");
                         observableLibraryFile.Add(fileProgressProperty);
                     });
                 }
                 else {
-                    this.Dispatcher.Invoke((Action)delegate {
+                    Dispatcher.Invoke((Action)delegate {
                         if (position != 0) {
                             tempFileProgressProperty.Speed = (position / ((float)time / 1000)) / 1024 + "KB/s";
                             tempFileProgressProperty.Progress = (((float)position / fileSize) * 100);
@@ -67,7 +67,7 @@ namespace PeerUI {
                     });
                 }
             }
-            catch (TaskCanceledException taskCancelled) {
+            catch (TaskCanceledException) {
                 Console.WriteLine("Task was cancelled");
             }
         }

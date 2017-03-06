@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.ServiceModel;
 using System.Text;
+using System.Windows.Threading;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using TorrentWcfServiceLibrary;
@@ -24,17 +25,10 @@ namespace PeerUI.Communication {
 
         //  Creates a connection to the main server.
         private void CreateConnection() {
-            try {
                 EndpointAddress ep = new EndpointAddress(@"http://" + user.ServerIP + ":"
        + user.ServerPort + @"/Wcf");
                 factory = new ChannelFactory<ITorrentWcfService>(new BasicHttpBinding(), ep);
                 proxy = factory.CreateChannel();
-            }
-            catch (Exception ex) {
-                if (factory != null) {
-                    factory.Abort();
-                }
-            }
         }
 
         private string GetLocalIp() {
@@ -160,14 +154,16 @@ namespace PeerUI.Communication {
         //  then returns if the user signed in successfuly.
         private MessageHeader SignIn() {
             var serviceMessage = GenerateSignInRequest();
-            if (serviceMessage == null)
+            if (serviceMessage == null) {
                 return MessageHeader.ConnectionFailed;
+            }
+
             var xmlMessage = SerializeMessage(serviceMessage);
             try {
                 xmlMessage = proxy.Request(xmlMessage);
             }
-            catch (Exception ex) {
-                Console.WriteLine("Couldnt connect to server");
+            catch (EndpointNotFoundException ex) {
+                Console.WriteLine("Couldnt connect to server: " + ex.Message);
                 return MessageHeader.ConnectionFailed;
             }
             serviceMessage = DeSerializeMessage(xmlMessage);
@@ -181,8 +177,8 @@ namespace PeerUI.Communication {
             try {
                 proxy.Request(xmlMessage);
             }
-            catch (Exception ex) {
-                Console.WriteLine("Couldnt connect to server");
+            catch (EndpointNotFoundException ex) {
+                Console.WriteLine("Couldnt connect to server: " + ex.Message);
             }
         }
 

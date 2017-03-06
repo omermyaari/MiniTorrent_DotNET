@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PeerUI.Entities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,13 +12,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using TorrentWcfServiceLibrary;
 
-namespace PeerUI
-{
-    public class DownloadManager
-    {
+namespace PeerUI {
+    public class DownloadManager {
         public string DownloadFolder {
             set; get;
         }
+
         public static event TransferProgressDelegate transferProgressEvent;
         private static Stopwatch stopWatch = new Stopwatch();
         private long totalReceived = 0;
@@ -25,32 +25,35 @@ namespace PeerUI
         private FileStream fileStream;
         private ManualResetEvent connectDone = new ManualResetEvent(false);
         private AutoResetEvent[] downloadDone;
-        private bool socketConnected = false;
+        private int transferId;
+        public static bool stopDownloading = false;
 
         public DownloadManager(ServiceDataFile serviceDataFile, string folder, TransferProgressDelegate progressDelegate) {
             try {
                 this.serviceDataFile = serviceDataFile;
                 DownloadFolder = folder;
                 downloadDone = new AutoResetEvent[serviceDataFile.PeerList.Count];
-                fileStream = new FileStream(folder + "\\" + serviceDataFile.Name, FileMode.Create, FileAccess.Write);
-                transferProgressEvent += progressDelegate;
-                DownloadFile();
+                using (fileStream = new FileStream(folder + "\\" + serviceDataFile.Name, FileMode.Create, FileAccess.Write)) {
+                    transferProgressEvent += progressDelegate;
+                    transferId = (new Random(DateTime.Now.Second)).Next();
+                    DownloadFile();
+                }
+
             }
             //  IOException to catch if the fileStream cannot open the file for writing.
             catch (IOException ioException) {
-               // MessageBox.Show("Io exception was thrown, cannot open file stream at downloader.");
+                Console.WriteLine("Socket exception at DownloadManager function (DownloadManager): " + ioException.Message);
+                fileStream.Close();
             }
 
         }
 
         //  Starts the downloading process.
-        private void DownloadFile()
-        {
+        private void DownloadFile()  {
             long segmentSize = serviceDataFile.Size / serviceDataFile.PeerList.Count;
             long segmentSizeMod = serviceDataFile.Size % serviceDataFile.PeerList.Count;
             stopWatch.Start();
-            for (int i = 0; i < serviceDataFile.PeerList.Count; i++) 
-            {
+            for (int i = 0; i < serviceDataFile.PeerList.Count; i++) {
                 downloadDone[i] = new AutoResetEvent(false);
                 int j = i;
                 Thread downloadingThread;
@@ -64,41 +67,32 @@ namespace PeerUI
             WaitHandle.WaitAll(downloadDone);
             stopWatch.Stop();
             stopWatch.Reset();
-            fileStream.Close();
             totalReceived = 0;
         }
 
         //  Starts the segment downloading thread.
-        private void startDownloading(Segment segment, PeerAddress peerAddress)
-        {
+        private void startDownloading(Segment segment, PeerAddress peerAddress) {
             Socket clientSocket = null;
-            try
-            {
+            try {
                 IPAddress ipAddress = IPAddress.Parse(peerAddress.Ip);
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, peerAddress.Port);
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), clientSocket);      // Connect to the remote endpoint.
-                bool success = connectDone.WaitOne(5000, false);
-                SendFileInfo(segment, clientSocket);
-                GetFileSegment(segment, clientSocket);
-
-            }
-            catch (Exception error)
-            {
-                MessageBox.Show("catch block: " + error.Message);
-            }
-            finally
-            {
-                if (clientSocket != null) {
-                    clientSocket.Shutdown(SocketShutdown.Both);
-                    clientSocket.Close();
-                    Console.WriteLine("Socket closed at downloader.");
+                using (clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
+                    clientSocket.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), clientSocket);      // Connect to the remote endpoint.
+                    bool success = connectDone.WaitOne(5000, false);
+                    SendFileInfo(segment, clientSocket);
+                    GetFileSegment(segment, clientSocket);
                 }
+            }
+            catch (SocketException socketException) {
+                Console.WriteLine("Socket exception at startDownloading function (DownloadManager): " + socketException.Message);
+                clientSocket.Shutdown(SocketShutdown.Both);
+                clientSocket.Close();
+                Thread.Yield();
             }
         }
 
         //  Checks if the socket is connected.
-        private void IsSocketConnected(Socket s) {
+        private void IsSocketConnected(Socket s, ref bool socketConnected) {
             Thread.Sleep(200);
             bool part1 = s.Poll(1000, SelectMode.SelectRead);
             bool part2 = (s.Available == 0);
@@ -110,75 +104,85 @@ namespace PeerUI
 
         //  Connects to the uploading peer.
         private void ConnectCallback(IAsyncResult ar) {
-            try
-            {
+            try {
                 Socket client = (Socket)ar.AsyncState; // Retrieve the socket from the state object.
                 client.EndConnect(ar);  // Complete the connection.
                 //MessageBox.Show("Socket connected to " + client.RemoteEndPoint.ToString());
                 connectDone.Set();// Signal that the connection has been made.
             }
-            catch (Exception e) { MessageBox.Show(e.ToString()); }
+            catch (Exception e) {
+                MessageBox.Show(e.ToString());
+            }
         }
 
         //  Sends the requested segment info to the relevant peer.
         private void SendFileInfo(Segment segment, Socket clientSocket) {
-            socketConnected = false;
+            bool socketConnected = false;
             while (!socketConnected)
-                IsSocketConnected(clientSocket);
-            NetworkStream nfs = new NetworkStream(clientSocket);
-            StreamWriter streamWriter = new StreamWriter(nfs);
-            try {
-                streamWriter.AutoFlush = true;
-                streamWriter.WriteLine(segment.FileName + "#" + segment.StartPosition + "#" + segment.Size);
-                streamWriter.Flush();
-                //Console.WriteLine("File INFO sent to server successfully !\n\n");
+                IsSocketConnected(clientSocket, ref socketConnected);
+            using (NetworkStream nfs = new NetworkStream(clientSocket)) {
+                StreamWriter streamWriter = new StreamWriter(nfs);
+                try {
+                    streamWriter.WriteLine(segment.FileName + "#" + segment.StartPosition + "#" + segment.Size);
+                    streamWriter.Flush();
+                    //Console.WriteLine("File INFO sent to server successfully !\n\n");
+                }
+                catch (IOException ioException) {
+                    Console.WriteLine("IO exception at SendFileInfo function (DownloadManager): " + ioException.Message);
+                    nfs.Close();
             }
-            catch (Exception ed) {
-                Console.WriteLine("A Exception occured in transfer in TESTER CLIENT" + ed.ToString());
             }
         }
 
         //  Downloads the file segment.
         private void GetFileSegment(Segment segment, Socket clientSocket) {
-            socketConnected = false;
+            bool socketConnected = false;
             while (!socketConnected)
-                IsSocketConnected(clientSocket);
-            NetworkStream nfs = new NetworkStream(clientSocket);
-            //int memoryStreamCapacity = (4 * 1024) ^ 2;
-            //FileStream fileStream = new FileStream(DownloadFolder + @"\Fuck.txt", FileMode.Create, FileAccess.Write);
-            //MemoryStream memoryStream = new MemoryStream(memoryStreamCapacity);
-            //long size=fi.Length ;
-            int bytesReceived = 1;  //  Current batch of bytes received.
-            long totalReceived = 0; //  Total bytes received so far.
-            //long totalReadInMemory = 0;
-            byte[] buffer = new byte[1024 * 64];
-            try {
-                while (totalReceived < segment.Size) {
-                    Array.Clear(buffer, 0, buffer.Length);
-                    //Read from the Network Stream
-                    bytesReceived = nfs.Read(buffer, 0, buffer.Length);
-                    //memoryStream.Write(buffer, 0, (int)bytesReceived);
-                    //totalReadInMemory += bytesReceived;
-                    totalReceived = totalReceived + bytesReceived;
-                    WriteToDisk2(buffer, segment.StartPosition + totalReceived - bytesReceived, bytesReceived);
-                    UpdateProgress(bytesReceived);
-                    //if (totalReceived == segment.Size)
-                    //    WriteToDisk(memoryStream, segment.StartPosition);
-                    //else if (totalReadInMemory >= memoryStreamCapacity) {
-                    //    WriteToDisk(memoryStream, segment.StartPosition + totalReceived - bytesReceived);
-                    //    totalReadInMemory = 0;
-                   // }
-                    //Console.WriteLine("wrote: " + totalReceived + "from server " + segment.Id);
+                IsSocketConnected(clientSocket, ref socketConnected);
+            using (NetworkStream nfs = new NetworkStream(clientSocket)) {
+
+                //int memoryStreamCapacity = (4 * 1024) ^ 2;
+                //FileStream fileStream = new FileStream(DownloadFolder + @"\Fuck.txt", FileMode.Create, FileAccess.Write);
+                //MemoryStream memoryStream = new MemoryStream(memoryStreamCapacity);
+                //long size=fi.Length ;
+                int bytesReceived = 1;  //  Current batch of bytes received.
+                long totalReceived = 0; //  Total bytes received so far.
+                                        //long totalReadInMemory = 0;
+                byte[] buffer = new byte[1024 * 64];
+                try {
+                    while (totalReceived < segment.Size && !stopDownloading) {
+                        Array.Clear(buffer, 0, buffer.Length);
+                        //Read from the Network Stream
+                        bytesReceived = nfs.Read(buffer, 0, buffer.Length);
+                        //memoryStream.Write(buffer, 0, (int)bytesReceived);
+                        //totalReadInMemory += bytesReceived;
+                        totalReceived = totalReceived + bytesReceived;
+                        WriteToDisk2(buffer, segment.StartPosition + totalReceived - bytesReceived, bytesReceived);
+                        UpdateDownloadProgress(bytesReceived, transferId);
+                        //if (totalReceived == segment.Size)
+                        //    WriteToDisk(memoryStream, segment.StartPosition);
+                        //else if (totalReadInMemory >= memoryStreamCapacity) {
+                        //    WriteToDisk(memoryStream, segment.StartPosition + totalReceived - bytesReceived);
+                        //    totalReadInMemory = 0;
+                        // }
+                        //Console.WriteLine("wrote: " + totalReceived + "from server " + segment.Id);
+                    }
+                    downloadDone[segment.Id].Set();
+                    //Console.WriteLine("file segment received successfully !");
                 }
-                downloadDone[segment.Id].Set();
-                //Console.WriteLine("file segment received successfully !");
-            }
-            catch (Exception ed) {
-                Console.WriteLine("A Exception occured in file transfer in Tester File Receiving!" + ed.Message);
-            }
-            finally {
-               //if (memoryStream != null)
-               //     memoryStream.Close();
+                catch (IOException ioException) {
+                    Console.WriteLine("IO exception at GetFileSegment function (DownloadManager): " + ioException.Message);
+                    nfs.Close();
+                    fileStream.Close();
+                    stopDownloading = true;
+                    downloadDone[segment.Id].Set();
+                }
+                catch (ObjectDisposedException objectDisposedException) {
+                    Console.WriteLine("Object FileStream was used but has been disposed at function WriteToDisk (DownloadManager): " + objectDisposedException.Message);
+                    nfs.Close();
+                    stopDownloading = true;
+                    downloadDone[segment.Id].Set();
+                }
             }
         }
 
@@ -195,19 +199,24 @@ namespace PeerUI
         }
         */
         private void WriteToDisk2(byte[] buffer, long position, int amount) {
-            lock (fileStream) {
-                if (fileStream != null && fileStream.CanWrite) {
-                    fileStream.Seek(position, SeekOrigin.Begin);
-                    fileStream.Write(buffer, 0, amount);
-                    //transferProgressEvent(serviceDataFile.Name, serviceDataFile.Size, position, stopWatch.ElapsedMilliseconds);
+            try {
+                lock (fileStream) {
+                    if (fileStream != null && fileStream.CanWrite) {
+                        fileStream.Seek(position, SeekOrigin.Begin);
+                        fileStream.Write(buffer, 0, amount);
+                    }
                 }
+            }
+            catch (Exception e) {
+                throw e;
             }
         }
 
-        private void UpdateProgress(long bytesReceived) {
+        //  Updates the GUI with the progress of the download.
+        private void UpdateDownloadProgress(long bytesReceived, int transferId) {
             lock (this) {
                 totalReceived += bytesReceived;
-                transferProgressEvent(serviceDataFile.Name, serviceDataFile.Size, totalReceived, stopWatch.ElapsedMilliseconds);
+                transferProgressEvent(transferId, serviceDataFile.Name, serviceDataFile.Size, totalReceived, stopWatch.ElapsedMilliseconds, TransferType.Download);
             }
         }
     }

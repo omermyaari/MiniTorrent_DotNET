@@ -11,9 +11,13 @@ namespace PeerUI.Entities {
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private int progress;
+        private double progress;
         private string speed;
         private long elapsedTime;
+
+        public int TransferId {
+            get; set;
+        }
 
         public string Type {
             get; set;
@@ -27,7 +31,7 @@ namespace PeerUI.Entities {
             get; set;
         }
 
-        public int Progress {
+        public double Progress {
             get {
                 return progress;
             }
@@ -57,24 +61,13 @@ namespace PeerUI.Entities {
             }
         }
 
-        public FileProgressProperty(string Type, string Name, long Size, int progress, string speed) {
+        public FileProgressProperty(int TransferId, string Type, string Name, long Size, double progress, string speed) {
+            this.TransferId = TransferId;
             this.Type = Type;
             this.Name = Name;
             this.Size = Size;
             this.progress = progress;
             this.speed = speed;
-        }
-
-
-        public override int GetHashCode() {
-            if (Name == null)
-                return 0;
-            return Name.GetHashCode();
-        }
-
-        public override bool Equals(object obj) {
-            FileProgressProperty other = obj as FileProgressProperty;
-            return other != null && other.Name == this.Name && other.Size == this.Size;
         }
 
         public void OnPropertyChanged([CallerMemberName] String propertyName = "") {

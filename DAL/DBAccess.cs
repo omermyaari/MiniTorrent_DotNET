@@ -5,14 +5,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DAL.Entities;
+using System.IO;
 //  CONSTRAINT [PK_File_Peer] PRIMARY KEY CLUSTERED ([FileId] ASC, [PeerName] ASC),
 //  this line was removed from File_Peer table definition.
 
 namespace DAL {
-    public class DBAccess {
-        private const string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentDB2.mdf;Integrated Security=True;Connect Timeout=30";
-        private static Connection connection = new Connection(connectionString);
+    public static class DBAccess {
+
+        private static readonly string connectionString;
+        private static Connection connection;
         public static long IdCounter = 0;
+
+        static DBAccess() {
+            string RunningPath = AppDomain.CurrentDomain.BaseDirectory;
+            string DatabaseFilePath = string.Format("{0}" + "TorrentDB2.mdf", Path.GetFullPath(Path.Combine(RunningPath, @"..\..\..\")));
+            connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + DatabaseFilePath + ";Integrated Security=True;Connect Timeout=30";
+            connection = new Connection(connectionString);
+        }
 
         public static int PeersConnected {
             get; private set;
@@ -278,12 +287,10 @@ namespace DAL {
                     "WHERE [dbo].[File_Peer].[FileId] = [dbo].[DataFiles].[FileId] " +
                     "AND [dbo].[Peers].[PeerName] = [dbo].[File_Peer].[PeerName] " +
                     "AND [dbo].[DataFiles].[FileName] LIKE '%'+@fileName+'%' " + 
-                    "ORDER BY FileName, FileSize;"
-                    , connection.DatabaseConnection);
+                    "ORDER BY FileName, FileSize;", connection.DatabaseConnection);
                 command.Parameters.Add("@fileName", System.Data.SqlDbType.NVarChar, fileName.Length).Value = fileName;
 
                 reader = command.ExecuteReader(); // Execute the getting command
-
 
                 while (reader.Read()) {
                     var file = new DBFile(reader.GetString(0), reader.GetInt64(1));

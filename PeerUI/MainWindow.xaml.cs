@@ -10,12 +10,13 @@ using PeerUI.Communication;
 using TorrentWcfServiceLibrary;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PeerUI {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public delegate void TransferProgressDelegate(string fileName, long fileSize, long position, long time);
+    public delegate void TransferProgressDelegate(int transferId, string fileName, long fileSize, long position, long time, TransferType type);
     public partial class MainWindow : Window {
 
         private string username;
@@ -26,7 +27,7 @@ namespace PeerUI {
         private int localPort;
         private string sharedFolderPath;
         private string downloadFolderPath;
-        private UploadManager uploadManager = new UploadManager();
+        private UploadManager uploadManager;
         private Thread uploadManagerThread;
         private bool configExists;
         private User user;
@@ -42,29 +43,32 @@ namespace PeerUI {
             listViewLibrary.SizeChanged += ListView_SizeChanged;
         }
 
-        public void updateDownloadProgress(string fileName, long fileSize, long position, long time) {
-            var fileProgressProperty = new FileProgressProperty(TransferType.Download.ToString(), fileName, fileSize, (int)(((float)position / fileSize) * 100), (position / ((float)time / 1000)) / 1024 + "KB/s");
-            FileProgressProperty tempFileProgressProperty;
-            //Console.WriteLine("UPDATE2222@@@@@@@@@@@@@@@@@" + fileProgressProperty.Speed + " " + fileProgressProperty.Progress + " " + time);
-            if ((tempFileProgressProperty = observableLibraryFile.Where(x => x.Name == fileName && x.Size == fileSize).FirstOrDefault()) == null) {
-                this.Dispatcher.Invoke((Action)delegate {
-                    observableLibraryFile.Add(fileProgressProperty);
-                });
-            }
-            else {
-                this.Dispatcher.Invoke((Action)delegate {
-                    if (position != 0) {
-                        //Console.WriteLine("UPDATE@@@@@@@@@@@@@@@@@" + fileProgressProperty.Speed + " " + fileProgressProperty.Progress + " " + time);
-                        tempFileProgressProperty.Speed = fileProgressProperty.Speed;
-                        tempFileProgressProperty.Progress = fileProgressProperty.Progress;
-                        tempFileProgressProperty.ElapsedTime = time;
-                        Console.WriteLine("DASDAD" + tempFileProgressProperty.Progress);
-                    }
-                    else {
-                        tempFileProgressProperty.Progress = 100;
-                    }
+        public void updateDownloadProgress(int transferId, string fileName, long fileSize, long position, long time, TransferType type) {
+            try {
+                FileProgressProperty tempFileProgressProperty;
+                if ((tempFileProgressProperty = observableLibraryFile.Where(x => x.TransferId == transferId).FirstOrDefault()) == null) {
+                    this.Dispatcher.Invoke((Action)delegate {
+                        var fileProgressProperty = new FileProgressProperty(transferId, type.ToString(), fileName, fileSize, (((float)position / fileSize) * 100), (position / ((float)time / 1000)) / 1024 + "KB/s");
+                        observableLibraryFile.Add(fileProgressProperty);
+                    });
+                }
+                else {
+                    this.Dispatcher.Invoke((Action)delegate {
+                        if (position != 0) {
+                            tempFileProgressProperty.Speed = (position / ((float)time / 1000)) / 1024 + "KB/s";
+                            tempFileProgressProperty.Progress = (((float)position / fileSize) * 100);
+                            tempFileProgressProperty.ElapsedTime = time;
+                            //Console.WriteLine("PROGRESS = " + tempFileProgressProperty.Progress);
+                        }
+                        else {
+                            tempFileProgressProperty.Progress = 100;
+                        }
 
-                });
+                    });
+                }
+            }
+            catch (TaskCanceledException taskCancelled) {
+                Console.WriteLine("Task was cancelled");
             }
         }
 
@@ -160,11 +164,13 @@ namespace PeerUI {
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             uploadManager.StopListening();
             wcfClient.CloseConnection();
+            DownloadManager.stopDownloading = true;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
             buttonDownload.IsEnabled = false;
             listViewLibrary.ItemsSource = observableLibraryFile;
+            uploadManager = new UploadManager(new TransferProgressDelegate(updateDownloadProgress));
             if (configExists = File.Exists("MyConfig.xml")) {
                 loadConfigFromXml();
                 wcfClient = new WCFClient(user);

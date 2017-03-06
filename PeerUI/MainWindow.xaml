@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PeerUI"
         mc:Ignorable="d"
-        Title="MiniTorrent" Height="350" Width="525" Closing="Window_Closing">
+        Title="MiniTorrent" Height="393.5" Width="582" Closing="Window_Closing">
     <TabControl Name="tabControl">
         <TabItem Name="searchTab" Header="Search">
             <DockPanel>
@@ -40,7 +40,7 @@
         </TabItem>
         <TabItem Name="libraryTab" Header="Library">
             <DockPanel>
-                <ListView Name ="listViewLibrary" Margin="5, 10, 5, 5" HorizontalAlignment='Stretch'>
+                <ListView Name ="listViewLibrary" Margin="5, 10, 5, 5">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
                             <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -57,13 +57,13 @@
                             <GridViewColumn DisplayMemberBinding="{Binding Size}">
                                 <GridViewColumnHeader Content="Size" SizeChanged="HandleColumnHeaderSizeChanged"/>
                             </GridViewColumn>
-                            <GridViewColumn>
-                                <GridViewColumnHeader Content="Progress" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                            <GridViewColumn x:Name="ProgressCell">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ProgressBar Maximum="100" Minimum="0" Value="{Binding Progress}"/>
+                                        <ProgressBar Maximum="100" Minimum="0" Value="{Binding Progress}" Width="{Binding Path=Width, ElementName=ProgressCell}" Height="10" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
+                                <GridViewColumnHeader Content="Progress" SizeChanged="HandleColumnHeaderSizeChanged"/>
                             </GridViewColumn>
                             <GridViewColumn DisplayMemberBinding="{Binding Speed}">
                                 <GridViewColumnHeader Content="Speed" SizeChanged="HandleColumnHeaderSizeChanged"/>

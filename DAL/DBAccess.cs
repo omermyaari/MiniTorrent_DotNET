@@ -17,9 +17,9 @@ namespace DAL {
         public static long IdCounter = 0;
 
         static DBAccess() {
-            string RunningPath = AppDomain.CurrentDomain.BaseDirectory;
-            string DatabaseFilePath = string.Format("{0}" + "TorrentDB2.mdf", Path.GetFullPath(Path.Combine(RunningPath, @"..\..\..\")));
-            connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + DatabaseFilePath + ";Integrated Security=True;Connect Timeout=30";
+            //string RunningPath = AppDomain.CurrentDomain.SetupInformation.PrivateBinPath;
+            //string DatabaseFilePath = string.Format("{0}" + "TorrentDB2.mdf", Path.GetFullPath(Path.Combine(RunningPath, @"..\..\")));
+            connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentDB2.mdf;Integrated Security=True;Connect Timeout=30";
             connection = new Connection(connectionString);
         }
 
@@ -347,6 +347,34 @@ namespace DAL {
             return IsOnline;
         }
         */
+
+        public static void LoginPeer(DBPeer peer, bool alreadyConnected = false) {
+            try {
+                // Connect to the database
+                if (!alreadyConnected)
+                    connection.Open();
+                SqlCommand command = null;
+                command = new SqlCommand(
+                "UPDATE Peers " +
+                "SET PeerIP = @PeerIP, PeerPort = @PeerPort " +
+                "WHERE PeerName = @PeerName " +
+                "AND PeerPassword = @PeerPassword;", connection.DatabaseConnection);
+                command.Parameters.Add("@PeerIP", System.Data.SqlDbType.NVarChar, peer.Ip.Length).Value = peer.Ip;
+                command.Parameters.Add("@PeerPort", System.Data.SqlDbType.Int).Value = peer.Port;
+                command.Parameters.Add("@PeerName", System.Data.SqlDbType.VarChar, peer.Name.Length).Value = peer.Name;
+                command.Parameters.Add("@PeerPassword", System.Data.SqlDbType.VarChar, peer.Password.Length).Value = peer.Password;
+
+                command.ExecuteNonQuery();
+            }
+            catch (Exception e) {
+                Console.WriteLine("ERROR: " + e.Message);
+            }
+            finally {
+                if (!alreadyConnected)
+                    connection.Close();
+            }
+        }
+
         //  Sets the status of the given peer name (online or offline) with the given bool.
         public static void SetPeerStatus(DBPeer peer, bool online, bool alreadyConnected = false) {
             try {
@@ -356,25 +384,20 @@ namespace DAL {
                 SqlCommand command = null;
                 command = new SqlCommand(
                 "UPDATE Peers " +
-                "SET PeerIsOnline = @PeerIsOnline, PeerIP = @PeerIP, PeerPort = @PeerPort " +
+                "SET PeerIsOnline = @PeerIsOnline " +
                 "WHERE PeerName = @PeerName " +
                 "AND PeerPassword = @PeerPassword;", connection.DatabaseConnection);
-                command.Parameters.Add("@PeerIP", System.Data.SqlDbType.NVarChar, peer.Ip.Length).Value = peer.Ip;
                 command.Parameters.Add("@PeerIsOnline", System.Data.SqlDbType.Bit, peer.Ip.Length).Value = online;
-                command.Parameters.Add("@PeerPort", System.Data.SqlDbType.Int).Value = peer.Port;
                 command.Parameters.Add("@PeerName", System.Data.SqlDbType.VarChar, peer.Name.Length).Value = peer.Name;
                 command.Parameters.Add("@PeerPassword", System.Data.SqlDbType.VarChar, peer.Password.Length).Value = peer.Password;
+                command.ExecuteNonQuery();
 
-                /*else {
+                if (!online) {
                     command = new SqlCommand(
-                    "UPDATE Peers " +
-                    "SET PeerIsOnline = 0 " +
-                    "WHERE PeerName = @PeerName " +
-                    "AND PeerPassword = @PeerPassword;", connection.DatabaseConnection);
+                    "DELETE FROM File_Peer " +
+                    "WHERE PeerName = @PeerName;", connection.DatabaseConnection);
                     command.Parameters.Add("@PeerName", System.Data.SqlDbType.VarChar, peer.Name.Length).Value = peer.Name;
-                    command.Parameters.Add("@PeerPassword", System.Data.SqlDbType.VarChar, peer.Password.Length).Value = peer.Password;
                 }
-                */
                 command.ExecuteNonQuery();
             }
             catch (Exception e) {
@@ -427,5 +450,129 @@ namespace DAL {
               }
               return dataFile;
           }*/
+        public static List<DBPeer> GetAllPeers(bool alreadyConnected = false) {
+            List<DBPeer> peers = new List<DBPeer>();
+            SqlDataReader reader = null;
+            try {
+                if (!alreadyConnected)
+                    connection.Open();
+
+                SqlCommand command = new SqlCommand(
+                "SELECT * " +
+                "FROM [Peers];", connection.DatabaseConnection);
+                reader = command.ExecuteReader(); // Execute the getting command
+
+                while (reader.Read()) {
+                    DBPeer peer = new DBPeer(reader.GetString(0), reader.GetString(1),
+                        reader.GetString(2), reader.GetInt32(3));
+                    peer.IsOnline = reader.GetBoolean(4);
+                    peers.Add(peer);
+                }
+            }
+            catch (Exception e) {
+                Console.WriteLine("ERROR: " + e.Message);
+            }
+            finally {
+                reader.Close();
+                if (!alreadyConnected)
+                    connection.Close();
+            }
+            return peers;
+        }
+
+        public static List<DBFile> GetAllFiles(bool alreadyConnected = false) {
+            List<DBFile> files = new List<DBFile>();
+            SqlDataReader reader = null;
+            try {
+                if (!alreadyConnected)
+                    connection.Open();
+
+                SqlCommand command = new SqlCommand(
+                "SELECT * " +
+                "FROM [DataFiles];", connection.DatabaseConnection);
+                reader = command.ExecuteReader(); // Execute the getting command
+
+                while (reader.Read()) {
+                    DBFile file = new DBFile(reader.GetString(1), reader.GetInt64(2));
+                    file.ID = reader.GetInt64(0);
+                    files.Add(file);
+                }
+            }
+            catch (Exception e) {
+                Console.WriteLine("ERROR: " + e.Message);
+            }
+            finally {
+                reader.Close();
+                if (!alreadyConnected)
+                    connection.Close();
+            }
+            return files;
+        }
+
+        public static bool DeletePeer(string peerName, bool alreadyConnected = false) {
+            try {
+                connection.Open();
+                SqlCommand command = new SqlCommand(
+                    "DELETE FROM File_Peer " +
+                    "WHERE PeerName = @peerName " +
+                    "DELETE FROM Peers " +
+                    "WHERE PeerName = @peerName;", connection.DatabaseConnection);
+                command.Parameters.Add("@peerName", System.Data.SqlDbType.Char, peerName.Length).Value = peerName;
+                command.ExecuteNonQuery(); // Execute the getting command 
+                return true;
+            }
+            catch (Exception e) {
+                Console.WriteLine("ERROR: " + e.Message);
+                return false;
+            }
+            finally { connection.Close(); }
+        }
+
+        //Update the Peer fields.
+        public static bool UpdatePeer(DBPeer oldPeer, DBPeer newPeer, bool alreadyConnected = false) {
+            //Check existance of the newPeer: TODO: implement equals in DBPeer
+            if (oldPeer.Equals(newPeer))
+                return true;
+            try {
+                SqlCommand command = null;
+                connection.Open();
+
+                //If the peers have a same name, update only in Peers table.
+                if (oldPeer.Name.Equals(newPeer.Name)) {
+                    command = new SqlCommand(
+                    "UPDATE Peers " +
+                    "SET PeerPassword = @newPassword, " +
+                    "PeerIP = @newIp, PeerPort = @newPort" +
+                    "WHERE PeerName = @oldName;", connection.DatabaseConnection);
+                }
+                //else update Peers table and File_Peer too.
+                else {
+                    command = new SqlCommand(
+                    "BEGIN TRANSACTION;" +
+                    "EXEC sp_msforeachtable \"ALTER TABLE ? NOCHECK CONSTRAINT ALL\";" +
+                    "UPDATE Peers " +
+                    "SET PeerName = @newName, PeerPassword = @newPassword, " +
+                    "PeerIP = @newIp, PeerPort = @newPort " +
+                    "WHERE PeerName = @oldName;" +
+                    "UPDATE File_Peer " +
+                    "SET PeerName = @newName " +
+                    "WHERE PeerName = @oldName;" +
+                    "EXEC sp_msforeachtable \"ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL\";" +
+                    "COMMIT;", connection.DatabaseConnection);
+                }
+                command.Parameters.Add("@newName", System.Data.SqlDbType.Char, newPeer.Name.Length).Value = newPeer.Name;
+                command.Parameters.Add("@newPassword", System.Data.SqlDbType.Char, newPeer.Password.Length).Value = newPeer.Password;
+                command.Parameters.Add("@newIp", System.Data.SqlDbType.Char, newPeer.Ip.Length).Value = newPeer.Ip;
+                command.Parameters.Add("@newPort", System.Data.SqlDbType.Int).Value = newPeer.Port;
+                command.Parameters.Add("@oldName", System.Data.SqlDbType.Char, oldPeer.Name.Length).Value = oldPeer.Name;
+                command.ExecuteNonQuery(); // Execute the getting command  
+                return true;
+            }
+            catch (Exception e) {
+                Console.WriteLine("ERROR: " + e.Message);
+                return false;
+            }
+            finally { connection.Close(); }
+        }
     }
 }

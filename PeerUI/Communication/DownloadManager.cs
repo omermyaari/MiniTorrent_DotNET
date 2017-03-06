@@ -26,11 +26,12 @@ namespace PeerUI {
         private ManualResetEvent connectDone = new ManualResetEvent(false);
         private AutoResetEvent[] downloadDone;
         private int transferId;
-        public static bool stopDownloading = false;
+        public bool stopDownloading = false;
 
         public DownloadManager(ServiceDataFile serviceDataFile, string folder, TransferProgressDelegate progressDelegate) {
             try {
                 this.serviceDataFile = serviceDataFile;
+                MainWindow.stopDownloadingEvent += stopDownloadingHandler;
                 DownloadFolder = folder;
                 downloadDone = new AutoResetEvent[serviceDataFile.PeerList.Count];
                 using (fileStream = new FileStream(folder + "\\" + serviceDataFile.Name, FileMode.Create, FileAccess.Write)) {
@@ -172,15 +173,15 @@ namespace PeerUI {
                 }
                 catch (IOException ioException) {
                     Console.WriteLine("IO exception at GetFileSegment function (DownloadManager): " + ioException.Message);
+                    stopDownloading = true;
                     nfs.Close();
                     fileStream.Close();
-                    stopDownloading = true;
                     downloadDone[segment.Id].Set();
                 }
                 catch (ObjectDisposedException objectDisposedException) {
                     Console.WriteLine("Object FileStream was used but has been disposed at function WriteToDisk (DownloadManager): " + objectDisposedException.Message);
-                    nfs.Close();
                     stopDownloading = true;
+                    nfs.Close();
                     downloadDone[segment.Id].Set();
                 }
             }
@@ -218,6 +219,10 @@ namespace PeerUI {
                 totalReceived += bytesReceived;
                 transferProgressEvent(transferId, serviceDataFile.Name, serviceDataFile.Size, totalReceived, stopWatch.ElapsedMilliseconds, TransferType.Download);
             }
+        }
+
+        private void stopDownloadingHandler() {
+            stopDownloading = true;
         }
     }
 }

@@ -21,5 +21,8 @@ namespace DAL.Entities
             this.Ip = Ip;
             this.Port = Port;
         }
+
+        public DBPeer() {
+        }
     }
 }

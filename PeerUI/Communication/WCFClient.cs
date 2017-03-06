@@ -70,6 +70,8 @@ namespace PeerUI.Communication {
             serviceMessage.Header = MessageHeader.FileRequest;
             serviceMessage.UserName = user.Name;
             serviceMessage.UserPassword = user.Password;
+            serviceMessage.UserIP = user.UserIP;
+            serviceMessage.UserPort = user.LocalPort;
             serviceMessage.FilesList = new List<ServiceDataFile> {
                 new ServiceDataFile {
                     Name = FileName

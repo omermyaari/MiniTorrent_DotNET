@@ -2,6 +2,8 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
-    Welcome to HOME PAGE!!!
-    About the Project:
-</asp:Content>
+    <h1>Welcome to the Torrent ASP WebSite!!!</h1> <br />
+    <h3>About the Project:</h3>
+    <br />
+    <br />
+    </asp:Content>

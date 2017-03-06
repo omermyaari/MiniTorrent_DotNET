@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace DAL.Entities {
 
     public class DBFile {
-        public long ID { get; private set; }
+        public long ID { get; set; }
         public string Name { get; set; }
         public long Size { get; set; }
 

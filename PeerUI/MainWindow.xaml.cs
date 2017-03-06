@@ -17,6 +17,7 @@ namespace PeerUI {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public delegate void TransferProgressDelegate(int transferId, string fileName, long fileSize, long position, long time, TransferType type);
+    public delegate void StopAllDownloading();
     public partial class MainWindow : Window {
 
         private string username;
@@ -36,6 +37,7 @@ namespace PeerUI {
         private List<ServiceDataFile> searchResults;
         private List<FileProgressProperty> libraryFiles = new List<FileProgressProperty>();
         private ObservableCollection<FileProgressProperty> observableLibraryFile = new ObservableCollection<FileProgressProperty>();
+        public static event StopAllDownloading stopDownloadingEvent;
 
         public MainWindow() {
             InitializeComponent();
@@ -164,7 +166,7 @@ namespace PeerUI {
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             uploadManager.StopListening();
             wcfClient.CloseConnection();
-            DownloadManager.stopDownloading = true;
+            stopDownloadingEvent();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {

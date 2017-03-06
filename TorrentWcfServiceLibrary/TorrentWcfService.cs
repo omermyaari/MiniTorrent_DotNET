@@ -36,6 +36,7 @@ namespace TorrentWcfServiceLibrary {
             var peer = new DBPeer(serviceMessage.UserName, serviceMessage.UserPassword, 
                 serviceMessage.UserIP, serviceMessage.UserPort);
             if (DAL.DBAccess.CheckPeerAuth(peer)) {
+                DAL.DBAccess.LoginPeer(peer);
                 DAL.DBAccess.SetPeerStatus(peer, true);
                 foreach (ServiceDataFile sdf in serviceMessage.FilesList) {
                     DBFile tempDBFile = new DBFile(sdf.Name, sdf.Size);
@@ -67,7 +68,7 @@ namespace TorrentWcfServiceLibrary {
                 };
                 sdf.PeerList = new List<PeerAddress>();
                 foreach(DBPeer dbpeer in DBResults[dbfile]) {
-                    if (dbpeer.IsOnline) {
+                    if (dbpeer.IsOnline && !(dbpeer.Ip == serviceMessage.UserIP && dbpeer.Port == serviceMessage.UserPort)) {
                         sdf.PeerList.Add(new PeerAddress {
                             Ip = dbpeer.Ip,
                             Port = dbpeer.Port

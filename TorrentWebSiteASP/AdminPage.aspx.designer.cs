@@ -11,5 +11,32 @@ namespace TorrentWebSiteASP {
     
     
     public partial class AdminLoginPage {
+        
+        /// <summary>
+        /// NavigationMenu control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Menu NavigationMenu;
+        
+        /// <summary>
+        /// AuthorsGridView control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView AuthorsGridView;
+        
+        /// <summary>
+        /// btnAddPeer control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnAddPeer;
     }
 }

@@ -65,3 +65,4 @@ C:\Users\omer\Source\Repos\MiniTorrent_DotNET\PeerUI\obj\Debug\PeerUI.Properties
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\PeerUI\obj\Debug\PeerUI.csproj.GenerateResource.Cache
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\PeerUI\obj\Debug\PeerUI.exe
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\PeerUI\obj\Debug\PeerUI.pdb
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\PeerUI\obj\Debug\GeneratedInternalTypeHelper.g.cs

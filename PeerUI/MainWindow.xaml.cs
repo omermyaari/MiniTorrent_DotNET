@@ -23,17 +23,11 @@ namespace PeerUI {
     public delegate List<ServiceDataFile> WcfFileRequestDelegate(string fileName);
     public partial class MainWindow : Window {
 
-        private string username;
-        private string password;
-        private string serverIP;
-        private int serverPort;
-        private int localPort;
-        private string sharedFolderPath;
-        private string downloadFolderPath;
-        private string dllFilePath = "";
+        private string username, password, serverIP, sharedFolderPath, downloadFolderPath, dllFilePath = "";
+        private int serverPort, localPort;
+        private bool configExists;
         private UploadManager uploadManager;
         private Thread uploadManagerThread;
-        private bool configExists;
         private User user;
         private XmlSerializer SerializerObj = new XmlSerializer(typeof(User));
         private WCFClient wcfClient;
@@ -75,7 +69,6 @@ namespace PeerUI {
                 }
             }
             catch (TaskCanceledException) {
-                Console.WriteLine("Task was cancelled");
             }
         }
 
@@ -158,14 +151,14 @@ namespace PeerUI {
 
         //  Saves settings to the configuration xml file.
         private void saveConfigToXml(User user) {
-            TextWriter WriteFileStream = new StreamWriter("MyConfig.xml");
+            TextWriter WriteFileStream = new StreamWriter(Properties.Resources.configFileName);
             SerializerObj.Serialize(WriteFileStream, user);
             WriteFileStream.Close();
         }
 
         //  Loads settings from the configuration xml file.
         private void loadConfigFromXml() {
-            var reader = new StreamReader("MyConfig.xml");
+            var reader = new StreamReader(Properties.Resources.configFileName);
             user = (User)SerializerObj.Deserialize(reader);
             DataContext = user;
             reader.Close();
@@ -183,7 +176,7 @@ namespace PeerUI {
             buttonDownload.IsEnabled = false;
             listViewLibrary.ItemsSource = observableLibraryFile;
             uploadManager = new UploadManager(new TransferProgressDelegate(updateDownloadProgress));
-            if (configExists = File.Exists("MyConfig.xml")) {
+            if (configExists = File.Exists(Properties.Resources.configFileName)) {
                 loadConfigFromXml();
                 wcfClient = new WCFClient();
                 wcfClient.WcfMessageEvent += displayWcfMessage;
@@ -193,7 +186,7 @@ namespace PeerUI {
             }
             else {
                 textblockStatus.Foreground = Brushes.Red;
-                textblockStatus.Text = "Config file does not exist, please fill the settings.";
+                textblockStatus.Text = Properties.Resources.errorConfigFileNotExist;
                 settingsTab.IsSelected = true;
             }
         }
@@ -267,7 +260,8 @@ namespace PeerUI {
             using (var dialog = new System.Windows.Forms.OpenFileDialog()) {
                 dialog.DefaultExt = ".dll";
                 dialog.Filter = "DLL Files (*.dll)|*.dll";
-                textboxDLLPath.Text = dllFilePath = dialog.FileName;
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    textboxDLLPath.Text = dllFilePath = dialog.FileName;
             }
         }
     }

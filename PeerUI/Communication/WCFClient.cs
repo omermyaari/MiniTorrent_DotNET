@@ -38,7 +38,7 @@ namespace PeerUI.Communication {
                     return i.ToString();
                 }
             }
-            return "192.168.0.0";
+            return Properties.Resources.defaultIP;
         }
 
         public void UpdateConfig(User user) {
@@ -96,7 +96,7 @@ namespace PeerUI.Communication {
                 return serviceMessage;
             }
             catch (Exception) {
-                WcfMessageEvent(true, "Error: Directory not found.");
+                WcfMessageEvent(true, Properties.Resources.errorDirectoryNotFound);
             }
             return null;
         }
@@ -116,7 +116,7 @@ namespace PeerUI.Communication {
         //  then returns the result to the user.
         public List<ServiceDataFile> FileRequest(string fileName) {
             if (String.IsNullOrEmpty(fileName)) {
-                WcfMessageEvent(true, "Error: File name cannot be empty.");
+                WcfMessageEvent(true, Properties.Resources.errorFileNameEmpty);
                 return null;
 
             }
@@ -126,11 +126,11 @@ namespace PeerUI.Communication {
                 xmlMessage = proxy.Request(xmlMessage);
             }
             catch (EndpointNotFoundException) {
-                WcfMessageEvent(true, "Error: Couldnt request file from main server - endpoint not found.");
+                WcfMessageEvent(true, Properties.Resources.errorEndpointNotFound);
                 return null;
             }
             catch (TimeoutException) {
-                WcfMessageEvent(true, "Error: Couldnt request file from main server - timeout.");
+                WcfMessageEvent(true, Properties.Resources.errorFileRequestTimeout);
                 return null;
             }
             serviceMessage = DeSerializeMessage(xmlMessage);
@@ -139,7 +139,7 @@ namespace PeerUI.Communication {
                 WcfMessageEvent(true, "Error: File " + fileName + " was not found.");
                 return null;
             }
-            WcfMessageEvent(false, "Connected.");
+            WcfMessageEvent(false, Properties.Resources.connectedString);
             return serviceMessage.FilesList;
         }
 
@@ -148,7 +148,7 @@ namespace PeerUI.Communication {
         private void SignIn() {
             var serviceMessage = GenerateSignInRequest();
             if (serviceMessage == null) {
-                WcfMessageEvent(true, "Error: Couldn't generate a sign in request, check your settings.");
+                WcfMessageEvent(true, Properties.Resources.errorGenerateSignIn);
                 return;
             }
             var xmlMessage = SerializeMessage(serviceMessage);
@@ -156,21 +156,21 @@ namespace PeerUI.Communication {
                 xmlMessage = proxy.Request(xmlMessage);
             }
             catch (EndpointNotFoundException) {
-                WcfMessageEvent(true, "Error: Couldnt sign in to main server - endpoint not found.");
+                WcfMessageEvent(true, Properties.Resources.errorEndpointNotFound);
                 return;
             }
             catch (TimeoutException) {
-                WcfMessageEvent(true, "Error: Couldn't sign in to main server - timeout.");
+                WcfMessageEvent(true, Properties.Resources.errorSignInTimeout);
                 return;
             }
             serviceMessage = DeSerializeMessage(xmlMessage);
             if (serviceMessage.Header == MessageHeader.ConnectionSuccessful) {
                 userConnected = true;
-                WcfMessageEvent(false, "Connected.");
+                WcfMessageEvent(false, Properties.Resources.connectedString);
                 return;
             }
             else {
-                WcfMessageEvent(true, "Error: Couldn't sign in to main server - username or password is incorrect.");
+                WcfMessageEvent(true, Properties.Resources.errorUsernamePassword);
             }
 
         }
@@ -183,10 +183,10 @@ namespace PeerUI.Communication {
                 proxy.Request(xmlMessage);
             }
             catch (EndpointNotFoundException) {
-                WcfMessageEvent(true, "Error: Couldnt sign out of server: endpoint not found.");
+                WcfMessageEvent(true, Properties.Resources.errorEndpointNotFound);
             }
             catch (TimeoutException) {
-                WcfMessageEvent(true, "Error: Couldn't sign in to main server - timeout.");
+                WcfMessageEvent(true, Properties.Resources.errorSignInTimeout);
             }
             userConnected = false;
         }

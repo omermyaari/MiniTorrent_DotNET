@@ -11,6 +11,7 @@ using TorrentWcfServiceLibrary;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace PeerUI {
     /// <summary>
@@ -18,16 +19,18 @@ namespace PeerUI {
     /// </summary>
     public delegate void TransferProgressDelegate(int transferId, string fileName, long fileSize, long position, long time, TransferType type);
     public delegate void StopAllDownloading();
+    public delegate void WcfMessageDelegate(bool error, string message);
+    public delegate List<ServiceDataFile> WcfFileRequestDelegate(string fileName);
     public partial class MainWindow : Window {
 
         private string username;
         private string password;
-
         private string serverIP;
         private int serverPort;
         private int localPort;
         private string sharedFolderPath;
         private string downloadFolderPath;
+        private string dllFilePath = "";
         private UploadManager uploadManager;
         private Thread uploadManagerThread;
         private bool configExists;
@@ -37,7 +40,9 @@ namespace PeerUI {
         private List<ServiceDataFile> searchResults;
         private List<FileProgressProperty> libraryFiles = new List<FileProgressProperty>();
         private ObservableCollection<FileProgressProperty> observableLibraryFile = new ObservableCollection<FileProgressProperty>();
+        
         public static event StopAllDownloading stopDownloadingEvent;
+
 
         public MainWindow() {
             InitializeComponent();
@@ -101,9 +106,12 @@ namespace PeerUI {
                 SharedFolderPath = sharedFolderPath,
                 DownloadFolderPath = downloadFolderPath
             };
+            DataContext = user;
             saveConfigToXml(user);
-            wcfClient.CloseConnection();
-            wcfClient.UpdateConfig(user);
+            new Thread(() => {
+                wcfClient.CloseConnection();
+                wcfClient.UpdateConfig(user);
+            }).Start();
             if (uploadManagerThread.IsAlive)
                 uploadManager.StopListening();
             uploadManagerThread = new Thread(() => uploadManager.StartListening(localPort, sharedFolderPath));
@@ -159,14 +167,16 @@ namespace PeerUI {
         private void loadConfigFromXml() {
             var reader = new StreamReader("MyConfig.xml");
             user = (User)SerializerObj.Deserialize(reader);
+            DataContext = user;
             reader.Close();
             loadDetailsFromUser();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             uploadManager.StopListening();
-            wcfClient.CloseConnection();
-            stopDownloadingEvent();
+            new Thread(() => wcfClient.CloseConnection()).Start();
+            if (stopDownloadingEvent != null)
+                stopDownloadingEvent();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
@@ -175,12 +185,15 @@ namespace PeerUI {
             uploadManager = new UploadManager(new TransferProgressDelegate(updateDownloadProgress));
             if (configExists = File.Exists("MyConfig.xml")) {
                 loadConfigFromXml();
-                wcfClient = new WCFClient(user);
+                wcfClient = new WCFClient();
+                wcfClient.WcfMessageEvent += displayWcfMessage;
+                new Thread(() => wcfClient.UpdateConfig(user)).Start();
                 uploadManagerThread = new Thread(()=> uploadManager.StartListening(user.LocalPort, user.SharedFolderPath));
                 uploadManagerThread.Start();
             }
             else {
-                MessageBox.Show("Config file does not exist, please fill the settings.", "Error");
+                textblockStatus.Foreground = Brushes.Red;
+                textblockStatus.Text = "Config file does not exist, please fill the settings.";
                 settingsTab.IsSelected = true;
             }
         }
@@ -213,16 +226,49 @@ namespace PeerUI {
 
         //  Searches the main server for files shared by all connected peers.
         private void buttonSearch_Click(object sender, RoutedEventArgs e) {
-            searchResults = wcfClient.FileRequest(textboxSearch.Text);
+            WcfFileRequestDelegate dlgt = new WcfFileRequestDelegate(wcfClient.FileRequest);
+            IAsyncResult ar = dlgt.BeginInvoke(textboxSearch.Text,
+            new AsyncCallback(FileSearchCallback), dlgt);
+
+        }
+
+        private void FileSearchCallback(IAsyncResult ar) {
+            WcfFileRequestDelegate dlgt = (WcfFileRequestDelegate)ar.AsyncState;
+            searchResults = dlgt.EndInvoke(ar);
+            if (searchResults == null)
+                return;
             List<SearchFileProperty> items = new List<SearchFileProperty>();
             foreach (ServiceDataFile sdf in searchResults) {
                 items.Add(new SearchFileProperty(sdf.Name, sdf.Size, sdf.PeerList.Count));
             }
-            listViewSearch.ItemsSource = items;
-            if (items.Count > 0)
-                buttonDownload.IsEnabled = true;
-            else
-                buttonDownload.IsEnabled = false;
+            Dispatcher.Invoke((Action)delegate {
+                listViewSearch.ItemsSource = items;
+                if (items.Count > 0)
+                    buttonDownload.IsEnabled = true;
+                else
+                    buttonDownload.IsEnabled = false;
+            });
+        }
+
+        //  Displays error messages called by the ErrorMessageDelegate event
+        private void displayWcfMessage(bool error, string message) {
+            try {
+                Dispatcher.Invoke((Action)delegate {
+                    textblockStatus.Foreground = (error) ? Brushes.Red : Brushes.Green;
+                    textblockStatus.Text = message;
+                });
+            }
+            catch (TaskCanceledException) {
+
+            }
+        }
+
+        private void buttonSetDLLPath_Click(object sender, RoutedEventArgs e) {
+            using (var dialog = new System.Windows.Forms.OpenFileDialog()) {
+                dialog.DefaultExt = ".dll";
+                dialog.Filter = "DLL Files (*.dll)|*.dll";
+                textboxDLLPath.Text = dllFilePath = dialog.FileName;
+            }
         }
     }
 }

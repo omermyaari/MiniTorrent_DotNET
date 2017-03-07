@@ -60,12 +60,13 @@
     </ApplicationDefinition>
     <Compile Include="Communication\DownloadManager.cs" />
     <Compile Include="Communication\WCFClient.cs" />
-    <Compile Include="Entities\DataFile.cs" />
+    <Compile Include="DLLFileValidationRule.cs" />
     <Compile Include="Entities\FileProgressProperty.cs" />
     <Compile Include="Entities\SearchFileProperty.cs" />
     <Compile Include="Entities\Segment.cs" />
     <Compile Include="Communication\UploadManager.cs" />
     <Compile Include="Entities\User.cs" />
+    <Compile Include="IPValidationRule.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -80,6 +81,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PathValidationRule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

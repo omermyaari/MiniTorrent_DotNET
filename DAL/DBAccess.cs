@@ -118,7 +118,7 @@ namespace DAL {
                     //  set parameters for the query
                     command.Parameters.Add("@PeerName", System.Data.SqlDbType.Char, peer.Name.Length).Value = peer.Name;
                     command.Parameters.Add("@PeerPassword", System.Data.SqlDbType.Char, peer.Password.Length).Value = peer.Password;
-                    command.Parameters.Add("@PeerIP", System.Data.SqlDbType.NVarChar, peer.Password.Length).Value = peer.Ip;
+                    command.Parameters.Add("@PeerIP", System.Data.SqlDbType.NVarChar, peer.Ip.Length).Value = peer.Ip;
                     command.Parameters.Add("@PeerPort", System.Data.SqlDbType.Int).Value = peer.Port;
                     command.Parameters.Add("@PeerIsOnline", System.Data.SqlDbType.Bit).Value = false;
                     command.ExecuteNonQuery();    // Execute the getting command   
@@ -276,20 +276,30 @@ namespace DAL {
             // Initialize a data reader
             var searchFileResult = new Dictionary<DBFile, List<DBPeer>>();
             SqlDataReader reader = null;
+            SqlCommand command = null;
             try {
                 // Connect to the database
                 if (!alreadyConnected)
                     connection.Open();
-
-                SqlCommand command = new SqlCommand(
-                    "SELECT FileName, FileSize, PeerIP, PeerPort, PeerIsOnline " +
-                    "FROM DataFiles, Peers, File_Peer " +
-                    "WHERE [dbo].[File_Peer].[FileId] = [dbo].[DataFiles].[FileId] " +
-                    "AND [dbo].[Peers].[PeerName] = [dbo].[File_Peer].[PeerName] " +
-                    "AND [dbo].[DataFiles].[FileName] LIKE '%'+@fileName+'%' " + 
-                    "ORDER BY FileName, FileSize;", connection.DatabaseConnection);
-                command.Parameters.Add("@fileName", System.Data.SqlDbType.NVarChar, fileName.Length).Value = fileName;
-
+                if (fileName.Equals("*")) {
+                    command = new SqlCommand(
+                   "SELECT FileName, FileSize, PeerIP, PeerPort, PeerIsOnline " +
+                   "FROM DataFiles, Peers, File_Peer " +
+                   "WHERE [dbo].[File_Peer].[FileId] = [dbo].[DataFiles].[FileId] " +
+                   "AND [dbo].[Peers].[PeerName] = [dbo].[File_Peer].[PeerName] " +
+                   "ORDER BY FileName, FileSize;", connection.DatabaseConnection);
+                }
+                else {
+                    command = new SqlCommand(
+                   "SELECT FileName, FileSize, PeerIP, PeerPort, PeerIsOnline " +
+                   "FROM DataFiles, Peers, File_Peer " +
+                   "WHERE [dbo].[File_Peer].[FileId] = [dbo].[DataFiles].[FileId] " +
+                   "AND [dbo].[Peers].[PeerName] = [dbo].[File_Peer].[PeerName] " +
+                   "AND [dbo].[DataFiles].[FileName] LIKE '%'+@fileName+'%' " +
+                   "ORDER BY FileName, FileSize;", connection.DatabaseConnection);
+                    command.Parameters.Add("@fileName", System.Data.SqlDbType.NVarChar, fileName.Length).Value = fileName;
+                }
+               
                 reader = command.ExecuteReader(); // Execute the getting command
 
                 while (reader.Read()) {

@@ -10,10 +10,10 @@ namespace TorrentWebSiteASP
 {
     public partial class AdminLoginPage : System.Web.UI.Page
     {
-        protected void Page_Load(object sender, EventArgs e)
-        {
+        private static DAL.Entities.DBPeer peerBeforeUpdate;
 
-        }
+        protected void Page_Load(object sender, EventArgs e)
+        {}
 
         //Clicking on menu buttons.
         protected void NavigationMenu_MenuItemClick(object sender, MenuEventArgs e)
@@ -65,20 +65,20 @@ namespace TorrentWebSiteASP
         private void viewAllPeers()
         {
             List<DAL.Entities.DBPeer> peers = DAL.DBAccess.GetAllPeers();
-          //  if (peers.Count > 0)
                 updateTable(peers);
         }
 
         private void viewAllFiles()
         {
-            List<DAL.Entities.DBFile> files = DAL.DBAccess.GetAllFiles();
-           // if (files.Count > 0)
+            List<DAL.Entities.DBFile> files = DAL.DBAccess.SearchFiles("*").Keys.ToList();
+          //  List<DAL.Entities.DBFile> files = DAL.DBAccess.GetAllFiles();
                 updateTable(files);
         }
 
         //Set the columns of "Edit" and "Delite" visible true or false.
         private void commandFieldsSetVisible(bool visible)
         {
+            regPanel.Visible = visible;
             btnAddPeer.Visible = visible;
             AuthorsGridView.Columns[0].Visible = visible;
             AuthorsGridView.Columns[1].Visible = visible;
@@ -86,18 +86,15 @@ namespace TorrentWebSiteASP
 
         //Inserting elements in the table and refresh.
         private void updateTable(object objects)
-        {          
+        {           
             AuthorsGridView.DataSource = objects;
             AuthorsGridView.DataBind();
         }
 
-        protected void AuthorsGridView_PageIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
         protected void AuthorsGridView_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
         {
+            AuthorsGridView.EditIndex = -1;
+            viewAllPeers();
 
         }
 
@@ -111,32 +108,53 @@ namespace TorrentWebSiteASP
 
         protected void AuthorsGridView_RowEditing(object sender, GridViewEditEventArgs e)
         {
-            //SetInitialRow();
+            peerBeforeUpdate = new DAL.Entities.DBPeer
+            {
+                Name = AuthorsGridView.Rows[e.NewEditIndex].Cells[2].Text.Trim(),
+                Password = AuthorsGridView.Rows[e.NewEditIndex].Cells[3].Text,
+                Ip = AuthorsGridView.Rows[e.NewEditIndex].Cells[4].Text,
+                Port = int.Parse(AuthorsGridView.Rows[e.NewEditIndex].Cells[5].Text)
+            };
+           
+            AuthorsGridView.EditIndex = e.NewEditIndex;
+            viewAllPeers();
         }
 
         protected void AuthorsGridView_RowUpdating(object sender, GridViewUpdateEventArgs e)
         {
-
-        }
-
-        protected void AuthorsGridView_RowUpdated(object sender, GridViewUpdatedEventArgs e)
-        {
-
-        }
-
-        private void AddNewRecord()
-        {
-
+            DAL.Entities.DBPeer newPeer = new DAL.Entities.DBPeer();
+            newPeer.Name = ((TextBox)AuthorsGridView.Rows[e.RowIndex].Cells[2].Controls[0]).Text;
+            newPeer.Password = ((TextBox)AuthorsGridView.Rows[e.RowIndex].Cells[3].Controls[0]).Text;
+            if(!string.IsNullOrEmpty(((TextBox)AuthorsGridView.Rows[e.RowIndex].Cells[4].Controls[0]).Text))
+                newPeer.Ip = ((TextBox)AuthorsGridView.Rows[e.RowIndex].Cells[4].Controls[0]).Text;
+            if (!string.IsNullOrEmpty(((TextBox)AuthorsGridView.Rows[e.RowIndex].Cells[5].Controls[0]).Text))
+                newPeer.Port = int.Parse(((TextBox)AuthorsGridView.Rows[e.RowIndex].Cells[5].Controls[0]).Text);
+            DAL.DBAccess.UpdatePeer(peerBeforeUpdate, newPeer);
+            AuthorsGridView.EditIndex = -1;
+            viewAllPeers();
         }
 
         protected void btnAddPeer_Click(object sender, EventArgs e)
         {
-            //AddNewRowToGrid();
+            DAL.Entities.DBPeer newPeer = new DAL.Entities.DBPeer
+            {
+                Name = txtUserName.Text,
+                Password = txtPwd.Text,
+                Ip = txtIP.Text,
+                Port = int.Parse(txtPort.Text)
+            };
+            clearFields();
+            if(!DAL.DBAccess.PeerExists(newPeer))
+                DAL.DBAccess.RegisterPeer(newPeer);
+            viewAllPeers();
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////
-
-                //////////////////////////////////////////////////////
-                
+        private void clearFields()
+        {
+            txtUserName.Text = string.Empty;
+            txtPwd.Text = string.Empty;
+            txtIP.Text = string.Empty;
+            txtPort.Text = string.Empty;
+        }
     }
 }

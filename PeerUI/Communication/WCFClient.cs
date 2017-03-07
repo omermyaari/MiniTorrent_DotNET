@@ -4,8 +4,6 @@ using System.IO;
 using System.Net;
 using System.ServiceModel;
 using System.Text;
-using System.Windows.Threading;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 using TorrentWcfServiceLibrary;
 
@@ -15,20 +13,21 @@ namespace PeerUI.Communication {
         private ITorrentWcfService proxy;
         private ChannelFactory<ITorrentWcfService> factory;
         private XmlSerializer xmlSerializer = new XmlSerializer(typeof(ServiceMessage));
+        private bool userConnected = false;
+        public event WcfMessageDelegate WcfMessageEvent;
 
-        public WCFClient(User user) {
-            this.user = user;
-            user.UserIP = GetLocalIp();
-            CreateConnection();
-            SignIn();
-        }
 
         //  Creates a connection to the main server.
         private void CreateConnection() {
                 EndpointAddress ep = new EndpointAddress(@"http://" + user.ServerIP + ":"
        + user.ServerPort + @"/Wcf");
-                factory = new ChannelFactory<ITorrentWcfService>(new BasicHttpBinding(), ep);
-                proxy = factory.CreateChannel();
+            factory = new ChannelFactory<ITorrentWcfService>(new BasicHttpBinding() {
+                SendTimeout = TimeSpan.FromSeconds(10),
+                ReceiveTimeout = TimeSpan.FromSeconds(10),
+                OpenTimeout = TimeSpan.FromSeconds(10),
+                CloseTimeout = TimeSpan.FromSeconds(10),
+            }, ep);
+            proxy = factory.CreateChannel();
         }
 
         private string GetLocalIp() {
@@ -43,10 +42,12 @@ namespace PeerUI.Communication {
         }
 
         public void UpdateConfig(User user) {
-            SignOut();
+            if (userConnected) {
+                SignOut();
+                CloseConnection();
+            }
             this.user = user;
             user.UserIP = GetLocalIp();
-            CloseConnection();
             CreateConnection();
             SignIn();
         }
@@ -59,13 +60,6 @@ namespace PeerUI.Communication {
 
         //  Generates a xml file request to send to the main server.
         private ServiceMessage GenerateFileRequest(string FileName) {
-            /*XDocument xmlFileRequest = new XDocument(
-                new XDeclaration("1.0", "UTF-8", null),
-                new XElement("FileRequest",
-            new XElement("Username", user.Username),
-            new XElement("Password", user.Password),
-            new XElement("File", new XAttribute("Name", FileName))));
-            return xmlFileRequest.ToString();*/
             ServiceMessage serviceMessage = new ServiceMessage();
             serviceMessage.Header = MessageHeader.FileRequest;
             serviceMessage.UserName = user.Name;
@@ -101,38 +95,14 @@ namespace PeerUI.Communication {
                 }
                 return serviceMessage;
             }
-            catch (Exception ex) {
-                Console.WriteLine("Directory not found.");
+            catch (Exception) {
+                WcfMessageEvent(true, "Error: Directory not found.");
             }
             return null;
-
-            /*
-            XDocument xmlSignInRequest = new XDocument(
-                new XDeclaration("1.0", "UTF-8", null),
-                new XElement("SignInRequest",
-                new XElement("Username", user.Username),
-                new XElement("Password", user.Password),
-                new XElement("UserIP", user.UserIP),
-                new XElement("UserPort", user.LocalPort),
-                new XElement("Files"))
-                );
-                
-            foreach (FileInfo fi in sharedFilesInfo) {
-                xmlSignInRequest.Element("User").Element("Files").Add(
-                    new XElement("File", new XAttribute("Name", fi.Name), new XAttribute("Size", fi.Length)));
-            }
-            return xmlSignInRequest.ToString();*/
         }
+
         //  Generates a xml sign out request to send to the main server.
         public ServiceMessage GenerateSignOutRequest() {
-            /*XDocument xmlSignOutRequest = new XDocument(
-                new XDeclaration("1.0", "UTF-8", null),
-                new XElement("SignOutRequest",
-            new XElement("Username", user.Username),
-            new XElement("Password", user.Password)
-                ));
-            return xmlSignOutRequest.ToString();
-            */
             var serviceMessage = new ServiceMessage();
             serviceMessage.Header = MessageHeader.UserSignOut;
             serviceMessage.UserName = user.Name;
@@ -144,32 +114,65 @@ namespace PeerUI.Communication {
 
         //  Generates a file request from the user and sends it to the server,
         //  then returns the result to the user.
-        public List<ServiceDataFile> FileRequest(string FileName) {
-            var serviceMessage = GenerateFileRequest(FileName);
+        public List<ServiceDataFile> FileRequest(string fileName) {
+            if (String.IsNullOrEmpty(fileName)) {
+                WcfMessageEvent(true, "Error: File name cannot be empty.");
+                return null;
+
+            }
+            var serviceMessage = GenerateFileRequest(fileName);
             var xmlMessage = SerializeMessage(serviceMessage);
-            xmlMessage = proxy.Request(xmlMessage);
+            try {
+                xmlMessage = proxy.Request(xmlMessage);
+            }
+            catch (EndpointNotFoundException) {
+                WcfMessageEvent(true, "Error: Couldnt request file from main server - endpoint not found.");
+                return null;
+            }
+            catch (TimeoutException) {
+                WcfMessageEvent(true, "Error: Couldnt request file from main server - timeout.");
+                return null;
+            }
             serviceMessage = DeSerializeMessage(xmlMessage);
+            //  If the main server has returned an empty list of files, notify the user.
+            if (serviceMessage.FilesList.Count == 0) {
+                WcfMessageEvent(true, "Error: File " + fileName + " was not found.");
+                return null;
+            }
+            WcfMessageEvent(false, "Connected.");
             return serviceMessage.FilesList;
         }
 
         //  Generates a sign in request from the user and sends it to the server,
         //  then returns if the user signed in successfuly.
-        private MessageHeader SignIn() {
+        private void SignIn() {
             var serviceMessage = GenerateSignInRequest();
             if (serviceMessage == null) {
-                return MessageHeader.ConnectionFailed;
+                WcfMessageEvent(true, "Error: Couldn't generate a sign in request, check your settings.");
+                return;
             }
-
             var xmlMessage = SerializeMessage(serviceMessage);
             try {
                 xmlMessage = proxy.Request(xmlMessage);
             }
-            catch (EndpointNotFoundException ex) {
-                Console.WriteLine("Couldnt connect to server: " + ex.Message);
-                return MessageHeader.ConnectionFailed;
+            catch (EndpointNotFoundException) {
+                WcfMessageEvent(true, "Error: Couldnt sign in to main server - endpoint not found.");
+                return;
+            }
+            catch (TimeoutException) {
+                WcfMessageEvent(true, "Error: Couldn't sign in to main server - timeout.");
+                return;
             }
             serviceMessage = DeSerializeMessage(xmlMessage);
-            return serviceMessage.Header;
+            if (serviceMessage.Header == MessageHeader.ConnectionSuccessful) {
+                userConnected = true;
+                WcfMessageEvent(false, "Connected.");
+                return;
+            }
+            else {
+                WcfMessageEvent(true, "Error: Couldn't sign in to main server - username or password is incorrect.");
+            }
+
         }
 
         //  Generates a sign out request from the user and sends it to the server.
@@ -179,9 +182,13 @@ namespace PeerUI.Communication {
             try {
                 proxy.Request(xmlMessage);
             }
-            catch (EndpointNotFoundException ex) {
-                Console.WriteLine("Couldnt connect to server: " + ex.Message);
+            catch (EndpointNotFoundException) {
+                WcfMessageEvent(true, "Error: Couldnt sign out of server: endpoint not found.");
             }
+            catch (TimeoutException) {
+                WcfMessageEvent(true, "Error: Couldn't sign in to main server - timeout.");
+            }
+            userConnected = false;
         }
 
         //  DeSerializes string messages received from the main server.

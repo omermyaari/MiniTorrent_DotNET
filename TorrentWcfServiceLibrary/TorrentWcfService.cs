@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using DAL.Entities;
 using System.Xml.Serialization;
+using System.Threading;
 
 namespace TorrentWcfServiceLibrary {
     public class TorrentWcfService : ITorrentWcfService {

@@ -24,7 +24,7 @@ namespace DAL.Entities {
 
         public override bool Equals(object obj) {
             DBFile other = obj as DBFile;
-            return other != null && other.Name == this.Name && other.Size == this.Size;
+            return other != null && other.Name.Equals(this.Name) && other.Size == this.Size;
         }
     }
 }

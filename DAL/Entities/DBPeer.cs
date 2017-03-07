@@ -24,5 +24,19 @@ namespace DAL.Entities
 
         public DBPeer() {
         }
+
+        public override bool Equals(object obj) {
+            DBPeer other = obj as DBPeer;
+            return other != null && other.Name.Equals(this.Name) &&
+                other.Password.Equals(this.Password) &&
+                other.Ip.Equals(this.Ip) &&
+                other.Port == this.Port;
+        }
+
+        public override int GetHashCode() {
+            if (Name == null)
+                return 0;
+            return Name.GetHashCode();
+        }
     }
 }

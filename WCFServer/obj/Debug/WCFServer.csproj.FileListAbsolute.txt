@@ -9,6 +9,13 @@ C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.pd
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\WCFServer.exe
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\TorrentWcfServiceLibrary.dll
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\DAL.exe
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\TorrentWcfServiceLibrary.pdb
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\DAL.pdb
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.csprojResolveAssemblyReference.cache
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.exe
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.pdb
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\WCFServer.exe.config
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\WCFServer.pdb
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\WCFServer.exe.config
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\WCFServer.exe
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\WCFServer.pdb
@@ -19,10 +26,3 @@ C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\DAL.pdb
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.csprojResolveAssemblyReference.cache
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.exe
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.pdb
-C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\TorrentWcfServiceLibrary.pdb
-C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\DAL.pdb
-C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.csprojResolveAssemblyReference.cache
-C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.exe
-C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\obj\Debug\WCFServer.pdb
-C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\WCFServer.exe.config
-C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\WCFServer\bin\Debug\WCFServer.pdb

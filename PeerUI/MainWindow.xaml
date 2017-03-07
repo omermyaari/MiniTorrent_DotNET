@@ -6,126 +6,194 @@
         xmlns:local="clr-namespace:PeerUI"
         mc:Ignorable="d"
         Title="MiniTorrent" Height="393.5" Width="582" Closing="Window_Closing">
-    <TabControl Name="tabControl">
-        <TabItem Name="searchTab" Header="Search">
-            <DockPanel>
-                <DockPanel Margin="0, 10, 0, 0" LastChildFill="False" HorizontalAlignment="Center" DockPanel.Dock="Top">
-                    <Label Name="labelFileName" Content="File Name:" Margin="0, 0, 10, 0"/>
-                    <TextBox Name="textboxSearch" Margin="0, 0, 30, 0" Width="160"/>
-                    <Button Name="buttonSearch" Content="Search" Margin="0, 0, 30, 0" Width="100" Click="buttonSearch_Click"/>
-                    <Button Name="buttonDownload" Content="Download" Width="100" Click="buttonDownload_Click"/>
-
+    <DockPanel>
+        <TextBlock Name="textblockStatus" DockPanel.Dock="Bottom" FontWeight="Bold" FontSize="16"/>
+        <TabControl Name="tabControl">
+            <TabItem Name="searchTab" Header="Search">
+                <DockPanel>
+                    <DockPanel Margin="0, 10, 0, 0" LastChildFill="False" HorizontalAlignment="Center" DockPanel.Dock="Top">
+                        <Label Name="labelFileName" Content="File Name:" Margin="0, 0, 10, 0"/>
+                        <TextBox Name="textboxSearch" Margin="0, 0, 30, 0" Width="160"/>
+                        <Button Name="buttonSearch" Content="Search" Margin="0, 0, 30, 0" Width="100" Click="buttonSearch_Click"/>
+                        <Button Name="buttonDownload" Content="Download" Width="100" Click="buttonDownload_Click"/>
+                    </DockPanel>
+                    <ListView x:Name ="listViewSearch" Margin="5, 10, 5, 5" HorizontalAlignment='Stretch'>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.View>
+                            <GridView x:Name="gridViewSearchHeaders">
+                                <GridViewColumn DisplayMemberBinding="{Binding Name}">
+                                    <GridViewColumnHeader Content="Name" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding Size}">
+                                    <GridViewColumnHeader Content="Size" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding Peers}">
+                                    <GridViewColumnHeader Content="Peers" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
                 </DockPanel>
-                <ListView x:Name ="listViewSearch" Margin="5, 10, 5, 5" HorizontalAlignment='Stretch'>
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.View>
-                        <GridView x:Name="gridViewSearchHeaders">
-                            <GridViewColumn DisplayMemberBinding="{Binding Name}">
-                                <GridViewColumnHeader Content="Name" SizeChanged="HandleColumnHeaderSizeChanged"/>
-                            </GridViewColumn>
-                            <GridViewColumn DisplayMemberBinding="{Binding Size}">
-                                <GridViewColumnHeader Content="Size" SizeChanged="HandleColumnHeaderSizeChanged"/>
-                            </GridViewColumn>
-                            <GridViewColumn DisplayMemberBinding="{Binding Peers}">
-                                <GridViewColumnHeader Content="Peers" SizeChanged="HandleColumnHeaderSizeChanged"/>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </DockPanel>
-        </TabItem>
-        <TabItem Name="libraryTab" Header="Library">
-            <DockPanel>
-                <ListView Name ="listViewLibrary" Margin="5, 10, 5, 5">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.View>
-                        <GridView x:Name="gridViewLibraryHeaders">
-                            <GridViewColumn DisplayMemberBinding="{Binding Type}">
-                                <GridViewColumnHeader Content="Type" SizeChanged="HandleColumnHeaderSizeChanged"/>
-                            </GridViewColumn>
-                            <GridViewColumn DisplayMemberBinding="{Binding Name}">
-                                <GridViewColumnHeader Content="Name" SizeChanged="HandleColumnHeaderSizeChanged"/>
-                            </GridViewColumn>
-                            <GridViewColumn DisplayMemberBinding="{Binding Size}">
-                                <GridViewColumnHeader Content="Size" SizeChanged="HandleColumnHeaderSizeChanged"/>
-                            </GridViewColumn>
-                            <GridViewColumn x:Name="ProgressCell">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ProgressBar Maximum="100" Minimum="0" Value="{Binding Progress}" Width="{Binding Path=Width, ElementName=ProgressCell}" Height="10" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                                <GridViewColumnHeader Content="Progress" SizeChanged="HandleColumnHeaderSizeChanged"/>
-                            </GridViewColumn>
-                            <GridViewColumn DisplayMemberBinding="{Binding Speed}">
-                                <GridViewColumnHeader Content="Speed" SizeChanged="HandleColumnHeaderSizeChanged"/>
-                            </GridViewColumn>
-                            <GridViewColumn DisplayMemberBinding="{Binding ElapsedTime}">
-                                <GridViewColumnHeader Content="Elapsed Time" SizeChanged="HandleColumnHeaderSizeChanged"/>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </DockPanel>
-        </TabItem>
-        <TabItem Name="settingsTab" Header="Settings">
-            <StackPanel Orientation="Vertical"  HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Grid Name="gridConfig">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="200" />
-                    </Grid.ColumnDefinitions>
-                    <Label Grid.Row="0" Grid.Column="0" Content="Username"/>
-                    <Label Grid.Row="1" Grid.Column="0" Content="Password"/>
-                    <Label Grid.Row="2" Grid.Column="0" Content="Server IP"/>
-                    <Label Grid.Row="3" Grid.Column="0" Content="Server Port"/>
-                    <Label Grid.Row="4" Grid.Column="0" Content="Local Port"/>
-                    <Label Grid.Row="5" Grid.Column="0" Content="Shared Folder"/>
-                    <Label Grid.Row="6" Grid.Column="0" Content="Download Folder"/>
-                    <TextBox Name="textboxUsername" Grid.Column="1" Grid.Row="0" Margin="3" />
-                    <PasswordBox Name="passwordboxPassword" Grid.Column="1" Grid.Row="1" Margin="3" />
-                    <TextBox Name="textboxServerIP" Grid.Column="1" Grid.Row="2" Margin="3" />
-                    <TextBox Name="textboxServerPort" Grid.Column="1" Grid.Row="3" Margin="3" />
-                    <TextBox Name="textboxLocalPort" Grid.Column="1" Grid.Row="4" Margin="3" />
-                    <Grid Grid.Column="1" Grid.Row="5">
+            </TabItem>
+            <TabItem Name="libraryTab" Header="Library">
+                <DockPanel>
+                    <ListView Name ="listViewLibrary" Margin="5, 10, 5, 5">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.View>
+                            <GridView x:Name="gridViewLibraryHeaders">
+                                <GridViewColumn DisplayMemberBinding="{Binding Type}">
+                                    <GridViewColumnHeader Content="Type" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding Name}">
+                                    <GridViewColumnHeader Content="Name" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding Size}">
+                                    <GridViewColumnHeader Content="Size" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                                </GridViewColumn>
+                                <GridViewColumn x:Name="ProgressCell">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ProgressBar Maximum="100" Minimum="0" Value="{Binding Progress}" Width="{Binding Path=Width, ElementName=ProgressCell}" Height="10" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                    <GridViewColumnHeader Content="Progress" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding Speed}">
+                                    <GridViewColumnHeader Content="Speed" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding ElapsedTime}">
+                                    <GridViewColumnHeader Content="Elapsed Time" SizeChanged="HandleColumnHeaderSizeChanged"/>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </DockPanel>
+            </TabItem>
+            <TabItem Name="settingsTab" Header="Settings">
+                <StackPanel Orientation="Vertical"  HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid Name="gridConfig">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="4*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="200" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Row="0" Grid.Column="0" Content="Username"/>
+                        <Label Grid.Row="1" Grid.Column="0" Content="Password"/>
+                        <Label Grid.Row="2" Grid.Column="0" Content="Server IP"/>
+                        <Label Grid.Row="3" Grid.Column="0" Content="Server Port"/>
+                        <Label Grid.Row="4" Grid.Column="0" Content="Local Port"/>
+                        <Label Grid.Row="5" Grid.Column="0" Content="Shared Folder"/>
+                        <Label Grid.Row="6" Grid.Column="0" Content="Download Folder"/>
+                        <TextBox Name="textboxUsername" Grid.Column="1" Grid.Row="0" Margin="3" Text="{Binding Path=Name, 
+                         UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True,
+                         ValidatesOnDataErrors=True}"/>
+                        <PasswordBox Name="passwordboxPassword" Grid.Column="1" Grid.Row="1" Margin="3"/>
+                        <TextBox Name="textboxServerIP" Grid.Column="1" Grid.Row="2" Margin="3">
+                            <TextBox.Text>
+                                <Binding UpdateSourceTrigger="PropertyChanged" Path="ServerIP" NotifyOnValidationError="True">
+                                    <Binding.ValidationRules>
+                                        <local:IPValidationRule />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                        <TextBox Name="textboxServerPort" Grid.Column="1" Grid.Row="3" Margin="3" Text="{Binding Path=ServerPort, 
+                         UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True,
+                         ValidatesOnDataErrors=True}"/>
+                        <TextBox Name="textboxLocalPort" Grid.Column="1" Grid.Row="4" Margin="3" Text="{Binding Path=LocalPort, 
+                         UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True,
+                         ValidatesOnDataErrors=True}"/>
+                        <Grid Grid.Column="1" Grid.Row="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Name="textboxSharedFolder" Margin="3" Grid.Column="0">
+                                <TextBox.Text>
+                                    <Binding UpdateSourceTrigger="PropertyChanged" Path="SharedFolderPath" NotifyOnValidationError="True">
+                                        <Binding.ValidationRules>
+                                            <local:PathValidationRule />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <Button Name="buttonSharedFolder" Margin="3" Grid.Column="1" Content="Browse" Click="buttonSharedFolder_Click"/>
+                        </Grid>
+                        <Grid Grid.Column="1" Grid.Row="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Name="textboxDownloadFolder" Margin="3" Grid.Column="0">
+                                <TextBox.Text>
+                                    <Binding UpdateSourceTrigger="PropertyChanged" Path="DownloadFolderPath" NotifyOnValidationError="True">
+                                        <Binding.ValidationRules>
+                                            <local:PathValidationRule />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <Button Name="buttonDownloadFolder" Margin="3" Grid.Column="1" Content="Browse" Click="buttonDownloadFolder_Click"/>
+                        </Grid>
+                    </Grid>
+                    <DockPanel Margin="0, 10, 0, 0" LastChildFill="False" HorizontalAlignment="Center">
+                        <Button Name="buttonApply" Content="Apply" Margin="0, 0, 30, 0" Width="100" Click="buttonApply_Click">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Path=(Validation.HasError), ElementName=textboxServerIP}" Value="False"/>
+                                                <Condition Binding="{Binding Path=(Validation.HasError), ElementName=textboxUsername}" Value="False"/>
+                                                <Condition Binding="{Binding Path=(Validation.HasError), ElementName=textboxServerPort}" Value="False"/>
+                                                <Condition Binding="{Binding Path=(Validation.HasError), ElementName=textboxLocalPort}" Value="False"/>
+                                                <Condition Binding="{Binding Path=(Validation.HasError), ElementName=textboxSharedFolder}" Value="False"/>
+                                                <Condition Binding="{Binding Path=(Validation.HasError), ElementName=textboxDownloadFolder}" Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button Name="buttonClear"  Content="Clear" Width="100" Click="buttonClear_Click"/>
+                    </DockPanel>
+                </StackPanel>
+            </TabItem>
+            <TabItem Name="dllTab" Header="Analyze DLL">
+                <DockPanel>
+                    <Grid Grid.Column="1" Grid.Row="5" DockPanel.Dock="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="3*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBox Name="textboxSharedFolder" Margin="3" Grid.Column="0" />
-                        <Button Name="buttonSharedFolder" Margin="3" Grid.Column="1" Content="Set" Click="buttonSharedFolder_Click"/>
+                        <Button Name="buttonAnalyzeDLL" Margin="3" Grid.Column="0" Content="Analyze" Click="buttonSharedFolder_Click"/>
+                        <TextBox Name="textboxDLLPath" Margin="3" Grid.Column="1"/>
+                        <Button Name="buttonSetDLLPath" Margin="3" Grid.Column="2" Content="Browse" Click="buttonSetDLLPath_Click"/>
                     </Grid>
-                    <Grid Grid.Column="1" Grid.Row="6">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="4*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBox Name="textboxDownloadFolder" Margin="3" Grid.Column="0" />
-                        <Button Name="buttonDownloadFolder" Margin="3" Grid.Column="1" Content="Set" Click="buttonDownloadFolder_Click"/>
-                    </Grid>
-                </Grid>
-                <DockPanel Margin="0, 10, 0, 0" LastChildFill="False" HorizontalAlignment="Center">
-                    <Button Name="buttonApply" Content="Apply" Margin="0, 0, 30, 0" Width="100" Click="buttonApply_Click"/>
-                    <Button Name="buttonClear"  Content="Clear" Width="100" Click="buttonClear_Click"/>
+                    <TextBlock>
+                        
+                    </TextBlock>
                 </DockPanel>
-            </StackPanel>
-        </TabItem>
-    </TabControl>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
 </Window>

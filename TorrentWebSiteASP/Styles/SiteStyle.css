@@ -3,18 +3,18 @@
 
 /* Authorization Text Boxes */
 .authTxtBox {
-	width: 230px;
-	border: 1px solid #3366FF;
-	border-left: 4px solid #3366FF;
+    width: 230px;
+    border: 1px solid #3366FF;
+    border-left: 4px solid #3366FF;
 }
 
 legend {
     color: #8043d7;
-    background: #dbbdf5; /* Цвет фона */
-    padding: 5px 10px; /* Поля */
-    border: 1px solid #333; /* Параметры рамки */
-    margin-left: 20px; /* Отступ слева */
-    border-radius: 5px; /* Радиус скругления */
+    background: #dbbdf5;
+    padding: 5px 10px;
+    border: 1px solid #333;
+    margin-left: 20px;
+    border-radius: 5px;
 }
 
 fieldset {

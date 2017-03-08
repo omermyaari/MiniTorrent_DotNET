@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace TorrentWebSiteASP
 {
+    public enum FileColomn { Id, Bame, Size };
     public partial class AdminLoginPage : System.Web.UI.Page
     {
-        private static DAL.Entities.DBPeer peerBeforeUpdate;
+        private static DAL.Entities.DBPeer oldPeer;
+
+        private enum PeerColomn { Edit , Delete , Name , Password , IP , Port}
+        private enum Validation { NameOrPassword, IP, Port}
 
         protected void Page_Load(object sender, EventArgs e)
         {}
@@ -70,9 +76,8 @@ namespace TorrentWebSiteASP
 
         private void viewAllFiles()
         {
-            List<DAL.Entities.DBFile> files = DAL.DBAccess.SearchFiles("*").Keys.ToList();
-          //  List<DAL.Entities.DBFile> files = DAL.DBAccess.GetAllFiles();
-                updateTable(files);
+            List<DAL.Entities.DBFile> files = DAL.DBAccess.GetAllFiles();
+            updateTable(files);
         }
 
         //Set the columns of "Edit" and "Delite" visible true or false.
@@ -80,81 +85,106 @@ namespace TorrentWebSiteASP
         {
             regPanel.Visible = visible;
             btnAddPeer.Visible = visible;
-            AuthorsGridView.Columns[0].Visible = visible;
-            AuthorsGridView.Columns[1].Visible = visible;
+            MainGridView.Columns[0].Visible = visible;
+            MainGridView.Columns[1].Visible = visible;
         }
 
         //Inserting elements in the table and refresh.
         private void updateTable(object objects)
         {           
-            AuthorsGridView.DataSource = objects;
-            AuthorsGridView.DataBind();
+            MainGridView.DataSource = objects;
+            MainGridView.DataBind();
         }
 
-        protected void AuthorsGridView_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+        //When the editing mode is cancelled.
+        protected void MainGridView_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
         {
-            AuthorsGridView.EditIndex = -1;
+            MainGridView.EditIndex = -1;
             viewAllPeers();
-
         }
 
-        protected void AuthorsGridView_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        //When the Peer "Delete" button is clicked.
+        protected void MainGridView_RowDeleting(object sender, GridViewDeleteEventArgs e)
         {
-            if(DAL.DBAccess.DeletePeer(AuthorsGridView.Rows[e.RowIndex].Cells[2].Text))
-                viewAllPeers();
-            //else ERROR MESSAGE
-            
+            if (DAL.DBAccess.DeletePeer(MainGridView.Rows[e.RowIndex].Cells[2].Text))
+                viewAllPeers();           
         }
 
-        protected void AuthorsGridView_RowEditing(object sender, GridViewEditEventArgs e)
+        //When the Peer "Edit" button is clicked.
+        protected void MainGridView_RowEditing(object sender, GridViewEditEventArgs e)
         {
-            peerBeforeUpdate = new DAL.Entities.DBPeer
-            {
-                Name = AuthorsGridView.Rows[e.NewEditIndex].Cells[2].Text.Trim(),
-                Password = AuthorsGridView.Rows[e.NewEditIndex].Cells[3].Text,
-                Ip = AuthorsGridView.Rows[e.NewEditIndex].Cells[4].Text,
-                Port = int.Parse(AuthorsGridView.Rows[e.NewEditIndex].Cells[5].Text)
-            };
+            oldPeer = new DAL.Entities.DBPeer();
+
+            oldPeer.Name = MainGridView.Rows[e.NewEditIndex].Cells[(int)PeerColomn.Name].Text.Trim();
+            oldPeer.Password = MainGridView.Rows[e.NewEditIndex].Cells[(int)PeerColomn.Password].Text;
+            oldPeer.Ip = MainGridView.Rows[e.NewEditIndex].Cells[(int)PeerColomn.IP].Text;
+            oldPeer.Port = int.Parse(MainGridView.Rows[e.NewEditIndex].Cells[(int)PeerColomn.Port].Text);            
            
-            AuthorsGridView.EditIndex = e.NewEditIndex;
+            MainGridView.EditIndex = e.NewEditIndex;
             viewAllPeers();
         }
 
-        protected void AuthorsGridView_RowUpdating(object sender, GridViewUpdateEventArgs e)
-        {
-            DAL.Entities.DBPeer newPeer = new DAL.Entities.DBPeer();
-            newPeer.Name = ((TextBox)AuthorsGridView.Rows[e.RowIndex].Cells[2].Controls[0]).Text;
-            newPeer.Password = ((TextBox)AuthorsGridView.Rows[e.RowIndex].Cells[3].Controls[0]).Text;
-            if(!string.IsNullOrEmpty(((TextBox)AuthorsGridView.Rows[e.RowIndex].Cells[4].Controls[0]).Text))
-                newPeer.Ip = ((TextBox)AuthorsGridView.Rows[e.RowIndex].Cells[4].Controls[0]).Text;
-            if (!string.IsNullOrEmpty(((TextBox)AuthorsGridView.Rows[e.RowIndex].Cells[5].Controls[0]).Text))
-                newPeer.Port = int.Parse(((TextBox)AuthorsGridView.Rows[e.RowIndex].Cells[5].Controls[0]).Text);
-            DAL.DBAccess.UpdatePeer(peerBeforeUpdate, newPeer);
-            AuthorsGridView.EditIndex = -1;
+        //When the Peer "Update" button is clicked. 
+        protected void MainGridView_RowUpdating(object sender, GridViewUpdateEventArgs e)
+        {           
+            string name = ((TextBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColomn.Name].Controls[0]).Text.Trim();
+            string pass = ((TextBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColomn.Password].Controls[0]).Text.Trim();
+            string ip = ((TextBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColomn.IP].Controls[0]).Text.Trim();
+            string port = ((TextBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColomn.Port].Controls[0]).Text.Trim();
+
+            if (validData(name, Validation.NameOrPassword) && validData(pass, Validation.NameOrPassword) &&
+                validData(ip, Validation.IP) && validData(port, Validation.Port)){
+                DAL.DBAccess.UpdatePeer(oldPeer, new DAL.Entities.DBPeer(name, pass, ip, int.Parse(port)));
+            }
+
+            MainGridView.EditIndex = -1;
             viewAllPeers();
         }
 
+        //When the button of Adding new peer is clicked.
         protected void btnAddPeer_Click(object sender, EventArgs e)
         {
-            DAL.Entities.DBPeer newPeer = new DAL.Entities.DBPeer
-            {
-                Name = txtUserName.Text,
-                Password = txtPwd.Text,
-                Ip = txtIP.Text,
-                Port = int.Parse(txtPort.Text)
-            };
+            DAL.Entities.DBPeer newPeer = new DAL.Entities.DBPeer();
+            newPeer.Name = txtUserName.Text;
+            newPeer.Password = txtPwd.Text;
+            if (txtIP.Text == null)
+                newPeer.Ip = txtIP.Text;
+            else
+                newPeer.Ip = "0.0.0.0";
+            if (!String.IsNullOrEmpty(txtPort.Text))
+                newPeer.Port = int.Parse(txtPort.Text);
             clearFields();
+
             if(!DAL.DBAccess.PeerExists(newPeer))
                 DAL.DBAccess.RegisterPeer(newPeer);
             viewAllPeers();
         }
 
+        //Clear the textFeields after new Peer creation.
         private void clearFields()
         {
             txtUserName.Text = string.Empty;
             txtPwd.Text = string.Empty;
             txtIP.Text = string.Empty;
             txtPort.Text = string.Empty;
+        }
+
+        //Check validation of input data in Peer Row (when updated).
+        private bool validData(string data, Validation val)
+        {
+            if (String.IsNullOrEmpty(data))
+                return false;
+            switch (val)
+            {
+                case Validation.NameOrPassword:
+                    return Regex.IsMatch(data, @"^[a-zA-Z0-9]{3,10}$");
+                case Validation.IP:
+                    return Regex.IsMatch(data, @"\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b");
+                case Validation.Port:
+                    return Regex.IsMatch(data, @"^(?:[0-5]?[0-9]{1,4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-6])");
+                default:
+                    return false;
+            }
         }
     }
 }

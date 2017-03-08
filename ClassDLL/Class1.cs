@@ -9,27 +9,28 @@ namespace ClassDLL {
 
         public string str;
         private int integer;
-        
-        public float Float {
-            get; set;
+
+        public int Integer {
+            get {
+                return integer;
+            }
+
+            set {
+                integer = value;
+            }
         }
 
-        public Class1() {
-
-        }
-
-        public Class1(string str, int integer, float Float) {
+        public Class1(string str, int integer) {
             this.str = str;
             this.integer = integer;
-            this.Float = Float;
         }
 
-        public float AddIntFloat() {
-            return integer + Float;
+        public void DoubleInt() {
+            integer *= 2;
         }
 
-        private string PrintIntFloatToStrPrivate() {
-            return Convert.ToString(integer + Float);
+        public override string ToString() {
+            return "String: " + str + ", Integer: " + Integer;
         }
     }
 }

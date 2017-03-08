@@ -1,97 +1,73 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPage.Master" AutoEventWireup="true" CodeBehind="RegistrationPage.aspx.cs" Inherits="TorrentWebSiteASP.WebForm1" %>
 
-<asp:Content ID="HeadContent" ContentPlaceHolderID="head" runat="server">
-    <style type="text/css">
-        .auto-style1 {
-            width: 653px;
-            height: 289px;
-        }
-        .auto-style3 {
-            width: 226px;
-        }
-        .auto-style4 {
-            width: 304px;
-        }
-        .auto-style5 {
-            height: 200px;
-            width: 610px;
-        }
-        .auto-style6 {
-            border-right: 1px solid #3366FF;
-            border-top: 1px solid #3366FF;
-            border-bottom: 1px solid #3366FF;
-            border-left: 4px solid #3366FF;
-        }
-    </style>
-</asp:Content>
+<asp:Content ID="HeadContent" ContentPlaceHolderID="head" runat="server"> </asp:Content>
 <asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
 
-
-    <fieldset class="auto-style1">
+    <fieldset style ="display: inline-block">
         <legend>
             <h1>New Torrent User Registration:</h1>
         </legend>
-        <table class="auto-style5">
+        <table>
             <tr>
-                <td class="auto-style4">UserName:</td>
+                <td ><h3>User Name:</h3></td>
                 <td>
-                    <asp:TextBox ID="txtUserName" runat="server" Width="230px" CssClass="auto-style6"></asp:TextBox>
+                    <asp:TextBox ID="txtUserNameReg" runat="server" CssClass="authTxtBox">
+                    </asp:TextBox>
                 </td>
-                <td class="auto-style3">
-                    <asp:RequiredFieldValidator
-                        ID="rfvUserName"
-                        runat="server"
-                        ControlToValidate="txtUserName"
-                        ErrorMessage="UserName can't be left blank"
-                        SetFocusOnError="True">*
+                <td>
+                    <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="txtUserNameReg"
+                        ErrorMessage="Password can't be left blank" SetFocusOnError="True">*
                     </asp:RequiredFieldValidator>
+                    <asp:RegularExpressionValidator ID="revUserNameReg" runat="server"
+                        ControlToValidate="txtUserNameReg" ErrorMessage="UserName must be 3 to 10 characters!"
+                        SetFocusOnError="True" ForeColor="Red" ValidationExpression="^[a-zA-Z0-9]{3,10}$"> 
+                    </asp:RegularExpressionValidator>
                 </td>
             </tr>
 
             <tr>
-                <td class="auto-style4">Password:</td>
+                <td><h3>Password:</h3></td>
                 <td>
-                    <asp:TextBox ID="txtPwd" runat="server" TextMode="Password" CssClass="authTxtBox">
+                    <asp:TextBox ID="txtPwdReg" runat="server" TextMode="Password" CssClass="authTxtBox">
                     </asp:TextBox>
                 </td>
-                <td class="auto-style3">
-                    <asp:RequiredFieldValidator ID="rfvPwd"
-                        runat="server" ControlToValidate="txtPwd"
-                        ErrorMessage="Password can't be left blank"
-                        SetFocusOnError="True">*
+                <td>
+                    <asp:RequiredFieldValidator ID="rfvPwd" runat="server" ControlToValidate="txtPwdReg"
+                        ErrorMessage="Password can't be left blank" SetFocusOnError="True">*
                     </asp:RequiredFieldValidator>
+                    <asp:RegularExpressionValidator ID="revPwdReg" runat="server" ControlToValidate="txtPwdReg"
+                        ErrorMessage="Password must be 3 to 10 characters!" ForeColor="Red" SetFocusOnError="True" ValidationExpression="^[a-zA-Z0-9]{3,10}$">
+                    </asp:RegularExpressionValidator>
                 </td>
             </tr>
 
             <tr>
-                <td class="auto-style4">Confirm Password:</td>
+                <td><h3>Confirm Password:</h3></td>
                 <td>
-                    <asp:TextBox ID="txtRePwd" runat="server" TextMode="Password" CssClass="authTxtBox">
+                    <asp:TextBox ID="txtRePwdReg" runat="server" TextMode="Password" CssClass="authTxtBox">
                     </asp:TextBox>
                 </td>
-                <td class="auto-style3">
+                <td>
                     <asp:CompareValidator ID="CompareValidator1"
                         runat="server"
-                        ControlToCompare="txtRePwd"
-                        ControlToValidate="txtPwd"
+                        ControlToCompare="txtRePwdReg"
+                        ControlToValidate="txtPwdReg"
                         Operator="Equal"
                         ErrorMessage="Password and confirm password do not match!"
-                        SetFocusOnError="True" Font-Bold ="true"
-                        >
+                        SetFocusOnError="True" Font-Bold="true">
                     </asp:CompareValidator>
                 </td>
             </tr>
 
             <tr>
-                <td colspan="2" align ="center">
-                    <asp:Label ID="lblMsg" runat="server" Font-Size="Large">
-                    </asp:Label>
+                <td colspan="2" align="center">
+                    <asp:Label ID="lblMsg" runat="server" Font-Size="Large"> </asp:Label>
                 </td>
             </tr>
 
             <tr>
-                <td class="auto-style4" align ="center">
-                    <asp:Button ID="btnSave" runat="server" CssClass ="submitButton"
+                <td align="center">
+                    <asp:Button ID="btnSave" runat="server" CssClass="submitButton"
                         Text="Sign Up"
                         OnClick="btnSave_Click" />
                 </td>

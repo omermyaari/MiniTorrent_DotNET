@@ -80,6 +80,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="SearchPage.aspx" />
     <Content Include="Styles\SiteStyle.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -121,6 +122,13 @@
     </Compile>
     <Compile Include="RegistrationPage.aspx.designer.cs">
       <DependentUpon>RegistrationPage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SearchPage.aspx.cs">
+      <DependentUpon>SearchPage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="SearchPage.aspx.designer.cs">
+      <DependentUpon>SearchPage.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

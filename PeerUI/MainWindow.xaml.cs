@@ -120,7 +120,7 @@ namespace PeerUI {
         //  TODO validator?
         private void getDetailsFromFields() {
             username = textboxUsername.Text;
-            password = passwordboxPassword.Password;
+            password = textboxPassword.Text;
             sharedFolderPath = textboxSharedFolder.Text;
             downloadFolderPath = textboxDownloadFolder.Text;
             serverIP = textboxServerIP.Text;
@@ -130,7 +130,7 @@ namespace PeerUI {
 
         private void loadDetailsFromUser() {
             textboxUsername.Text = user.Name;
-            passwordboxPassword.Password = user.Password;
+            textboxPassword.Text = user.Password;
             textboxSharedFolder.Text = user.SharedFolderPath;
             textboxDownloadFolder.Text = user.DownloadFolderPath;
             textboxServerIP.Text = user.ServerIP;
@@ -305,17 +305,29 @@ namespace PeerUI {
          BindingFlags.Public);
                     ConcatDLLMembers(props);
 
-                    //  Activating constructor
-                    object[] parametersArray = new Object[3];
-                    parametersArray[0] = 5;
-                    parametersArray[1] = "Hello";
-                    parametersArray[2] = 2.2;
-                    //object obj = Activator.CreateInstance(t, parametersArray);
+                    //  Calling constructor
+                    object[] parametersArray = new Object[2];
+                    parametersArray[0] = "Hello";
+                    parametersArray[1] = 3;
+                    object obj = Activator.CreateInstance(t, parametersArray);
 
-                    //  Activating ToString method
-                    //string s = (string)t.GetMethod("ToString").Invoke(obj, null);
+                    //  Calling ToString method
+                    MethodInfo mi = t.GetMethod("ToString");
+                    string s = (string)mi.Invoke(obj, null);
+                    textblockDLLDetails.Text += "\nToString():\n" + s + "\n";
 
+                    //  Setting the Integer property to 7
+                    PropertyInfo pi = t.GetProperty("Integer");
+                    pi.SetValue(obj, 7, null);
 
+                    //  Calling the method that doubles the Integer property
+                    MethodInfo mi2 = t.GetMethod("DoubleInt");
+                    mi2.Invoke(obj, null);
+
+                    //  Calling ToString method again
+                    s = (string)mi.Invoke(obj, null);
+                    textblockDLLDetails.Text += "\nToString() after setting the integer " +
+                        "property to 7 and using the DoubleInt method:\n" + s + "\n";
                 }
             }
             else {

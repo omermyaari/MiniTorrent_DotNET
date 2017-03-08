@@ -13,31 +13,40 @@ namespace TorrentWebSiteASP {
     public partial class WebForm1 {
         
         /// <summary>
-        /// txtUserName control.
+        /// txtUserNameReg control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtUserName;
+        protected global::System.Web.UI.WebControls.TextBox txtUserNameReg;
         
         /// <summary>
-        /// rfvUserName control.
+        /// RequiredFieldValidator1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvUserName;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
         
         /// <summary>
-        /// txtPwd control.
+        /// revUserNameReg control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPwd;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revUserNameReg;
+        
+        /// <summary>
+        /// txtPwdReg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtPwdReg;
         
         /// <summary>
         /// rfvPwd control.
@@ -49,13 +58,22 @@ namespace TorrentWebSiteASP {
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvPwd;
         
         /// <summary>
-        /// txtRePwd control.
+        /// revPwdReg control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtRePwd;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revPwdReg;
+        
+        /// <summary>
+        /// txtRePwdReg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtRePwdReg;
         
         /// <summary>
         /// CompareValidator1 control.

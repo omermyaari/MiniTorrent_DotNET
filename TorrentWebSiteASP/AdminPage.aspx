@@ -50,9 +50,9 @@
             </td>
 
             <td align="right">
-                <asp:GridView ID="AuthorsGridView" OnRowCancelingEdit="AuthorsGridView_RowCancelingEdit" OnRowUpdating="AuthorsGridView_RowUpdating"
-                    ShowFooter="True" Width="600px" OnRowEditing="AuthorsGridView_RowEditing" OnRowDeleting="AuthorsGridView_RowDeleting" AllowPaging="True" HorizontalAlign="Left"
-                    CssClass="Grid" AlternatingRowStyle-CssClass="alt" PagerStyle-CssClass="pgr" runat="server" CellPadding="4" ForeColor="#333333" GridLines="None">
+                <asp:GridView ID="MainGridView" OnRowCancelingEdit="MainGridView_RowCancelingEdit" OnRowUpdating="MainGridView_RowUpdating"
+                    ShowFooter="True" Width="600px" OnRowEditing="MainGridView_RowEditing" OnRowDeleting="MainGridView_RowDeleting" AllowPaging="True" HorizontalAlign="Left"
+                    ShowHeaderWhenEmpty="true" CssClass="Grid" AlternatingRowStyle-CssClass="alt" PagerStyle-CssClass="pgr" runat="server" CellPadding="4" ForeColor="#333333" GridLines="None">
                     <AlternatingRowStyle CssClass="alt" BackColor="White" ForeColor="#284775"></AlternatingRowStyle>
 
                     <EditRowStyle BackColor="#999999" />
@@ -68,87 +68,89 @@
                     <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
 
                     <Columns>
-
-                        <asp:CommandField ShowEditButton="true" causesvalidation="false" headertext="Edit"/>
-                        <asp:CommandField ShowDeleteButton="true"  headertext="Delete"/>
-
+                        <asp:CommandField ShowEditButton="true" CausesValidation="false" HeaderText="Edit" />
+                        <asp:CommandField ShowDeleteButton="true" HeaderText="Delete" />                      
                     </Columns>
-
-
-
                 </asp:GridView>
 
             </td>
             <td class="auto-style3"></td>
         </tr>
 
-        <tr>
+        <tr> 
             <td align="center" colspan="2">&nbsp;</td>
         </tr>
 
         <tr>
-            <asp:Panel runat="server" ID ="regPanel" Visible="false">
-            <td>&nbsp;</td>
-            <td class="auto-style3">
-                <table class="auto-style5" id="table1">
-                    <tr>
-                        <td class="auto-style4">UserName:</td>
-                        <td>
-                            <asp:TextBox ID="txtUserName" runat="server" Width="230px" CssClass="auto-style6"></asp:TextBox>
-                        </td>
-                        <td class="auto-style3">
-                            <asp:RequiredFieldValidator
-                                ID="rfvUserName"
-                                runat="server"
-                                ControlToValidate="txtUserName"
-                                ErrorMessage="UserName can't be left blank"
-                                SetFocusOnError="True">*
-                            </asp:RequiredFieldValidator>
-                        </td>
-                    </tr>
+            <asp:Panel runat="server" ID="regPanel" Visible="false">
+                <td>&nbsp;</td>
+                <td class="auto-style3">
+                    <table class="auto-style5" id="table1">
+                        <tr>
+                            <td class="auto-style4"><h3>User Name:</h3></td>
+                            <td>
+                                <asp:TextBox ID="txtUserName" runat="server" CssClass="authTxtBox"></asp:TextBox>
+                            </td>
+                            <td class="auto-style3">
+                                <asp:RegularExpressionValidator ID="RegularExpressionValidator3" runat="server" ControlToValidate="txtUserName"
+                                    ErrorMessage="Password must be 3 to 10 characters!" ForeColor="Red" SetFocusOnError="True" ValidationExpression="^[a-zA-Z0-9]{3,10}$">
+                                </asp:RegularExpressionValidator>
+                                <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="txtUserName"
+                                    ErrorMessage="Password can't be left blank" SetFocusOnError="True">*
+                                </asp:RequiredFieldValidator>
+                            </td>
+                        </tr>
 
-                    <tr>
-                        <td class="auto-style4">Password:</td>
-                        <td>
-                            <asp:TextBox ID="txtPwd" runat="server" CssClass="authTxtBox"></asp:TextBox>
-                        </td>
-                        <td class="auto-style3">
-                            <asp:RequiredFieldValidator ID="rfvPwd"
-                                runat="server" ControlToValidate="txtPwd"
-                                ErrorMessage="Password can't be left blank"
-                                SetFocusOnError="True">*
-                            </asp:RequiredFieldValidator>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td class="auto-style4"><h3>Password:</h3></td>
+                            <td>
+                                <asp:TextBox ID="txtPwd" runat="server" CssClass="authTxtBox"></asp:TextBox>
+                            </td>
+                            <td class="auto-style3">
+                                <asp:RegularExpressionValidator ID="revPwd" runat="server" ControlToValidate="txtPwd"
+                                    ErrorMessage="Password must be 3 to 10 characters!" ForeColor="Red" SetFocusOnError="True" ValidationExpression="^[a-zA-Z0-9]{3,10}$">
+                                </asp:RegularExpressionValidator>
+                                <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="txtPwd"
+                                    ErrorMessage="Password can't be left blank" SetFocusOnError="True">*
+                                </asp:RequiredFieldValidator>
+                            </td>
+                        </tr>
 
-                    <tr>
-                        <td class="auto-style4">IP:</td>
-                        <td>
-                            <asp:TextBox ID="txtIP" runat="server" Width="230px" CssClass="auto-style6"></asp:TextBox>
-                        </td>
-                        <td class="auto-style3"></td>
-                    </tr>
+                        <tr>
+                            <td class="auto-style4"><h3>IP:</h3></td>
+                            <td>
+                                <asp:TextBox ID="txtIP" runat="server" Width="230px" CssClass="authTxtBox"></asp:TextBox>
+                            </td>
+                            <td class="auto-style3">
+                                <asp:RegularExpressionValidator ValidationExpression="\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
+                                    ID="RegularExpressionValidator1" runat="server" ErrorMessage="Invalid IP !" ForeColor="red" ControlToValidate="txtIP"></asp:RegularExpressionValidator>
+                            </td>
+                        </tr>
 
-                    <tr>
-                        <td class="auto-style4">Port:</td>
-                        <td>
-                            <asp:TextBox ID="txtPort" runat="server" Width="230px" CssClass="auto-style6"></asp:TextBox>
-                        </td>
-                        <td class="auto-style3"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">
-                            <asp:Label ID="lblMsg" runat="server" Font-Size="Large"></asp:Label>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td class="auto-style4"><h3>Port:</h3></td>
+                            <td>
+                                <asp:TextBox ID="txtPort" runat="server" Width="230px" CssClass="authTxtBox"></asp:TextBox>
+                            </td>
+                            <td class="auto-style3">
+                                <asp:RangeValidator runat="server" Type="Integer"
+                                    MinimumValue="1" MaximumValue="65535" ControlToValidate="txtPort"
+                                    ErrorMessage="Value must be a whole number between 1 and 65535!" ForeColor="red" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <asp:Label ID="lblMsg" runat="server" Font-Size="Large"></asp:Label>
+                            </td>
+                        </tr>
 
-                    <tr>
-                        <td class="auto-style4" align="center">
-                            <asp:Button ID="btnAddPeer" runat="server" Visible="false" CssClass="submitButton" Text="Add Peer" OnClick="btnAddPeer_Click" />
-                        </td>
-                    </tr>
-                </table>
-            </td>
+                        <tr>
+                            <td class="auto-style4" align="center">
+                                <asp:Button ID="btnAddPeer" runat="server" Visible="false" CssClass="submitButton" Text="Add Peer" OnClick="btnAddPeer_Click" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
 
             </asp:Panel>
         </tr>

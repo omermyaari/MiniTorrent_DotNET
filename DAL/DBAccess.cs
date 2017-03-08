@@ -19,7 +19,7 @@ namespace DAL {
         static DBAccess() {
             //string RunningPath = AppDomain.CurrentDomain.SetupInformation.PrivateBinPath;
             //string DatabaseFilePath = string.Format("{0}" + "TorrentDB2.mdf", Path.GetFullPath(Path.Combine(RunningPath, @"..\..\")));
-            connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentDB2.mdf;Integrated Security=True;Connect Timeout=30";
+            connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentDB2.mdf;Integrated Security=True;Connect Timeout=30";
             connection = new Connection(connectionString);
         }
 
@@ -283,29 +283,30 @@ namespace DAL {
                     connection.Open();
                 if (fileName.Equals("*")) {
                     command = new SqlCommand(
-                   "SELECT FileName, FileSize, PeerIP, PeerPort, PeerIsOnline " +
-                   "FROM DataFiles, Peers, File_Peer " +
-                   "WHERE [dbo].[File_Peer].[FileId] = [dbo].[DataFiles].[FileId] " +
-                   "AND [dbo].[Peers].[PeerName] = [dbo].[File_Peer].[PeerName] " +
-                   "ORDER BY FileName, FileSize;", connection.DatabaseConnection);
+                   "SELECT files.FileId, files.FileName, files.FileSize, peers.PeerIP, peers.PeerPort, peers.PeerIsOnline " +
+                   "FROM DataFiles AS files, Peers AS peers, File_Peer AS files_peers " +
+                   "WHERE files_peers.FileId = files.FileId " +
+                   "AND peers.PeerName = files_peers.PeerName " +
+                   "ORDER BY files.FileName, files.FileSize;", connection.DatabaseConnection);
                 }
                 else {
                     command = new SqlCommand(
-                   "SELECT FileName, FileSize, PeerIP, PeerPort, PeerIsOnline " +
-                   "FROM DataFiles, Peers, File_Peer " +
-                   "WHERE [dbo].[File_Peer].[FileId] = [dbo].[DataFiles].[FileId] " +
-                   "AND [dbo].[Peers].[PeerName] = [dbo].[File_Peer].[PeerName] " +
-                   "AND [dbo].[DataFiles].[FileName] LIKE '%'+@fileName+'%' " +
-                   "ORDER BY FileName, FileSize;", connection.DatabaseConnection);
+                   "SELECT files.FileId, files.FileName, files.FileSize, peers.PeerIP, peers.PeerPort, peers.PeerIsOnline " +
+                   "FROM DataFiles AS files, Peers AS peers, File_Peer AS files_peers " +
+                   "WHERE files_peers.FileId = files.FileId " +
+                   "AND peers.PeerName = files_peers.PeerName " +
+                   "AND files.FileName LIKE '%'+@fileName+'%' " +
+                   "ORDER BY files.FileName, files.FileSize;", connection.DatabaseConnection);
                     command.Parameters.Add("@fileName", System.Data.SqlDbType.NVarChar, fileName.Length).Value = fileName;
                 }
                
                 reader = command.ExecuteReader(); // Execute the getting command
 
                 while (reader.Read()) {
-                    var file = new DBFile(reader.GetString(0), reader.GetInt64(1));
-                    var peer = new DBPeer("user", "password", reader.GetString(2), reader.GetInt32(3));
-                    peer.IsOnline = reader.GetBoolean(4);
+                    var file = new DBFile(reader.GetString(1), reader.GetInt64(2));
+                    file.ID = reader.GetInt64(0);
+                    var peer = new DBPeer("user", "password", reader.GetString(3), reader.GetInt32(4));
+                    peer.IsOnline = reader.GetBoolean(5);
                     if (searchFileResult.ContainsKey(file))
                         searchFileResult[file].Add(peer);
                     else {
@@ -422,48 +423,7 @@ namespace DAL {
                 }
             }
         }
-        /*  public static DataFile GetDataFileByName(string fileName, bool alreadyConnected = false)
-          {
-              DataFile dataFile = null;
-              SqlDataReader reader = null;    // Initialize a data reader
-              try
-              {
-                  // Connect to the database
-                  if (!alreadyConnected)
-                      connection.Open();
-
-                  // Initialize the getting command
-                  SqlCommand command = new SqlCommand(
-                      "SELECT * " +
-                      "FROM [DataFiles] " +
-                      "WHERE FileName = @fileName;", connection.DatabaseConnection);
-                  command.Parameters.Add("@fileName", System.Data.SqlDbType.NVarChar).Value = fileName;
-
-                  // Execute the getting commande
-                  reader = command.ExecuteReader();
-
-                  // Get the returned user ID
-                  if (reader.Read())
-                  {
-                     // reader.NextResult();
-                     // List<User> peers = new List<User>(GetPeerByFileName(fileName));
-                      List<Peer> peers = new List<Peer>();
-                      dataFile = new DataFile(reader.GetString(1), long.Parse(reader.GetString(2)), peers);
-                  }
-
-              }
-              catch (Exception e)
-              {
-                  Console.WriteLine("ERROR: " + e.Message);
-              }
-              finally
-              {
-                  reader.Close();
-                  if (!alreadyConnected)
-                      connection.Close();
-              }
-              return dataFile;
-          }*/
+        
         public static List<DBPeer> GetAllPeers(bool alreadyConnected = false) {
             List<DBPeer> peers = new List<DBPeer>();
             SqlDataReader reader = null;

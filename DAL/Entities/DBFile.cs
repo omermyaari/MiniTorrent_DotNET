@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace DAL.Entities {
-
+    /// <summary>
+    /// Class used to hold files retrieved from the database.
+    /// </summary>
     public class DBFile {
         public long ID { get; set; }
         public string Name { get; set; }

@@ -88,6 +88,15 @@ namespace PeerUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error: Config file is damaged, please re-enter the settings..
+        /// </summary>
+        internal static string errorConfigFileBad {
+            get {
+                return ResourceManager.GetString("errorConfigFileBad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Config file does not exist, please fill the settings..
         /// </summary>
         internal static string errorConfigFileNotExist {
@@ -106,11 +115,11 @@ namespace PeerUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: Couldn&apos;t analyze dll file - file does not exist..
+        ///   Looks up a localized string similar to Error: Couldn&apos;t analyze dll file - file does not exist / input class name is empty.
         /// </summary>
-        internal static string errorDLLFileNotExist {
+        internal static string errorDLLFileError {
             get {
-                return ResourceManager.GetString("errorDLLFileNotExist", resourceCulture);
+                return ResourceManager.GetString("errorDLLFileError", resourceCulture);
             }
         }
         
@@ -120,6 +129,42 @@ namespace PeerUI.Properties {
         internal static string errorDLLNotMatchClass {
             get {
                 return ResourceManager.GetString("errorDLLNotMatchClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: Couldn&apos;t read the DLL file..
+        /// </summary>
+        internal static string errorDLLReading {
+            get {
+                return ResourceManager.GetString("errorDLLReading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: IO exception at DownloadManager function (DownloadManager): .
+        /// </summary>
+        internal static string errorDLManager1 {
+            get {
+                return ResourceManager.GetString("errorDLManager1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: Socket exception at startDownloading function (DownloadManager): .
+        /// </summary>
+        internal static string errorDLManager2 {
+            get {
+                return ResourceManager.GetString("errorDLManager2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: IO exception at SendFileInfo function (DownloadManager): .
+        /// </summary>
+        internal static string errorDLManager3 {
+            get {
+                return ResourceManager.GetString("errorDLManager3", resourceCulture);
             }
         }
         

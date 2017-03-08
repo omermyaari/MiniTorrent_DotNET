@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
-using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace TorrentWebSiteASP
@@ -15,7 +10,7 @@ namespace TorrentWebSiteASP
     {
         private static DAL.Entities.DBPeer oldPeer;
 
-        private enum PeerColomn { Edit , Delete , Name , Password , IP , Port}
+        private enum PeerColumn { Edit , Delete , Name , Password , IP , Port, IsOnline }
         private enum Validation { NameOrPassword, IP, Port}
 
         protected void Page_Load(object sender, EventArgs e)
@@ -115,11 +110,11 @@ namespace TorrentWebSiteASP
         {
             oldPeer = new DAL.Entities.DBPeer();
 
-            oldPeer.Name = MainGridView.Rows[e.NewEditIndex].Cells[(int)PeerColomn.Name].Text.Trim();
-            oldPeer.Password = MainGridView.Rows[e.NewEditIndex].Cells[(int)PeerColomn.Password].Text;
-            oldPeer.Ip = MainGridView.Rows[e.NewEditIndex].Cells[(int)PeerColomn.IP].Text;
-            oldPeer.Port = int.Parse(MainGridView.Rows[e.NewEditIndex].Cells[(int)PeerColomn.Port].Text);            
-           
+            oldPeer.Name = MainGridView.Rows[e.NewEditIndex].Cells[(int)PeerColumn.Name].Text.Trim();
+            oldPeer.Password = MainGridView.Rows[e.NewEditIndex].Cells[(int)PeerColumn.Password].Text;
+            oldPeer.Ip = MainGridView.Rows[e.NewEditIndex].Cells[(int)PeerColumn.IP].Text;
+            oldPeer.Port = int.Parse(MainGridView.Rows[e.NewEditIndex].Cells[(int)PeerColumn.Port].Text);            
+            
             MainGridView.EditIndex = e.NewEditIndex;
             viewAllPeers();
         }
@@ -127,14 +122,17 @@ namespace TorrentWebSiteASP
         //When the Peer "Update" button is clicked. 
         protected void MainGridView_RowUpdating(object sender, GridViewUpdateEventArgs e)
         {           
-            string name = ((TextBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColomn.Name].Controls[0]).Text.Trim();
-            string pass = ((TextBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColomn.Password].Controls[0]).Text.Trim();
-            string ip = ((TextBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColomn.IP].Controls[0]).Text.Trim();
-            string port = ((TextBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColomn.Port].Controls[0]).Text.Trim();
+            string name = ((TextBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColumn.Name].Controls[0]).Text.Trim();
+            string pass = ((TextBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColumn.Password].Controls[0]).Text.Trim();
+            string ip = ((TextBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColumn.IP].Controls[0]).Text.Trim();
+            string port = ((TextBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColumn.Port].Controls[0]).Text.Trim();
+
+            var newPeer = new DAL.Entities.DBPeer(name, pass, ip, int.Parse(port));
+            newPeer.IsOnline = ((CheckBox)MainGridView.Rows[e.RowIndex].Cells[(int)PeerColumn.IsOnline].Controls[0]).Checked;
 
             if (validData(name, Validation.NameOrPassword) && validData(pass, Validation.NameOrPassword) &&
                 validData(ip, Validation.IP) && validData(port, Validation.Port)){
-                DAL.DBAccess.UpdatePeer(oldPeer, new DAL.Entities.DBPeer(name, pass, ip, int.Parse(port)));
+                DAL.DBAccess.UpdatePeer(oldPeer, newPeer);
             }
 
             MainGridView.EditIndex = -1;

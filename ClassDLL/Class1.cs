@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ClassDLL {
+
+    /// <summary>
+    /// Class used for DLL analyzing.
+    /// </summary>
     public class Class1 {
 
         public string str;

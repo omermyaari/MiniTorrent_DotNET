@@ -41,7 +41,7 @@
                             <asp:MenuItem Text="Offline" Value="Offline"></asp:MenuItem>
                         </asp:MenuItem>
                         <asp:MenuItem Text="User Management" Value="User Management"></asp:MenuItem>
-                        <asp:MenuItem Text="Available Files" Value="Available Files"></asp:MenuItem>
+                        <asp:MenuItem Text="Available Files" Value="Show all files"></asp:MenuItem>
                     </Items>
                     <StaticHoverStyle BackColor="#284E98" ForeColor="White" />
                     <StaticMenuItemStyle HorizontalPadding="5px" VerticalPadding="2px" />

@@ -9,7 +9,7 @@
     </div>
     <div align="center">
         <h2>
-            <asp:Label ID="OnLinePeersLbl" runat="server" Text="Peers is Online: "></asp:Label>
+            <asp:Label ID="OnLinePeersLbl" runat="server" Text="Peers online: "></asp:Label>
             <asp:Label ID="onLinePeers" runat="server" Text=""></asp:Label></h2>
     </div>
     <div align="center">

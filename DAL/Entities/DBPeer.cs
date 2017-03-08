@@ -8,6 +8,9 @@ namespace DAL.Entities
 {
     public class DBPeer
     {
+        /// <summary>
+        /// Class used to hold peer retrieved from the database.
+        /// </summary>
         public string Name { get; set; }
         public string Password { get; set; }
         public string Ip { get; set; }

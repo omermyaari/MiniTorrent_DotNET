@@ -124,8 +124,10 @@ namespace PeerUI {
             sharedFolderPath = textboxSharedFolder.Text;
             downloadFolderPath = textboxDownloadFolder.Text;
             serverIP = textboxServerIP.Text;
-            Int32.TryParse(textboxServerPort.Text, out serverPort);
-            Int32.TryParse(textboxLocalPort.Text, out localPort);
+            if (Int32.TryParse(textboxServerPort.Text, out serverPort))
+                serverPort = 9876;
+            if (Int32.TryParse(textboxLocalPort.Text, out localPort))
+                localPort = 9876;
         }
 
         private void loadDetailsFromUser() {
@@ -159,16 +161,23 @@ namespace PeerUI {
 
         //  Loads settings from the configuration xml file.
         private void loadConfigFromXml() {
-            var reader = new StreamReader(Properties.Resources.configFileName);
-            user = (User)SerializerObj.Deserialize(reader);
-            DataContext = user;
-            reader.Close();
-            loadDetailsFromUser();
+            try {
+                var reader = new StreamReader(Properties.Resources.configFileName);
+                user = (User)SerializerObj.Deserialize(reader);
+                DataContext = user;
+                reader.Close();
+                loadDetailsFromUser();
+            }
+            catch (InvalidOperationException ex) {
+                throw ex;
+            }
+
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             uploadManager.StopListening();
-            new Thread(() => wcfClient.CloseConnection()).Start();
+            if (wcfClient != null)
+                new Thread(() => wcfClient.CloseConnection()).Start();
             if (stopDownloadingEvent != null)
                 stopDownloadingEvent();
         }
@@ -177,18 +186,23 @@ namespace PeerUI {
             buttonDownload.IsEnabled = false;
             listViewLibrary.ItemsSource = observableLibraryFile;
             uploadManager = new UploadManager(new TransferProgressDelegate(updateDownloadProgress));
-            if (configExists = File.Exists(Properties.Resources.configFileName)) {
-                loadConfigFromXml();
-                wcfClient = new WCFClient();
-                wcfClient.WcfMessageEvent += displayWcfMessage;
-                new Thread(() => wcfClient.UpdateConfig(user)).Start();
-                uploadManagerThread = new Thread(()=> uploadManager.StartListening(user.LocalPort, user.SharedFolderPath));
-                uploadManagerThread.Start();
+            try {
+                if (configExists = File.Exists(Properties.Resources.configFileName)) {
+                    loadConfigFromXml();
+                    wcfClient = new WCFClient();
+                    wcfClient.WcfMessageEvent += displayWcfMessage;
+                    new Thread(() => wcfClient.UpdateConfig(user)).Start();
+                    uploadManagerThread = new Thread(() => uploadManager.StartListening(user.LocalPort, user.SharedFolderPath));
+                    uploadManagerThread.Start();
+                }
+                else {
+                    textblockStatus.Foreground = Brushes.Red;
+                    textblockStatus.Text = Properties.Resources.errorConfigFileNotExist;
+                    settingsTab.IsSelected = true;
+                }
             }
-            else {
-                textblockStatus.Foreground = Brushes.Red;
-                textblockStatus.Text = Properties.Resources.errorConfigFileNotExist;
-                settingsTab.IsSelected = true;
+            catch (InvalidOperationException) {
+                displayWcfMessage(true, Properties.Resources.errorConfigFileBad);
             }
         }
 
@@ -216,7 +230,9 @@ namespace PeerUI {
             SearchFileProperty searchFileProperty = (SearchFileProperty)listViewSearch.SelectedItem;
             foreach (ServiceDataFile sdf in searchResults) {
                 if (sdf.Name == searchFileProperty.Name && sdf.Size == searchFileProperty.Size)
-                    new Thread(() => new DownloadManager(sdf, user.DownloadFolderPath, new TransferProgressDelegate(updateDownloadProgress))).Start();
+                    new Thread(() => new DownloadManager(sdf, user.DownloadFolderPath, 
+                        new TransferProgressDelegate(updateDownloadProgress),
+                        displayWcfMessage)).Start();
             }
         }
 
@@ -290,19 +306,19 @@ namespace PeerUI {
                     //  Methods
                     textblockDLLDetails.Text += "\nMethods:\n";
                     var methods = t.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic |
-         BindingFlags.Public);
+                    BindingFlags.Public);
                     ConcatDLLMembers(methods);
 
                     //  Fields
                     textblockDLLDetails.Text += "\nFields:\n";
                     var fields = t.GetFields(BindingFlags.Instance | BindingFlags.NonPublic |
-         BindingFlags.Public);
+                    BindingFlags.Public);
                     ConcatDLLMembers(fields);
 
                     //  Properties
                     textblockDLLDetails.Text += "\nProperties:\n";
                     var props = t.GetFields(BindingFlags.Instance | BindingFlags.NonPublic |
-         BindingFlags.Public);
+                    BindingFlags.Public);
                     ConcatDLLMembers(props);
 
                     //  Calling constructor
@@ -329,13 +345,18 @@ namespace PeerUI {
                     textblockDLLDetails.Text += "\nToString() after setting the integer " +
                         "property to 7 and using the DoubleInt method:\n" + s + "\n";
                 }
+                else {
+                    textblockStatus.Foreground = Brushes.Red;
+                    textblockStatus.Text = Properties.Resources.errorDLLReading;
+                }
             }
             else {
                 textblockStatus.Foreground = Brushes.Red;
-                textblockStatus.Text = Properties.Resources.errorDLLFileNotExist;
+                textblockStatus.Text = Properties.Resources.errorDLLFileError;
             }
         }
 
+        //
         public void ConcatDLLMembers(MemberInfo[] members) {
             foreach (MemberInfo memberInfo in members) {
                 textblockDLLDetails.Text += memberInfo + "\n";

@@ -137,9 +137,9 @@
     <value>Error: Directory not found.</value>
     <comment>Directory not found error.</comment>
   </data>
-  <data name="errorDLLFileNotExist" xml:space="preserve">
-    <value>Error: Couldn't analyze dll file - file does not exist.</value>
-    <comment>DLL file not exist error.</comment>
+  <data name="errorDLLFileError" xml:space="preserve">
+    <value>Error: Couldn't analyze dll file - file does not exist / input class name is empty</value>
+    <comment>DLL file not exist / input class name is empty error.</comment>
   </data>
   <data name="errorDLLNotMatchClass" xml:space="preserve">
     <value>Error: DLL file doesn't match class name.</value>
@@ -168,5 +168,25 @@
   <data name="errorUsernamePassword" xml:space="preserve">
     <value>Error: Couldn't sign in to main server - username or password is incorrect.</value>
     <comment>Username / password error.</comment>
+  </data>
+  <data name="errorConfigFileBad" xml:space="preserve">
+    <value>Error: Config file is damaged, please re-enter the settings.</value>
+    <comment>Bad config file error.</comment>
+  </data>
+  <data name="errorDLLReading" xml:space="preserve">
+    <value>Error: Couldn't read the DLL file.</value>
+    <comment>DLL file reading error.</comment>
+  </data>
+  <data name="errorDLManager1" xml:space="preserve">
+    <value>Error: IO exception at DownloadManager function (DownloadManager): </value>
+    <comment>IO exception error at DownloadMangager's constructor.</comment>
+  </data>
+  <data name="errorDLManager2" xml:space="preserve">
+    <value>Error: Socket exception at startDownloading function (DownloadManager): </value>
+    <comment>Socket exception error at DownloadManager function: startDownloading.</comment>
+  </data>
+  <data name="errorDLManager3" xml:space="preserve">
+    <value>Error: IO exception at SendFileInfo function (DownloadManager): </value>
+    <comment>IO exception error at DownloadManager function: SendFileInfo</comment>
   </data>
 </root>

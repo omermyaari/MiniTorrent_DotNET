@@ -137,8 +137,16 @@
     <value>Error: Directory not found.</value>
     <comment>Directory not found error.</comment>
   </data>
+  <data name="errorDLLFileNotExist" xml:space="preserve">
+    <value>Error: Couldn't analyze dll file - file does not exist.</value>
+    <comment>DLL file not exist error.</comment>
+  </data>
+  <data name="errorDLLNotMatchClass" xml:space="preserve">
+    <value>Error: DLL file doesn't match class name.</value>
+    <comment>DLL file doesn't match class name.</comment>
+  </data>
   <data name="errorEndpointNotFound" xml:space="preserve">
-    <value>Error: Couldnt request file from main server - endpoint not found.</value>
+    <value>Error: Couldn't request file from main server - endpoint not found.</value>
     <comment>Endpoint not found error.</comment>
   </data>
   <data name="errorFileNameEmpty" xml:space="preserve">
@@ -146,7 +154,7 @@
     <comment>File name empty error.</comment>
   </data>
   <data name="errorFileRequestTimeout" xml:space="preserve">
-    <value>Error: Couldnt request file from main server - timeout.</value>
+    <value>Error: Couldn't request file from main server - timeout.</value>
     <comment>File request timeout error.</comment>
   </data>
   <data name="errorGenerateSignIn" xml:space="preserve">

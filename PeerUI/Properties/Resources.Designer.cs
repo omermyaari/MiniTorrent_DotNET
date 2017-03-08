@@ -106,7 +106,25 @@ namespace PeerUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: Couldnt request file from main server - endpoint not found..
+        ///   Looks up a localized string similar to Error: Couldn&apos;t analyze dll file - file does not exist..
+        /// </summary>
+        internal static string errorDLLFileNotExist {
+            get {
+                return ResourceManager.GetString("errorDLLFileNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: DLL file doesn&apos;t match class name..
+        /// </summary>
+        internal static string errorDLLNotMatchClass {
+            get {
+                return ResourceManager.GetString("errorDLLNotMatchClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: Couldn&apos;t request file from main server - endpoint not found..
         /// </summary>
         internal static string errorEndpointNotFound {
             get {
@@ -124,7 +142,7 @@ namespace PeerUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: Couldnt request file from main server - timeout..
+        ///   Looks up a localized string similar to Error: Couldn&apos;t request file from main server - timeout..
         /// </summary>
         internal static string errorFileRequestTimeout {
             get {

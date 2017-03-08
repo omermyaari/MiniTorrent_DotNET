@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PeerUI"
         mc:Ignorable="d"
-        Title="MiniTorrent" Height="393.5" Width="582" Closing="Window_Closing">
+        Title="MiniTorrent" Height="592.5" Width="659" Closing="Window_Closing">
     <DockPanel>
         <TextBlock Name="textblockStatus" DockPanel.Dock="Bottom" FontWeight="Bold" FontSize="16"/>
         <TabControl Name="tabControl">
@@ -179,18 +179,38 @@
             </TabItem>
             <TabItem Name="dllTab" Header="Analyze DLL">
                 <DockPanel>
-                    <Grid Grid.Column="1" Grid.Row="5" DockPanel.Dock="Top">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="3*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Button Name="buttonAnalyzeDLL" Margin="3" Grid.Column="0" Content="Analyze" Click="buttonSharedFolder_Click"/>
-                        <TextBox Name="textboxDLLPath" Margin="3" Grid.Column="1"/>
-                        <Button Name="buttonSetDLLPath" Margin="3" Grid.Column="2" Content="Browse" Click="buttonSetDLLPath_Click"/>
-                    </Grid>
-                    <TextBlock>
-                        
+                    <StackPanel DockPanel.Dock="Top" Orientation="Vertical"  HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Grid Grid.Column="2" Grid.Row="1" HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="200" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Name="textboxDLLPath" Margin="3" Grid.Column="1">
+                                <TextBox.Text>
+                                    <Binding UpdateSourceTrigger="PropertyChanged" Path="dllFilePath" NotifyOnValidationError="True">
+                                        <Binding.ValidationRules>
+                                            <local:DLLFileValidationRule />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <Button Name="buttonSetDLLPath" Margin="3" Grid.Column="0" Content="Browse" Click="buttonSetDLLPath_Click"/>
+                        </Grid>
+                        <Grid Grid.Column="2" Grid.Row="1" HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="200" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Name="textblockDLLClassName" Text="Class :"/>
+                            <TextBox Name="textboxDLLClassName" Margin="3" Grid.Column="1">
+                            </TextBox>
+                        </Grid>
+                        <Button Name="buttonAnalyzeDLL" Margin="3" Grid.Column="0" Content="Analyze" Click="buttonAnalyzeDLL_Click" HorizontalAlignment="Center"/>
+
+                    </StackPanel>
+
+                    <TextBlock Name="textblockDLLDetails" FontSize="10">
+
                     </TextBlock>
                 </DockPanel>
             </TabItem>

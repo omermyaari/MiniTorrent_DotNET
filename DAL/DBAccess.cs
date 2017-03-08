@@ -559,7 +559,7 @@ namespace DAL {
                         command = new SqlCommand(
                         "UPDATE Peers " +
                         "SET PeerPassword = @newPassword, " +
-                        "PeerIP = @newIp, PeerPort = @newPort" +
+                        "PeerIP = @newIp, PeerPort = @newPort " +
                         "WHERE PeerName = @oldName;", connection.DatabaseConnection);
                     }
                     //else update Peers table and File_Peer too.

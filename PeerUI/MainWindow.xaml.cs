@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Reflection;
 
 namespace PeerUI {
     /// <summary>
@@ -201,6 +202,8 @@ namespace PeerUI {
             }
         }
 
+
+
         //  Event to handle column minimum size.
         private void HandleColumnHeaderSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs) {
             if (sizeChangedEventArgs.NewSize.Width <= 60) {
@@ -262,6 +265,68 @@ namespace PeerUI {
                 dialog.Filter = "DLL Files (*.dll)|*.dll";
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     textboxDLLPath.Text = dllFilePath = dialog.FileName;
+            }
+        }
+
+        private void buttonAnalyzeDLL_Click(object sender, RoutedEventArgs e) {
+            string dllClassName = textboxDLLClassName.Text;
+            if (File.Exists(dllFilePath) && !String.IsNullOrEmpty(dllClassName)) {
+                Assembly assembly = Assembly.LoadFrom(dllFilePath);
+                Console.WriteLine(assembly.GetName());
+                Type t = assembly.GetType(dllClassName);
+                if (t != null) {
+                    textblockDLLDetails.Text = "Name: " + t.Name + "\n" +
+                        "Namespace: " + t.Namespace + "\n" +
+                        "IsClass: " + t.IsClass + "\n" +
+                        "IsAbstract: " + t.IsAbstract + "\n" +
+                        "IsSealed: " + t.IsSealed + "\n" +
+                        "IsPublic: " + t.IsPublic + "\n";
+
+                    //  Constructors
+                    textblockDLLDetails.Text += "\nConstructors:\n";
+                    var ctors = t.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+                    ConcatDLLMembers(ctors);
+
+                    //  Methods
+                    textblockDLLDetails.Text += "\nMethods:\n";
+                    var methods = t.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic |
+         BindingFlags.Public);
+                    ConcatDLLMembers(methods);
+
+                    //  Fields
+                    textblockDLLDetails.Text += "\nFields:\n";
+                    var fields = t.GetFields(BindingFlags.Instance | BindingFlags.NonPublic |
+         BindingFlags.Public);
+                    ConcatDLLMembers(fields);
+
+                    //  Properties
+                    textblockDLLDetails.Text += "\nProperties:\n";
+                    var props = t.GetFields(BindingFlags.Instance | BindingFlags.NonPublic |
+         BindingFlags.Public);
+                    ConcatDLLMembers(props);
+
+                    //  Activating constructor
+                    object[] parametersArray = new Object[3];
+                    parametersArray[0] = 5;
+                    parametersArray[1] = "Hello";
+                    parametersArray[2] = 2.2;
+                    //object obj = Activator.CreateInstance(t, parametersArray);
+
+                    //  Activating ToString method
+                    //string s = (string)t.GetMethod("ToString").Invoke(obj, null);
+
+
+                }
+            }
+            else {
+                textblockStatus.Foreground = Brushes.Red;
+                textblockStatus.Text = Properties.Resources.errorDLLFileNotExist;
+            }
+        }
+
+        public void ConcatDLLMembers(MemberInfo[] members) {
+            foreach (MemberInfo memberInfo in members) {
+                textblockDLLDetails.Text += memberInfo + "\n";
             }
         }
     }

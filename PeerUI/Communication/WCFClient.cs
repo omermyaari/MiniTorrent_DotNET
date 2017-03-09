@@ -21,7 +21,7 @@ namespace PeerUI.Communication {
         //  XML serializer used to serialize and deserialize service messages.
         private XmlSerializer xmlSerializer = new XmlSerializer(typeof(ServiceMessage));
         //  Boolean used to detect whether the user has signed in to the WCF server.
-        private bool userConnected = false;
+        public bool userConnected = false;
         //  WcfMessageDelegate event used to notify the UI of errors and updates.
         public event WcfMessageDelegate WcfMessageEvent;
 
@@ -61,8 +61,8 @@ namespace PeerUI.Communication {
         /// <param name="user"></param>
         public void UpdateConfig(User user) {
             if (userConnected) {
-                SignOut();
                 CloseConnection();
+                userConnected = false;
             }
             this.user = user;
             user.UserIP = GetLocalIp();

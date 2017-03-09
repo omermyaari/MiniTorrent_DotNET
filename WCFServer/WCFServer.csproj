@@ -54,6 +54,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DAL\DAL.csproj">
+      <Project>{ec96f7fc-37b3-4fbb-aca8-c7c22a013591}</Project>
+      <Name>DAL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TorrentWcfServiceLibrary\TorrentWcfServiceLibrary.csproj">
       <Project>{ec139056-6f2d-402b-b518-3584136a9275}</Project>
       <Name>TorrentWcfServiceLibrary</Name>

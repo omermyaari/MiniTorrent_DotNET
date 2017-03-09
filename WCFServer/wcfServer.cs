@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ServiceModel;
 using TorrentWcfServiceLibrary;
+using DAL;
+using System.Collections.Generic;
 
 namespace WCFServer {
 

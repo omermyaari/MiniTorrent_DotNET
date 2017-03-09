@@ -670,7 +670,7 @@ namespace DAL {
                 "SELECT PeerIsOnline " +
                 "FROM Peers " +
                 "WHERE PeerName = @PeerName " +
-                "AND PeerPassword = @PeerPassword", connection.DatabaseConnection);
+                "AND PeerPassword = @PeerPassword;", connection.DatabaseConnection);
 
                 //  Set parameters for the query.
                 command.Parameters.Add("@PeerName", System.Data.SqlDbType.Char, peer.Name.Length).Value = peer.Name;

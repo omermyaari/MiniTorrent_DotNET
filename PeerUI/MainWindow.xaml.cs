@@ -138,9 +138,7 @@ namespace PeerUI {
             //  Saves the settings to the config xml file.
             saveConfigToXml(user);
             //  Creates a connection with the information supplied by the user.
-            new Thread(() => {
-                wcfClient.CloseConnection();
-                wcfClient.UpdateConfig(user);
+            new Thread(() => { wcfClient.UpdateConfig(user);
             }).Start();
             //  Stop listening for new upload requests.
             if (uploadManagerThread.IsAlive)
@@ -238,7 +236,8 @@ namespace PeerUI {
             uploadManager.StopListening();
             if (wcfClient != null)
                 //  Close the connection to the main WCF server.
-                new Thread(() => wcfClient.CloseConnection()).Start();
+                if (wcfClient.userConnected)
+                    new Thread(() => wcfClient.CloseConnection()).Start();
             if (stopDownloadingEvent != null)
                 //  Stop all active downloads.
                 stopDownloadingEvent();

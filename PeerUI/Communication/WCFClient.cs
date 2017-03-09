@@ -152,7 +152,6 @@ namespace PeerUI.Communication {
             if (String.IsNullOrEmpty(fileName)) {
                 WcfMessageEvent(true, Properties.Resources.errorFileNameEmpty);
                 return null;
-
             }
             //  Generate the file request xml message.
             var serviceMessage = GenerateFileRequest(fileName);
@@ -173,6 +172,10 @@ namespace PeerUI.Communication {
             //  DeSerialize the message received from the server.
             serviceMessage = DeSerializeMessage(xmlMessage);
             //  If the main server has returned an empty list of files, notify the user.
+            if (serviceMessage.Header == MessageHeader.ConnectionFailed) {
+                WcfMessageEvent(true, Properties.Resources.errorUserNotSigned);
+                return null;
+            }
             if (serviceMessage.FilesList.Count == 0) {
                 WcfMessageEvent(true, "Error: File " + fileName + " was not found.");
                 return null;

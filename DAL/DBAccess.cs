@@ -18,7 +18,7 @@ namespace DAL {
         public static long IdCounter = 0;
 
         static DBAccess() {
-            connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\TorrentDB2.mdf;Integrated Security=True;Connect Timeout=30";
+            connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentDB2.mdf;Integrated Security=True;Connect Timeout=30";
             connection = new Connection(connectionString);
         }
 
@@ -206,6 +206,7 @@ namespace DAL {
                     connection.Close();
             }
         }
+
         /// <summary>
         /// Checks if a given file (name and size) exists, if it does, the method will return its id,
         /// otherwise, it will return -1.
@@ -648,6 +649,47 @@ namespace DAL {
                 }
                 finally { connection.Close(); }
             }
+        }
+
+        /// <summary>
+        /// Checks if a given file (name and size) exists, if it does, the method will return its id,
+        /// otherwise, it will return -1.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="alreadyConnected"></param>
+        /// <returns>long</returns>
+        public static bool CheckPeerConnected(DBPeer peer, bool alreadyConnected = false) {
+            bool isExist = false;
+            SqlDataReader reader = null;
+            try {
+                // Connect to the database.
+                if (!alreadyConnected)
+                    connection.Open();
+
+                SqlCommand command = new SqlCommand(
+                "SELECT PeerIsOnline " +
+                "FROM Peers " +
+                "WHERE PeerName = @PeerName " +
+                "AND PeerPassword = @PeerPassword", connection.DatabaseConnection);
+
+                //  Set parameters for the query.
+                command.Parameters.Add("@PeerName", System.Data.SqlDbType.Char, peer.Name.Length).Value = peer.Name;
+                command.Parameters.Add("@PeerPassword", System.Data.SqlDbType.Char, peer.Password.Length).Value = peer.Password;
+                //  Execute the query.
+                reader = command.ExecuteReader();
+                isExist = reader.Read();
+                if (isExist)
+                    return reader.GetBoolean(0);
+            }
+            catch (Exception e) {
+                Console.WriteLine("ERROR: " + e.Message);
+            }
+            finally {
+                reader.Close();
+                if (!alreadyConnected)
+                    connection.Close();
+            }
+            return false;
         }
     }
 }

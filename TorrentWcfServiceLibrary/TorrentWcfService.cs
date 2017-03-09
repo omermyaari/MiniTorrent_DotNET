@@ -90,6 +90,11 @@ namespace TorrentWcfServiceLibrary {
                 serviceMessage.Header = MessageHeader.FileNotFound;
                 return serviceMessage;
             }
+            //  If user isn't marked online in the system (an admin disabled it)
+            if (!DAL.DBAccess.CheckPeerConnected(new DBPeer(serviceMessage.UserName, serviceMessage.UserPassword, serviceMessage.UserIP, serviceMessage.UserPort))) {
+                serviceMessage.Header = MessageHeader.ConnectionFailed;
+                return serviceMessage;
+            }
             //  Search the DB for the given file name.
             //  Retrive a dictionary containing files as keys and lists of peers as values.
             Dictionary<DBFile, List<DBPeer>> DBResults = DAL.DBAccess.SearchFiles(serviceMessage.FilesList[0].Name);

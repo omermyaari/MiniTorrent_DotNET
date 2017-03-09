@@ -209,4 +209,8 @@
     <value>Error: IO exception at SendFile function (UploadManager): </value>
     <comment>IO exception at UploadManager's function: SendFile.</comment>
   </data>
+  <data name="errorUserNotSigned" xml:space="preserve">
+    <value>Error: You're not signed in, please try to sign in again.</value>
+    <comment>Username disabled error.</comment>
+  </data>
 </root>

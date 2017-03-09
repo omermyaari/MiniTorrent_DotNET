@@ -40,7 +40,8 @@ C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\Microsoft.C
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\obj\Debug\TorrentWebSiteASP.csprojResolveAssemblyReference.cache
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\obj\Debug\TorrentWebSiteASP.dll
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\obj\Debug\TorrentWebSiteASP.pdb
-C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\obj\Debug\TorrentWebSiteASP.csprojResolveAssemblyReference.cache
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\DAL.dll
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\DAL.dll
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\roslyn\csc.exe
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
@@ -60,7 +61,6 @@ C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\DAL.dll
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\DAL.pdb
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\obj\Debug\TorrentWebSiteASP.csprojResolveAssemblyReference.cache
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\obj\Debug\TorrentWebSiteASP.dll
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\obj\Debug\TorrentWebSiteASP.pdb
-C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\DAL.dll
-C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\DAL.dll

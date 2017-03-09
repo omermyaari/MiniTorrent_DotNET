@@ -266,5 +266,14 @@ namespace PeerUI.Properties {
                 return ResourceManager.GetString("errorUsernamePassword", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: You&apos;re not signed in, please try to sign in again..
+        /// </summary>
+        internal static string errorUserNotSigned {
+            get {
+                return ResourceManager.GetString("errorUserNotSigned", resourceCulture);
+            }
+        }
     }
 }

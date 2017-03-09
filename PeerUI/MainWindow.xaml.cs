@@ -312,11 +312,13 @@ namespace PeerUI {
         /// <param name="e"></param>
         private void buttonDownload_Click(object sender, RoutedEventArgs e) {
             SearchFileProperty searchFileProperty = (SearchFileProperty)listViewSearch.SelectedItem;
-            foreach (ServiceDataFile sdf in searchResults) {
-                if (sdf.Name == searchFileProperty.Name && sdf.Size == searchFileProperty.Size)
-                    new Thread(() => new DownloadManager(sdf, user.DownloadFolderPath, 
-                        new TransferProgressDelegate(updateDownloadProgress),
-                        displayWcfMessage)).Start();
+            if (searchFileProperty != null) {
+                foreach (ServiceDataFile sdf in searchResults) {
+                    if (sdf.Name == searchFileProperty.Name && sdf.Size == searchFileProperty.Size)
+                        new Thread(() => new DownloadManager(sdf, user.DownloadFolderPath,
+                            new TransferProgressDelegate(updateDownloadProgress),
+                            displayWcfMessage)).Start();
+                }
             }
         }
 
@@ -326,6 +328,7 @@ namespace PeerUI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void buttonSearch_Click(object sender, RoutedEventArgs e) {
+            buttonDownload.IsEnabled = false;
             WcfFileRequestDelegate dlgt = new WcfFileRequestDelegate(wcfClient.FileRequest);
             IAsyncResult ar = dlgt.BeginInvoke(textboxSearch.Text,
             new AsyncCallback(FileSearchCallback), dlgt);

@@ -1,10 +1,5 @@
-C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\DAL.exe.config
-C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\DAL.exe
 C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\DAL.pdb
-C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\PeerUI.exe
-C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\PeerUI.pdb
 C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.csprojResolveAssemblyReference.cache
-C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.exe
 C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.pdb
 E:\AFEKA\Year 3\DotNET\PROJECT\MY_PROJECT\MiniTorrent_DotNET\DAL\bin\Debug\DAL.exe.config
 E:\AFEKA\Year 3\DotNET\PROJECT\MY_PROJECT\MiniTorrent_DotNET\DAL\obj\Debug\DAL.exe
@@ -24,8 +19,6 @@ C:\Users\PC323\Desktop\db\DAL\bin\Debug\TorrentWcfServiceLibrary.pdb
 C:\Users\PC323\Desktop\db\DAL\obj\Debug\DAL.csprojResolveAssemblyReference.cache
 C:\Users\PC323\Desktop\db\DAL\obj\Debug\DAL.exe
 C:\Users\PC323\Desktop\db\DAL\obj\Debug\DAL.pdb
-C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\TorrentWcfServiceLibrary.dll
-C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\TorrentWcfServiceLibrary.pdb
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\DAL.pdb
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.pdb
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.csprojResolveAssemblyReference.cache
@@ -38,3 +31,6 @@ C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\DAL.dll.config
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\DAL.dll
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.csprojResolveAssemblyReference.cache
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.dll
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\DAL.dll.config
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\DAL.dll
+C:\Users\Vitaly\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.dll

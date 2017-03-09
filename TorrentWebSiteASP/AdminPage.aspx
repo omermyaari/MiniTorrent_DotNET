@@ -146,7 +146,7 @@
 
                         <tr>
                             <td class="auto-style4" align="center">
-                                <asp:Button ID="btnAddPeer" runat="server" Visible="false" CssClass="submitButton" Text="Add Peer" OnClick="btnAddPeer_Click" />
+                                <asp:Button ID="btnAddPeer" runat="server" Visible="false" CssClass="submitButton" Text="Add New Peer" OnClick="btnAddPeer_Click" />
                             </td>
                         </tr>
                     </table>

@@ -145,12 +145,14 @@ namespace TorrentWebSiteASP
             DAL.Entities.DBPeer newPeer = new DAL.Entities.DBPeer();
             newPeer.Name = txtUserName.Text;
             newPeer.Password = txtPwd.Text;
-            if (txtIP.Text == null)
-                newPeer.Ip = txtIP.Text;
-            else
+            newPeer.Ip = txtIP.Text;
+
+            if (String.IsNullOrEmpty(txtIP.Text))
                 newPeer.Ip = "0.0.0.0";
             if (!String.IsNullOrEmpty(txtPort.Text))
                 newPeer.Port = int.Parse(txtPort.Text);
+            else
+                newPeer.Port = 9876;
             clearFields();
 
             if(!DAL.DBAccess.PeerExists(newPeer))

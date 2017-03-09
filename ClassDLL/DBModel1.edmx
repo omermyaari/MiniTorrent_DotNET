@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="TorrentDB2Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="DataFiles">
+          <Key>
+            <PropertyRef Name="FileId" />
+          </Key>
+          <Property Name="FileId" Type="bigint" Nullable="false" />
+          <Property Name="FileName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="FileSize" Type="bigint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="File_Peer">
+          <Key>
+            <PropertyRef Name="FileId" />
+            <PropertyRef Name="PeerName" />
+          </Key>
+          <Property Name="FileId" Type="bigint" Nullable="false" />
+          <Property Name="PeerName" Type="char" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Peers">
+          <Key>
+            <PropertyRef Name="PeerName" />
+          </Key>
+          <Property Name="PeerName" Type="char" MaxLength="10" Nullable="false" />
+          <Property Name="PeerPassword" Type="char" MaxLength="10" Nullable="false" />
+          <Property Name="PeerIP" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="PeerPort" Type="int" Nullable="false" />
+          <Property Name="PeerIsOnline" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_FileId">
+          <End Role="DataFiles" Type="Self.DataFiles" Multiplicity="1" />
+          <End Role="File_Peer" Type="Self.File_Peer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DataFiles">
+              <PropertyRef Name="FileId" />
+            </Principal>
+            <Dependent Role="File_Peer">
+              <PropertyRef Name="FileId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PeerName">
+          <End Role="Peers" Type="Self.Peers" Multiplicity="1" />
+          <End Role="File_Peer" Type="Self.File_Peer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Peers">
+              <PropertyRef Name="PeerName" />
+            </Principal>
+            <Dependent Role="File_Peer">
+              <PropertyRef Name="PeerName" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="TorrentDB2ModelStoreContainer">
+          <EntitySet Name="DataFiles" EntityType="Self.DataFiles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="File_Peer" EntityType="Self.File_Peer" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Peers" EntityType="Self.Peers" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_FileId" Association="Self.FK_FileId">
+            <End Role="DataFiles" EntitySet="DataFiles" />
+            <End Role="File_Peer" EntitySet="File_Peer" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PeerName" Association="Self.FK_PeerName">
+            <End Role="Peers" EntitySet="Peers" />
+            <End Role="File_Peer" EntitySet="File_Peer" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="TorrentDB2Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="DataFiles">
+          <Key>
+            <PropertyRef Name="FileId" />
+          </Key>
+          <Property Name="FileId" Type="Int64" Nullable="false" />
+          <Property Name="FileName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="FileSize" Type="Int64" Nullable="false" />
+          <NavigationProperty Name="Peers" Relationship="Self.File_Peer" FromRole="DataFiles" ToRole="Peers" />
+        </EntityType>
+        <EntityType Name="Peers">
+          <Key>
+            <PropertyRef Name="PeerName" />
+          </Key>
+          <Property Name="PeerName" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="PeerPassword" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="PeerIP" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PeerPort" Type="Int32" Nullable="false" />
+          <Property Name="PeerIsOnline" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="DataFiles" Relationship="Self.File_Peer" FromRole="Peers" ToRole="DataFiles" />
+        </EntityType>
+        <Association Name="File_Peer">
+          <End Role="DataFiles" Type="Self.DataFiles" Multiplicity="*" />
+          <End Role="Peers" Type="Self.Peers" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="TorrentDB2Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="DataFiles" EntityType="Self.DataFiles" />
+          <EntitySet Name="Peers" EntityType="Self.Peers" />
+          <AssociationSet Name="File_Peer" Association="Self.File_Peer">
+            <End Role="DataFiles" EntitySet="DataFiles" />
+            <End Role="Peers" EntitySet="Peers" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="TorrentDB2ModelStoreContainer" CdmEntityContainer="TorrentDB2Entities">
+          <EntitySetMapping Name="DataFiles">
+            <EntityTypeMapping TypeName="TorrentDB2Model.DataFiles">
+              <MappingFragment StoreEntitySet="DataFiles">
+                <ScalarProperty Name="FileId" ColumnName="FileId" />
+                <ScalarProperty Name="FileName" ColumnName="FileName" />
+                <ScalarProperty Name="FileSize" ColumnName="FileSize" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Peers">
+            <EntityTypeMapping TypeName="TorrentDB2Model.Peers">
+              <MappingFragment StoreEntitySet="Peers">
+                <ScalarProperty Name="PeerName" ColumnName="PeerName" />
+                <ScalarProperty Name="PeerPassword" ColumnName="PeerPassword" />
+                <ScalarProperty Name="PeerIP" ColumnName="PeerIP" />
+                <ScalarProperty Name="PeerPort" ColumnName="PeerPort" />
+                <ScalarProperty Name="PeerIsOnline" ColumnName="PeerIsOnline" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="File_Peer" TypeName="TorrentDB2Model.File_Peer" StoreEntitySet="File_Peer">
+            <EndProperty Name="DataFiles">
+              <ScalarProperty Name="FileId" ColumnName="FileId" />
+            </EndProperty>
+            <EndProperty Name="Peers">
+              <ScalarProperty Name="PeerName" ColumnName="PeerName" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="ad313da7b4a94a4985ebac19912581ab" Name="Diagram1">
+      </Diagram>
+      <Diagram DiagramId="79739c8b518f4771a073c81e8b7f0c7d" Name="Diagram2" >
+        <EntityTypeShape EntityType="TorrentDB2Model.Peers" Width="1.5" PointX="3.375" PointY="1.25" />
+        <EntityTypeShape EntityType="TorrentDB2Model.DataFiles" Width="1.5" PointX="1.125" PointY="1.5" />
+        <AssociationConnector Association="TorrentDB2Model.File_Peer" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

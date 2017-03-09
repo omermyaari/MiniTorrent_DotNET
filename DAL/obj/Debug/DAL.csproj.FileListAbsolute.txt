@@ -33,4 +33,3 @@ C:\Users\omer\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\DAL.dll
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\DAL\bin\Debug\DAL.pdb
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.dll
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.pdb
-C:\Users\omer\Source\Repos\MiniTorrent_DotNET\DAL\obj\Debug\DAL.csprojResolveAssemblyReference.cache

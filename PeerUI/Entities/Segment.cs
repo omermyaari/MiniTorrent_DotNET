@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace PeerUI
 {
+
+    /// <summary>
+    /// Segment, this class is used to hold file segment properties.
+    /// </summary>
     public enum SegmentInfo {FileName, StartPosition, Size};
 
     public class Segment

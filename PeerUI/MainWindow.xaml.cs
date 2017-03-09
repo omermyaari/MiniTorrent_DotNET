@@ -24,18 +24,25 @@ namespace PeerUI {
     public delegate List<ServiceDataFile> WcfFileRequestDelegate(string fileName);
     public partial class MainWindow : Window {
 
+        //  User settings and the DLL file path.
         private string username, password, serverIP, sharedFolderPath, downloadFolderPath, dllFilePath = "";
         private int serverPort, localPort;
-        private bool configExists;
+        //  UploadManager instance.
         private UploadManager uploadManager;
+        //  UploadManager's thread.
         private Thread uploadManagerThread;
+        //  Current user settings.
         private User user;
+        //  XML serializer used to serialize and deserialize the config xml file.
         private XmlSerializer SerializerObj = new XmlSerializer(typeof(User));
+        //  The WCF client, used to send and receive messages to and from the main WCF server.
         private WCFClient wcfClient;
+        //  Holds the current search's results.
         private List<ServiceDataFile> searchResults;
+        //  Holds the current transfers from and to the user.
         private List<FileProgressProperty> libraryFiles = new List<FileProgressProperty>();
         private ObservableCollection<FileProgressProperty> observableLibraryFile = new ObservableCollection<FileProgressProperty>();
-        
+        //  Event used by the UI to signal the DownloadManager to stop all downloading.
         public static event StopAllDownloading stopDownloadingEvent;
 
 
@@ -45,6 +52,15 @@ namespace PeerUI {
             listViewLibrary.SizeChanged += ListView_SizeChanged;
         }
 
+        /// <summary>
+        /// Used by the UploadManager and the DownloadManager to update the UI with the transfers progress.
+        /// </summary>
+        /// <param name="transferId"></param>
+        /// <param name="fileName"></param>
+        /// <param name="fileSize"></param>
+        /// <param name="position"></param>
+        /// <param name="time"></param>
+        /// <param name="type"></param>
         public void updateDownloadProgress(int transferId, string fileName, long fileSize, long position, long time, TransferType type) {
             try {
                 FileProgressProperty tempFileProgressProperty;
@@ -56,12 +72,13 @@ namespace PeerUI {
                 }
                 else {
                     Dispatcher.Invoke((Action)delegate {
+                        //  If the transfer hasn't finished yet.
                         if (position != 0) {
                             tempFileProgressProperty.Speed = (position / ((float)time / 1000)) / 1024 + "KB/s";
                             tempFileProgressProperty.Progress = (((float)position / fileSize) * 100);
                             tempFileProgressProperty.ElapsedTime = time;
-                            //Console.WriteLine("PROGRESS = " + tempFileProgressProperty.Progress);
                         }
+                        //  If the transfer has finished.
                         else {
                             tempFileProgressProperty.Progress = 100;
                         }
@@ -73,6 +90,12 @@ namespace PeerUI {
             }
         }
 
+        /// <summary>
+        /// Executes when the "Set" button next to the share folder settings is clicked.
+        /// opens a folder browse dialog, to choose a new shared folder.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonSharedFolder_Click(object sender, RoutedEventArgs e) {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog()) {
                 System.Windows.Forms.DialogResult result = dialog.ShowDialog();
@@ -80,6 +103,12 @@ namespace PeerUI {
             }
         }
 
+        /// <summary>
+        /// Executes when the "Set" button next to the download folder settings is clicked.
+        /// opens a folder browse dialog, to choose a new incoming downloads folder.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonDownloadFolder_Click(object sender, RoutedEventArgs e) {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog()) {
                 System.Windows.Forms.DialogResult result = dialog.ShowDialog();
@@ -87,8 +116,13 @@ namespace PeerUI {
             }
         }
 
-        //  Saves the current input settings.
+        /// <summary>
+        /// Saves the current input settings.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonApply_Click(object sender, RoutedEventArgs e) {
+            //  Retrieves the input settings given by the user.
             getDetailsFromFields();
             user = new User
             {
@@ -101,23 +135,33 @@ namespace PeerUI {
                 DownloadFolderPath = downloadFolderPath
             };
             DataContext = user;
+            //  Saves the settings to the config xml file.
             saveConfigToXml(user);
+            //  Creates a connection with the information supplied by the user.
             new Thread(() => {
                 wcfClient.CloseConnection();
                 wcfClient.UpdateConfig(user);
             }).Start();
+            //  Stop listening for new upload requests.
             if (uploadManagerThread.IsAlive)
                 uploadManager.StopListening();
+            //  Start listening for new upload requests, using the new settings.
             uploadManagerThread = new Thread(() => uploadManager.StartListening(localPort, sharedFolderPath));
             uploadManagerThread.Start();
         }
 
-        //  Clears the config settings.
+        /// <summary>
+        /// Clears the settings in the settings tab.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonClear_Click(object sender, RoutedEventArgs e) {
             clearSettings();
         }
 
-        //  TODO validator?
+        /// <summary>
+        /// Retrieves the settings from the settings fields.
+        /// </summary>
         private void getDetailsFromFields() {
             username = textboxUsername.Text;
             password = textboxPassword.Text;
@@ -130,6 +174,9 @@ namespace PeerUI {
                 localPort = 9876;
         }
 
+        /// <summary>
+        /// Displays the config file's settings in the settings tab.
+        /// </summary>
         private void loadDetailsFromUser() {
             textboxUsername.Text = user.Name;
             textboxPassword.Text = user.Password;
@@ -140,7 +187,9 @@ namespace PeerUI {
             textboxLocalPort.Text = Convert.ToString(user.LocalPort);
         }
 
-        //  Clears the settings in the settings tab.
+        /// <summary>
+        /// Clears the settings in the settings tab.
+        /// </summary>
         private void clearSettings() {
             foreach (var item in gridConfig.Children) {
                 if (item is TextBox) {
@@ -152,14 +201,19 @@ namespace PeerUI {
             textboxSharedFolder.Clear();
         }
 
-        //  Saves settings to the configuration xml file.
+        /// <summary>
+        /// Saves settings to the configuration xml file.
+        /// </summary>
+        /// <param name="user"></param>
         private void saveConfigToXml(User user) {
             TextWriter WriteFileStream = new StreamWriter(Properties.Resources.configFileName);
             SerializerObj.Serialize(WriteFileStream, user);
             WriteFileStream.Close();
         }
 
-        //  Loads settings from the configuration xml file.
+        /// <summary>
+        /// Loads settings from the configuration xml file.
+        /// </summary>
         private void loadConfigFromXml() {
             try {
                 var reader = new StreamReader(Properties.Resources.configFileName);
@@ -174,27 +228,45 @@ namespace PeerUI {
 
         }
 
+        /// <summary>
+        /// This method executes when the window is closed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            //  Stop accepting upload requests.
             uploadManager.StopListening();
             if (wcfClient != null)
+                //  Close the connection to the main WCF server.
                 new Thread(() => wcfClient.CloseConnection()).Start();
             if (stopDownloadingEvent != null)
+                //  Stop all active downloads.
                 stopDownloadingEvent();
         }
 
+        /// <summary>
+        /// This method executes when the window loads.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Loaded(object sender, RoutedEventArgs e) {
             buttonDownload.IsEnabled = false;
             listViewLibrary.ItemsSource = observableLibraryFile;
-            uploadManager = new UploadManager(new TransferProgressDelegate(updateDownloadProgress));
+            uploadManager = new UploadManager(new TransferProgressDelegate(updateDownloadProgress), displayWcfMessage);
             try {
-                if (configExists = File.Exists(Properties.Resources.configFileName)) {
+                //  If a configuration file exists.
+                if (File.Exists(Properties.Resources.configFileName)) {
+                    //  Load the config file.
                     loadConfigFromXml();
                     wcfClient = new WCFClient();
                     wcfClient.WcfMessageEvent += displayWcfMessage;
+                    //  Update the WCF client with the config file.
                     new Thread(() => wcfClient.UpdateConfig(user)).Start();
+                    //  Start listening for incoming upload requests.
                     uploadManagerThread = new Thread(() => uploadManager.StartListening(user.LocalPort, user.SharedFolderPath));
                     uploadManagerThread.Start();
                 }
+                //  If a configuration file doesn't exist, display an error message.
                 else {
                     textblockStatus.Foreground = Brushes.Red;
                     textblockStatus.Text = Properties.Resources.errorConfigFileNotExist;
@@ -206,7 +278,11 @@ namespace PeerUI {
             }
         }
 
-        //  Event to change the ListView's columns width when the ListView's size changes.
+        /// <summary>
+        /// Event to change the ListView's columns width when the ListView's size changes.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListView_SizeChanged(object sender, SizeChangedEventArgs e) {
             ListView listView = sender as ListView;
             GridView gridView = listView.View as GridView;
@@ -218,7 +294,11 @@ namespace PeerUI {
 
 
 
-        //  Event to handle column minimum size.
+        /// <summary>
+        /// Event to handle column minimum size.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="sizeChangedEventArgs"></param>
         private void HandleColumnHeaderSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs) {
             if (sizeChangedEventArgs.NewSize.Width <= 60) {
                 sizeChangedEventArgs.Handled = true;
@@ -226,6 +306,11 @@ namespace PeerUI {
             }
         }
 
+        /// <summary>
+        /// Downloads the selected file.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonDownload_Click(object sender, RoutedEventArgs e) {
             SearchFileProperty searchFileProperty = (SearchFileProperty)listViewSearch.SelectedItem;
             foreach (ServiceDataFile sdf in searchResults) {
@@ -236,7 +321,11 @@ namespace PeerUI {
             }
         }
 
-        //  Searches the main server for files shared by all connected peers.
+        /// <summary>
+        /// Sends a request to the WCF main server to search a given file name.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonSearch_Click(object sender, RoutedEventArgs e) {
             WcfFileRequestDelegate dlgt = new WcfFileRequestDelegate(wcfClient.FileRequest);
             IAsyncResult ar = dlgt.BeginInvoke(textboxSearch.Text,
@@ -244,6 +333,10 @@ namespace PeerUI {
 
         }
 
+        /// <summary>
+        /// The file search callback, refreshes the search tab with the files found at the WCF main server.
+        /// </summary>
+        /// <param name="ar"></param>
         private void FileSearchCallback(IAsyncResult ar) {
             WcfFileRequestDelegate dlgt = (WcfFileRequestDelegate)ar.AsyncState;
             searchResults = dlgt.EndInvoke(ar);
@@ -262,7 +355,11 @@ namespace PeerUI {
             });
         }
 
-        //  Displays error messages called by the ErrorMessageDelegate event
+        /// <summary>
+        /// Displays error messages called by the ErrorMessageDelegate event
+        /// </summary>
+        /// <param name="error"></param>
+        /// <param name="message"></param>
         private void displayWcfMessage(bool error, string message) {
             try {
                 Dispatcher.Invoke((Action)delegate {
@@ -275,6 +372,11 @@ namespace PeerUI {
             }
         }
 
+        /// <summary>
+        /// Open a file dialog for the user to choose a DLL file.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonSetDLLPath_Click(object sender, RoutedEventArgs e) {
             using (var dialog = new System.Windows.Forms.OpenFileDialog()) {
                 dialog.DefaultExt = ".dll";
@@ -284,12 +386,20 @@ namespace PeerUI {
             }
         }
 
+        /// <summary>
+        /// Analyzes a given DLL file.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonAnalyzeDLL_Click(object sender, RoutedEventArgs e) {
             string dllClassName = textboxDLLClassName.Text;
+            
+            //  If the DLL file exists, and the given class name isn't null or empty.
             if (File.Exists(dllFilePath) && !String.IsNullOrEmpty(dllClassName)) {
                 Assembly assembly = Assembly.LoadFrom(dllFilePath);
                 Console.WriteLine(assembly.GetName());
                 Type t = assembly.GetType(dllClassName);
+                //  If the type is indeed the given class's name.
                 if (t != null) {
                     textblockDLLDetails.Text = "Name: " + t.Name + "\n" +
                         "Namespace: " + t.Namespace + "\n" +
@@ -298,30 +408,30 @@ namespace PeerUI {
                         "IsSealed: " + t.IsSealed + "\n" +
                         "IsPublic: " + t.IsPublic + "\n";
 
-                    //  Constructors
+                    //  Display constructors.
                     textblockDLLDetails.Text += "\nConstructors:\n";
                     var ctors = t.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
                     ConcatDLLMembers(ctors);
 
-                    //  Methods
+                    //  Display methods.
                     textblockDLLDetails.Text += "\nMethods:\n";
                     var methods = t.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic |
                     BindingFlags.Public);
                     ConcatDLLMembers(methods);
 
-                    //  Fields
+                    //  Display fields.
                     textblockDLLDetails.Text += "\nFields:\n";
                     var fields = t.GetFields(BindingFlags.Instance | BindingFlags.NonPublic |
                     BindingFlags.Public);
                     ConcatDLLMembers(fields);
 
-                    //  Properties
+                    //  Dispplay properties.
                     textblockDLLDetails.Text += "\nProperties:\n";
                     var props = t.GetFields(BindingFlags.Instance | BindingFlags.NonPublic |
                     BindingFlags.Public);
                     ConcatDLLMembers(props);
 
-                    //  Calling constructor
+                    //  Calling constructor with two parameters: string and integer.
                     object[] parametersArray = new Object[2];
                     parametersArray[0] = "Hello";
                     parametersArray[1] = 3;
@@ -332,11 +442,11 @@ namespace PeerUI {
                     string s = (string)mi.Invoke(obj, null);
                     textblockDLLDetails.Text += "\nToString():\n" + s + "\n";
 
-                    //  Setting the Integer property to 7
+                    //  Setting the integer property to 7
                     PropertyInfo pi = t.GetProperty("Integer");
                     pi.SetValue(obj, 7, null);
 
-                    //  Calling the method that doubles the Integer property
+                    //  Calling the method that doubles the integer property
                     MethodInfo mi2 = t.GetMethod("DoubleInt");
                     mi2.Invoke(obj, null);
 
@@ -356,7 +466,10 @@ namespace PeerUI {
             }
         }
 
-        //
+        /// <summary>
+        /// Concats the DLL file's members to a single string.
+        /// </summary>
+        /// <param name="members"></param>
         public void ConcatDLLMembers(MemberInfo[] members) {
             foreach (MemberInfo memberInfo in members) {
                 textblockDLLDetails.Text += memberInfo + "\n";

@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace PeerUI {
+
+    /// <summary>
+    /// IP validation rule.
+    /// </summary>
     public class IPValidationRule : ValidationRule {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo) {
             IPAddress ipAddress;

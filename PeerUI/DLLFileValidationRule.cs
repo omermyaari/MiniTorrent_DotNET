@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace PeerUI {
+
+    /// <summary>
+    /// DLL file path validation rule.
+    /// </summary>
     class DLLFileValidationRule : ValidationRule {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo) {
             if (File.Exists(value.ToString())) {

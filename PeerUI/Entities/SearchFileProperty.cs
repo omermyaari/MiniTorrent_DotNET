@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace PeerUI.Entities {
+
+    /// <summary>
+    /// Search file property.
+    /// used by the UI in the search tab, holds basic information of files searched by the user.
+    /// </summary>
     public class SearchFileProperty {
         public string Name {
             get; set;

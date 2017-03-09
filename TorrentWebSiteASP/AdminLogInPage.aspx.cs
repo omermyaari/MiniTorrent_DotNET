@@ -16,7 +16,7 @@ namespace TorrentWebSiteASP
         protected void LoginButton_Click(object sender, EventArgs e)
         {
             // Three valid username/password pairs: Vit/password, Omer/password.
-            string[] users = { "Vit", "Om"};
+            string[] users = { "Vit", "Omer"};
             string[] passwords = { "pass", "pass" };
 
             for (int i = 0; i < users.Length; i++)

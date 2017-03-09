@@ -2,9 +2,9 @@
 <User xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Name>omer</Name>
   <Password>omer</Password>
-  <ServerIP>192.168.43.124</ServerIP>
+  <ServerIP>10.7.107.3</ServerIP>
   <ServerPort>8089</ServerPort>
   <LocalPort>9993</LocalPort>
-  <SharedFolderPath>C:\temp\share3</SharedFolderPath>
-  <DownloadFolderPath>C:\temp\download3</DownloadFolderPath>
+  <SharedFolderPath>C:\temp\share1</SharedFolderPath>
+  <DownloadFolderPath>C:\temp\download1</DownloadFolderPath>
 </User>

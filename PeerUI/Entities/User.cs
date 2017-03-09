@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
 using System.ComponentModel;
 
 namespace PeerUI {
-    //test test
+    
+    /// <summary>
+    /// User class, holds the user's settings and properties.
+    /// </summary>
     [Serializable]
     public class User : IDataErrorInfo {
 

@@ -151,7 +151,7 @@ namespace PeerUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: Socket exception at startDownloading function (DownloadManager): .
+        ///   Looks up a localized string similar to Error: Socket exception at StartDownloading function (DownloadManager): .
         /// </summary>
         internal static string errorDLManager2 {
             get {
@@ -165,6 +165,24 @@ namespace PeerUI.Properties {
         internal static string errorDLManager3 {
             get {
                 return ResourceManager.GetString("errorDLManager3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: IO exception at GetFileSegment function (DownloadManager): .
+        /// </summary>
+        internal static string errorDLManager4 {
+            get {
+                return ResourceManager.GetString("errorDLManager4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: Object FileStream was used but has been disposed at function WriteToDisk (DownloadManager):.
+        /// </summary>
+        internal static string errorDLManager5 {
+            get {
+                return ResourceManager.GetString("errorDLManager5", resourceCulture);
             }
         }
         
@@ -210,6 +228,33 @@ namespace PeerUI.Properties {
         internal static string errorSignInTimeout {
             get {
                 return ResourceManager.GetString("errorSignInTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: Socket exception at StartListening function (UploadManager): .
+        /// </summary>
+        internal static string errorULManager1 {
+            get {
+                return ResourceManager.GetString("errorULManager1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: IO exception at GetFileInfo function (UploadManager): .
+        /// </summary>
+        internal static string errorULManager2 {
+            get {
+                return ResourceManager.GetString("errorULManager2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: IO exception at SendFile function (UploadManager): .
+        /// </summary>
+        internal static string errorULManager3 {
+            get {
+                return ResourceManager.GetString("errorULManager3", resourceCulture);
             }
         }
         

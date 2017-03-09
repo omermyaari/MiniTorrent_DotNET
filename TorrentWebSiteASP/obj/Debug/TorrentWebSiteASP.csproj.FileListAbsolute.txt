@@ -35,7 +35,6 @@ C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\roslyn\VBCS
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\TorrentWebSiteASP.dll.config
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\TorrentWebSiteASP.dll
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\TorrentWebSiteASP.pdb
-C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\DAL.exe
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\DAL.pdb
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
@@ -64,3 +63,4 @@ C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\DAL.pdb
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\obj\Debug\TorrentWebSiteASP.dll
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\obj\Debug\TorrentWebSiteASP.pdb
+C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentWebSiteASP\bin\DAL.dll

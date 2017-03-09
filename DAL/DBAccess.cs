@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using DAL.Entities;
-using System.Threading;
 
 namespace DAL {
+
     /// <summary>
     /// This class is responsible of handling the data from the database.
     /// </summary>
@@ -18,7 +18,7 @@ namespace DAL {
         public static long IdCounter = 0;
 
         static DBAccess() {
-            connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\omer\Source\Repos\MiniTorrent_DotNET\TorrentDB2.mdf;Integrated Security=True;Connect Timeout=30";
+            connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\TorrentDB2.mdf;Integrated Security=True;Connect Timeout=30";
             connection = new Connection(connectionString);
         }
 

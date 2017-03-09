@@ -182,11 +182,31 @@
     <comment>IO exception error at DownloadMangager's constructor.</comment>
   </data>
   <data name="errorDLManager2" xml:space="preserve">
-    <value>Error: Socket exception at startDownloading function (DownloadManager): </value>
-    <comment>Socket exception error at DownloadManager function: startDownloading.</comment>
+    <value>Error: Socket exception at StartDownloading function (DownloadManager): </value>
+    <comment>Socket exception error at DownloadManager's function: StartDownloading.</comment>
   </data>
   <data name="errorDLManager3" xml:space="preserve">
     <value>Error: IO exception at SendFileInfo function (DownloadManager): </value>
-    <comment>IO exception error at DownloadManager function: SendFileInfo</comment>
+    <comment>IO exception error at DownloadManager's function: SendFileInfo</comment>
+  </data>
+  <data name="errorDLManager4" xml:space="preserve">
+    <value>Error: IO exception at GetFileSegment function (DownloadManager): </value>
+    <comment>IO exception error at DownloadManger's function: GetFileSegment.</comment>
+  </data>
+  <data name="errorDLManager5" xml:space="preserve">
+    <value>Error: Object FileStream was used but has been disposed at function WriteToDisk (DownloadManager):</value>
+    <comment>ObjectDisposed exception error at DownloadManager's function: GetFileSegment.</comment>
+  </data>
+  <data name="errorULManager1" xml:space="preserve">
+    <value>Error: Socket exception at StartListening function (UploadManager): </value>
+    <comment>Socket exception error at UploadManager's function: StartListening</comment>
+  </data>
+  <data name="errorULManager2" xml:space="preserve">
+    <value>Error: IO exception at GetFileInfo function (UploadManager): </value>
+    <comment>IO exception at UploadManager's function: GetFileInfo.</comment>
+  </data>
+  <data name="errorULManager3" xml:space="preserve">
+    <value>Error: IO exception at SendFile function (UploadManager): </value>
+    <comment>IO exception at UploadManager's function: SendFile.</comment>
   </data>
 </root>

@@ -8,16 +8,26 @@ using System.Xml.Serialization;
 using TorrentWcfServiceLibrary;
 
 namespace PeerUI.Communication {
+
+    /// <summary>
+    /// This is the WCF client, used by the program to send and receive messages to and from the WCF main server.
+    /// </summary>
     public class WCFClient {
+        //  Holds the current user settings.
         private User user;
+        //  Proxy used to send requests to the WCF main server.
         private ITorrentWcfService proxy;
         private ChannelFactory<ITorrentWcfService> factory;
+        //  XML serializer used to serialize and deserialize service messages.
         private XmlSerializer xmlSerializer = new XmlSerializer(typeof(ServiceMessage));
+        //  Boolean used to detect whether the user has signed in to the WCF server.
         private bool userConnected = false;
+        //  WcfMessageDelegate event used to notify the UI of errors and updates.
         public event WcfMessageDelegate WcfMessageEvent;
 
-
-        //  Creates a connection to the main server.
+        /// <summary>
+        /// Creates a connection to the WCF server.
+        /// </summary>
         private void CreateConnection() {
                 EndpointAddress ep = new EndpointAddress(@"http://" + user.ServerIP + ":"
        + user.ServerPort + @"/Wcf");
@@ -30,6 +40,10 @@ namespace PeerUI.Communication {
             proxy = factory.CreateChannel();
         }
 
+        /// <summary>
+        /// Retrieves the local machine's IP address.
+        /// </summary>
+        /// <returns>string</returns>
         private string GetLocalIp() {
             var localIPs = Dns.GetHostAddresses(Dns.GetHostName());
             foreach (IPAddress i in localIPs) {
@@ -41,6 +55,10 @@ namespace PeerUI.Communication {
             return Properties.Resources.defaultIP;
         }
 
+        /// <summary>
+        /// Updates the configuration file.
+        /// </summary>
+        /// <param name="user"></param>
         public void UpdateConfig(User user) {
             if (userConnected) {
                 SignOut();
@@ -52,13 +70,19 @@ namespace PeerUI.Communication {
             SignIn();
         }
 
-        //  Closes the connection to the main server.
+        /// <summary>
+        /// Closes the connection to the main server.
+        /// </summary>
         public void CloseConnection() {
             SignOut();
             factory.Close();
         }
 
-        //  Generates a xml file request to send to the main server.
+        /// <summary>
+        /// Generates a xml file request to send to the main server.
+        /// </summary>
+        /// <param name="FileName"></param>
+        /// <returns>ServiceMessage</returns>
         private ServiceMessage GenerateFileRequest(string FileName) {
             ServiceMessage serviceMessage = new ServiceMessage();
             serviceMessage.Header = MessageHeader.FileRequest;
@@ -74,7 +98,10 @@ namespace PeerUI.Communication {
             return serviceMessage;
         }
 
-        //  Generates a xml sign in request to send to the main server.
+        /// <summary>
+        /// Generates a xml sign in request to send to the main server.
+        /// </summary>
+        /// <returns>ServiceMessage</returns>
         private ServiceMessage GenerateSignInRequest() {
             try {
                 var directoryInfo = new DirectoryInfo(user.SharedFolderPath);
@@ -101,7 +128,10 @@ namespace PeerUI.Communication {
             return null;
         }
 
-        //  Generates a xml sign out request to send to the main server.
+        /// <summary>
+        /// Generates a xml sign out request to send to the main server.
+        /// </summary>
+        /// <returns>ServiceMessage</returns>
         public ServiceMessage GenerateSignOutRequest() {
             var serviceMessage = new ServiceMessage();
             serviceMessage.Header = MessageHeader.UserSignOut;
@@ -112,17 +142,24 @@ namespace PeerUI.Communication {
             return serviceMessage;
         }
 
-        //  Generates a file request from the user and sends it to the server,
-        //  then returns the result to the user.
+        /// <summary>
+        /// Generates a file request from the user and sends it to the server,
+        /// then returns the result to the user.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns>List</returns>
         public List<ServiceDataFile> FileRequest(string fileName) {
             if (String.IsNullOrEmpty(fileName)) {
                 WcfMessageEvent(true, Properties.Resources.errorFileNameEmpty);
                 return null;
 
             }
+            //  Generate the file request xml message.
             var serviceMessage = GenerateFileRequest(fileName);
+            //  Serialize the xml message.
             var xmlMessage = SerializeMessage(serviceMessage);
             try {
+                //  Send the request to the WCF server.
                 xmlMessage = proxy.Request(xmlMessage);
             }
             catch (EndpointNotFoundException) {
@@ -133,6 +170,7 @@ namespace PeerUI.Communication {
                 WcfMessageEvent(true, Properties.Resources.errorFileRequestTimeout);
                 return null;
             }
+            //  DeSerialize the message received from the server.
             serviceMessage = DeSerializeMessage(xmlMessage);
             //  If the main server has returned an empty list of files, notify the user.
             if (serviceMessage.FilesList.Count == 0) {
@@ -143,16 +181,21 @@ namespace PeerUI.Communication {
             return serviceMessage.FilesList;
         }
 
-        //  Generates a sign in request from the user and sends it to the server,
-        //  then returns if the user signed in successfuly.
+        /// <summary>
+        /// Generates a sign in request from the user and sends it to the server,
+        /// then returns if the user signed in successfuly.
+        /// </summary>
         private void SignIn() {
+            //  Generate the sign in xml message.
             var serviceMessage = GenerateSignInRequest();
             if (serviceMessage == null) {
                 WcfMessageEvent(true, Properties.Resources.errorGenerateSignIn);
                 return;
             }
+            //  Serialize the xml message.
             var xmlMessage = SerializeMessage(serviceMessage);
             try {
+                //  Send the request to the WCF server.
                 xmlMessage = proxy.Request(xmlMessage);
             }
             catch (EndpointNotFoundException) {
@@ -163,6 +206,7 @@ namespace PeerUI.Communication {
                 WcfMessageEvent(true, Properties.Resources.errorSignInTimeout);
                 return;
             }
+            //  DeSerialize the message received from the server.
             serviceMessage = DeSerializeMessage(xmlMessage);
             if (serviceMessage.Header == MessageHeader.ConnectionSuccessful) {
                 userConnected = true;
@@ -175,11 +219,16 @@ namespace PeerUI.Communication {
 
         }
 
-        //  Generates a sign out request from the user and sends it to the server.
+        /// <summary>
+        /// Generates a sign out request from the user and sends it to the server.
+        /// </summary>
         public void SignOut() {
+            //  Generate the sign out xml message.
             var serviceMessage = GenerateSignOutRequest();
+            //  Serialize the xml message.
             var xmlMessage = SerializeMessage(serviceMessage);
             try {
+                //  Send the request to the WCF server.
                 proxy.Request(xmlMessage);
             }
             catch (EndpointNotFoundException) {
@@ -191,7 +240,11 @@ namespace PeerUI.Communication {
             userConnected = false;
         }
 
-        //  DeSerializes string messages received from the main server.
+        /// <summary>
+        /// DeSerializes string messages received from the main server.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns>ServiceMessage</returns>
         private ServiceMessage DeSerializeMessage(string message) {
             ServiceMessage serviceMessage;
             using (TextReader reader = new StringReader(message)) {
@@ -200,7 +253,11 @@ namespace PeerUI.Communication {
             return serviceMessage;
         }
 
-        //  Serializes ServiceMessages to be sent to the main server.
+        /// <summary>
+        /// Serializes ServiceMessages to be sent to the main server.
+        /// </summary>
+        /// <param name="serviceMessage"></param>
+        /// <returns>ServiceMessage</returns>
         private string SerializeMessage(ServiceMessage serviceMessage) {
             var sb = new StringBuilder();
             using (TextWriter writer = new StringWriter(sb)) {

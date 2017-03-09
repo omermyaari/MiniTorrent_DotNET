@@ -5,7 +5,6 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Windows;
 using TorrentWcfServiceLibrary;
 
 namespace PeerUI {
@@ -31,8 +30,11 @@ namespace PeerUI {
         //  AutoResetEvent used by the "main" DownloadManager thread,
         //  to determine if the download has finished.
         private AutoResetEvent[] downloadDone;
+        //  Transfer id, used to distinguish between transfers in the progress list (library tab in ui).
         private int transferId;
+        //  Boolean used when an exception has occured or the user wishes to end the downloading process.
         public bool stopDownloading = false;
+        //  WcfMessageDelegate event used to notify the UI of errors and updates.
         public event WcfMessageDelegate wcfMessageEvent;
         //  Event delegate used by the DownloadManager to update the UI of the download progress.
         public static event TransferProgressDelegate transferProgressEvent;
@@ -59,7 +61,9 @@ namespace PeerUI {
             }
         }
 
-        //  Starts the downloading process.
+        /// <summary>
+        /// Starts the download process.
+        /// </summary>
         private void DownloadFile()  {
             //  Divides the file size and sets the segment size.
             long segmentSize = serviceDataFile.Size / serviceDataFile.PeerList.Count;
@@ -73,9 +77,9 @@ namespace PeerUI {
                 Thread downloadingThread;
                 //  If the users count doesnt divide file size evenly, let the last downloading thread get the remainder.
                 if (j == serviceDataFile.PeerList.Count - 1 && (serviceDataFile.Size % serviceDataFile.PeerList.Count != 0))
-                    downloadingThread = new Thread(() => startDownloading(new Segment(j, serviceDataFile.Name, segmentSize * j, segmentSize + segmentSizeMod), serviceDataFile.PeerList[j]));
+                    downloadingThread = new Thread(() => StartDownloading(new Segment(j, serviceDataFile.Name, segmentSize * j, segmentSize + segmentSizeMod), serviceDataFile.PeerList[j]));
                 else
-                    downloadingThread =  new Thread(()=> startDownloading(new Segment(j, serviceDataFile.Name, segmentSize * j, segmentSize), serviceDataFile.PeerList[j]));
+                    downloadingThread =  new Thread(()=> StartDownloading(new Segment(j, serviceDataFile.Name, segmentSize * j, segmentSize), serviceDataFile.PeerList[j]));
                 downloadingThread.Start();
             }
             //  Waits for all the downloading threads to complete.
@@ -85,8 +89,12 @@ namespace PeerUI {
             totalReceived = 0;
         }
 
-        //  Starts a segment downloading thread.
-        private void startDownloading(Segment segment, PeerAddress peerAddress) {
+        /// <summary>
+        /// Starts a segment downloading thread.
+        /// </summary>
+        /// <param name="segment"></param>
+        /// <param name="peerAddress"></param>
+        private void StartDownloading(Segment segment, PeerAddress peerAddress) {
             Socket clientSocket = null;
             try {
                 IPAddress ipAddress = IPAddress.Parse(peerAddress.Ip);
@@ -109,7 +117,11 @@ namespace PeerUI {
             }
         }
 
-        //  Checks if the socket is connected.
+        /// <summary>
+        /// Checks if the socket is connected.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="socketConnected"></param>
         private void IsSocketConnected(Socket s, ref bool socketConnected) {
             Thread.Sleep(200);
             bool part1 = s.Poll(1000, SelectMode.SelectRead);
@@ -120,7 +132,10 @@ namespace PeerUI {
                 socketConnected = true;
         }
 
-        //  Connects to the uploading peer.
+        /// <summary>
+        /// Connects to the uploading peer.
+        /// </summary>
+        /// <param name="ar"></param>
         private void ConnectCallback(IAsyncResult ar) {
             try {
                 // Retrieve the socket from the state object.
@@ -133,7 +148,11 @@ namespace PeerUI {
             }
         }
 
-        //  Sends the requested segment info to the relevant uploading peer.
+        /// <summary>
+        /// Sends the requested segment info to the relevant uploading peer.
+        /// </summary>
+        /// <param name="segment"></param>
+        /// <param name="clientSocket"></param>
         private void SendFileInfo(Segment segment, Socket clientSocket) {
             bool socketConnected = false;
             while (!socketConnected)
@@ -152,51 +171,46 @@ namespace PeerUI {
             }
         }
 
-        //  Downloads the file segment.
+        /// <summary>
+        /// Downloads the file segment.
+        /// </summary>
+        /// <param name="segment"></param>
+        /// <param name="clientSocket"></param>
         private void GetFileSegment(Segment segment, Socket clientSocket) {
             bool socketConnected = false;
             while (!socketConnected)
                 IsSocketConnected(clientSocket, ref socketConnected);
             using (NetworkStream nfs = new NetworkStream(clientSocket)) {
-
-                //int memoryStreamCapacity = (4 * 1024) ^ 2;
-                //FileStream fileStream = new FileStream(DownloadFolder + @"\Fuck.txt", FileMode.Create, FileAccess.Write);
-                //MemoryStream memoryStream = new MemoryStream(memoryStreamCapacity);
-                //long size=fi.Length ;
-                int bytesReceived = 1;  //  Current batch of bytes received.
-                long segmentTotalReceived = 0; //  Total bytes received so far.
-                                        //long totalReadInMemory = 0;
+                //  Current batch of bytes received.
+                int bytesReceived = 1;
+                //  Total bytes (of segment) received so far.
+                long segmentTotalReceived = 0; 
                 byte[] buffer = new byte[1024 * 64];
                 try {
+                    //  Stop downloading if stopDownloading bool set to true or the segment download has completed.
                     while (segmentTotalReceived < segment.Size && !stopDownloading) {
                         Array.Clear(buffer, 0, buffer.Length);
-                        //Read from the Network Stream
+                        //  Read 64K bytes from the Network Stream
                         bytesReceived = nfs.Read(buffer, 0, buffer.Length);
-                        //memoryStream.Write(buffer, 0, (int)bytesReceived);
-                        //totalReadInMemory += bytesReceived;
+                        //  Update the total amount of bytes received for this specific segment.
                         segmentTotalReceived = segmentTotalReceived + bytesReceived;
-                        WriteToDisk2(buffer, segment.StartPosition + segmentTotalReceived - bytesReceived, bytesReceived);
+                        //  Write the buffer to the file stream.
+                        WriteToDisk(buffer, segment.StartPosition + segmentTotalReceived - bytesReceived, bytesReceived);
+                        //  Update the segment downloading progress.
                         UpdateDownloadProgress(bytesReceived, transferId);
-                        //if (totalReceived == segment.Size)
-                        //    WriteToDisk(memoryStream, segment.StartPosition);
-                        //else if (totalReadInMemory >= memoryStreamCapacity) {
-                        //    WriteToDisk(memoryStream, segment.StartPosition + totalReceived - bytesReceived);
-                        //    totalReadInMemory = 0;
-                        // }
-                        //Console.WriteLine("wrote: " + totalReceived + "from server " + segment.Id);
                     }
+                    //  When the segment downloading has finished, update the reset event.
                     downloadDone[segment.Id].Set();
-                    //Console.WriteLine("file segment received successfully !");
                 }
                 catch (IOException ioException) {
-                    Console.WriteLine("IO exception at GetFileSegment function (DownloadManager): " + ioException.Message);
+                    wcfMessageEvent(true, Properties.Resources.errorDLManager4 + ioException.Message);
                     stopDownloading = true;
                     nfs.Close();
                     fileStream.Close();
                     downloadDone[segment.Id].Set();
                 }
                 catch (ObjectDisposedException objectDisposedException) {
-                    Console.WriteLine("Object FileStream was used but has been disposed at function WriteToDisk (DownloadManager): " + objectDisposedException.Message);
+                    wcfMessageEvent(true, Properties.Resources.errorDLManager5 + objectDisposedException.Message);
                     stopDownloading = true;
                     nfs.Close();
                     downloadDone[segment.Id].Set();
@@ -204,19 +218,13 @@ namespace PeerUI {
             }
         }
 
-        //  Writes the data to the disk when the memory stream has been filled,
-        //  or the file has been downloaded fully
-        /*private void WriteToDisk(MemoryStream memoryStream, long position) {
-            lock (fileStream) {
-                if (fileStream != null && fileStream.CanWrite) {
-                    fileStream.Seek(position, SeekOrigin.Begin);
-                    memoryStream.WriteTo(fileStream);
-                    //transferProgressEvent(serviceDataFile.Name, serviceDataFile.Size, position, stopWatch.ElapsedMilliseconds);
-                }
-            }
-        }
-        */
-        private void WriteToDisk2(byte[] buffer, long position, int amount) {
+        /// <summary>
+        /// Writes buffer to the file stream at the given position.
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="position"></param>
+        /// <param name="amount"></param>
+        private void WriteToDisk(byte[] buffer, long position, int amount) {
             try {
                 lock (fileStream) {
                     if (fileStream != null && fileStream.CanWrite) {
@@ -230,7 +238,11 @@ namespace PeerUI {
             }
         }
 
-        //  Updates the GUI with the progress of the download.
+        /// <summary>
+        /// Updates the GUI with the progress of the download.
+        /// </summary>
+        /// <param name="bytesReceived"></param>
+        /// <param name="transferId"></param>
         private void UpdateDownloadProgress(long bytesReceived, int transferId) {
             lock (this) {
                 totalReceived += bytesReceived;
@@ -238,6 +250,9 @@ namespace PeerUI {
             }
         }
 
+        /// <summary>
+        /// Used by the UI to stop all downloading threads.
+        /// </summary>
         private void stopDownloadingHandler() {
             stopDownloading = true;
         }

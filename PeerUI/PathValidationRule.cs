@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace PeerUI {
+
+    /// <summary>
+    /// Directory path validation rule.
+    /// </summary>
     class PathValidationRule : ValidationRule {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo) {
             if(Directory.Exists(value.ToString())) {

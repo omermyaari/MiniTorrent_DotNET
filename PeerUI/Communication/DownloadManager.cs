@@ -173,7 +173,7 @@ namespace PeerUI {
                     nfs.Close();
             }
         }
-
+        //
         /// <summary>
         /// Downloads the file segment.
         /// </summary>

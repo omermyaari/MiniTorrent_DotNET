@@ -191,7 +191,7 @@ namespace PeerUI {
             }
             stopWatch.Stop();
         }
-
+        //
         /// <summary>
         /// Updates the UI with the progress of an upload.
         /// </summary>

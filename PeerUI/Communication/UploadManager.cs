@@ -130,7 +130,8 @@ namespace PeerUI {
             }
             catch (IOException ioException) {
                 wcfMessageEvent(true, Properties.Resources.errorULManager2 + ioException.Message);
-                nfs.Close();
+                if (nfs != null)
+                    nfs.Close();
             }
         }
 
@@ -183,8 +184,10 @@ namespace PeerUI {
             }
             catch (IOException ioException) {
                 wcfMessageEvent(true, Properties.Resources.errorULManager3 + ioException.Message);
-                nfs.Close();
-                fin.Close();
+                if (nfs != null)
+                    nfs.Close();
+                if (fin != null)
+                    fin.Close();
             }
             stopWatch.Stop();
         }

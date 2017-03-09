@@ -169,7 +169,8 @@ namespace PeerUI {
 
             catch (IOException ioException) {
                 wcfMessageEvent(true, Properties.Resources.errorDLManager3 + ioException.Message);
-                nfs.Close();
+                if (nfs != null)
+                    nfs.Close();
             }
         }
 
@@ -210,14 +211,17 @@ namespace PeerUI {
             catch (IOException ioException) {
                 wcfMessageEvent(true, Properties.Resources.errorDLManager4 + ioException.Message);
                 stopDownloading = true;
-                nfs.Close();
-                fileStream.Close();
+                if (nfs != null)
+                    nfs.Close();
+                if (fileStream != null)
+                    fileStream.Close();
                 downloadDone[segment.Id].Set();
             }
             catch (ObjectDisposedException objectDisposedException) {
                 wcfMessageEvent(true, Properties.Resources.errorDLManager5 + objectDisposedException.Message);
                 stopDownloading = true;
-                nfs.Close();
+                if (nfs != null)
+                    nfs.Close();
                 downloadDone[segment.Id].Set();
             }
         }

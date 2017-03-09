@@ -58,7 +58,7 @@ namespace TorrentWcfServiceLibrary {
             var peer = new DBPeer(serviceMessage.UserName, serviceMessage.UserPassword, 
                 serviceMessage.UserIP, serviceMessage.UserPort);
             //  If the login credentials are correct.
-            if (DAL.DBAccess.CheckPeerAuth(peer)) {
+            if (DAL.DBAccess.CheckPeerAuth(peer) && !DAL.DBAccess.CheckPeerConnected(peer)) {
                 //  Update the database with the current peer's IP and port.
                 DAL.DBAccess.LoginPeer(peer);
                 //  Mark the peer as online.

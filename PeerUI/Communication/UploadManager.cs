@@ -113,6 +113,9 @@ namespace PeerUI {
         /// <param name="socket"></param>
         /// <param name="segment"></param>
         private void GetFileInfo(Socket socket, Segment segment) {
+            bool socketConnected = false;
+            while (!socketConnected)
+                IsSocketConnected(socket, ref socketConnected);
             NetworkStream nfs = null;
             try {
                 using (nfs = new NetworkStream(socket)) {
@@ -137,6 +140,9 @@ namespace PeerUI {
         /// <param name="socket"></param>
         /// <param name="segment"></param>
         private void SendFile(Socket socket, Segment segment) {
+            bool socketConnected = false;
+            while (!socketConnected)
+                IsSocketConnected(socket, ref socketConnected);
             FileStream fin = null;
             NetworkStream nfs = null;
             Stopwatch stopWatch = new Stopwatch();
@@ -193,6 +199,21 @@ namespace PeerUI {
         /// <param name="time"></param>
         private void UpdateUploadProgress(int transferId, string fileName, long totalSent, long segmentSize, long time) {
                transferProgressEvent(transferId, fileName, segmentSize, totalSent, time, TransferType.Upload);
+        }
+
+        /// <summary>
+        /// Checks if the socket is connected.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="socketConnected"></param>
+        private void IsSocketConnected(Socket s, ref bool socketConnected) {
+            Thread.Sleep(200);
+            bool part1 = s.Poll(1000, SelectMode.SelectRead);
+            bool part2 = (s.Available == 0);
+            if (part1 && part2)
+                socketConnected = false;
+            else
+                socketConnected = true;
         }
     }
 }

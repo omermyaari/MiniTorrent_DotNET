@@ -113,8 +113,9 @@ namespace PeerUI {
         /// <param name="socket"></param>
         /// <param name="segment"></param>
         private void GetFileInfo(Socket socket, Segment segment) {
-            using (NetworkStream nfs = new NetworkStream(socket)) {
-                try {
+            NetworkStream nfs = null;
+            try {
+                using (nfs = new NetworkStream(socket)) {
                     StreamReader streamReader = new StreamReader(nfs);
                     string str = streamReader.ReadLine();
                     string[] fileInfo = str.Split('#');
@@ -123,10 +124,10 @@ namespace PeerUI {
                     segment.Size = Int64.Parse(fileInfo[(int)SegmentInfo.Size]);
                     streamReader.Close();
                 }
-                catch (IOException ioException) {
-                    wcfMessageEvent(true, Properties.Resources.errorULManager2 + ioException.Message);
-                    nfs.Close();
-                }
+            }
+            catch (IOException ioException) {
+                wcfMessageEvent(true, Properties.Resources.errorULManager2 + ioException.Message);
+                nfs.Close();
             }
         }
 

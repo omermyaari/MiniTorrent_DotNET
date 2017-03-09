@@ -157,17 +157,19 @@ namespace PeerUI {
             bool socketConnected = false;
             while (!socketConnected)
                 IsSocketConnected(clientSocket, ref socketConnected);
-            using (NetworkStream nfs = new NetworkStream(clientSocket)) {
-                StreamWriter streamWriter = new StreamWriter(nfs);
-                try {
+            NetworkStream nfs = null;
+
+            try {
+                using (nfs = new NetworkStream(clientSocket)) {
+                    StreamWriter streamWriter = new StreamWriter(nfs);
                     streamWriter.WriteLine(segment.FileName + "#" + segment.StartPosition + "#" + segment.Size);
                     streamWriter.Flush();
                 }
+            }
 
-                catch (IOException ioException) {
-                    wcfMessageEvent(true, Properties.Resources.errorDLManager3 + ioException.Message);
-                    nfs.Close();
-                }
+            catch (IOException ioException) {
+                wcfMessageEvent(true, Properties.Resources.errorDLManager3 + ioException.Message);
+                nfs.Close();
             }
         }
 
@@ -180,13 +182,15 @@ namespace PeerUI {
             bool socketConnected = false;
             while (!socketConnected)
                 IsSocketConnected(clientSocket, ref socketConnected);
-            using (NetworkStream nfs = new NetworkStream(clientSocket)) {
-                //  Current batch of bytes received.
-                int bytesReceived = 1;
-                //  Total bytes (of segment) received so far.
-                long segmentTotalReceived = 0; 
-                byte[] buffer = new byte[1024 * 64];
-                try {
+            NetworkStream nfs = null;
+
+            //  Current batch of bytes received.
+            int bytesReceived = 1;
+            //  Total bytes (of segment) received so far.
+            long segmentTotalReceived = 0;
+            byte[] buffer = new byte[1024 * 64];
+            try {
+                using (nfs = new NetworkStream(clientSocket)) {
                     //  Stop downloading if stopDownloading bool set to true or the segment download has completed.
                     while (segmentTotalReceived < segment.Size && !stopDownloading) {
                         Array.Clear(buffer, 0, buffer.Length);
@@ -200,21 +204,21 @@ namespace PeerUI {
                         UpdateDownloadProgress(bytesReceived, transferId);
                     }
                     //  When the segment downloading has finished, update the reset event.
-                    downloadDone[segment.Id].Set();
                 }
-                catch (IOException ioException) {
-                    wcfMessageEvent(true, Properties.Resources.errorDLManager4 + ioException.Message);
-                    stopDownloading = true;
-                    nfs.Close();
-                    fileStream.Close();
-                    downloadDone[segment.Id].Set();
-                }
-                catch (ObjectDisposedException objectDisposedException) {
-                    wcfMessageEvent(true, Properties.Resources.errorDLManager5 + objectDisposedException.Message);
-                    stopDownloading = true;
-                    nfs.Close();
-                    downloadDone[segment.Id].Set();
-                }
+                downloadDone[segment.Id].Set();
+            }
+            catch (IOException ioException) {
+                wcfMessageEvent(true, Properties.Resources.errorDLManager4 + ioException.Message);
+                stopDownloading = true;
+                nfs.Close();
+                fileStream.Close();
+                downloadDone[segment.Id].Set();
+            }
+            catch (ObjectDisposedException objectDisposedException) {
+                wcfMessageEvent(true, Properties.Resources.errorDLManager5 + objectDisposedException.Message);
+                stopDownloading = true;
+                nfs.Close();
+                downloadDone[segment.Id].Set();
             }
         }
 

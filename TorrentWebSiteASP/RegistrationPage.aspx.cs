@@ -14,10 +14,10 @@ namespace TorrentWebSiteASP
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            DAL.Entities.DBPeer peer = new DAL.Entities.DBPeer(txtUserNameReg.Text, txtPwdReg.Text, "0.0.0.0", 0);
+            DAL.Entities.DBPeer peer = new DAL.Entities.DBPeer(txtUserNameReg.Text, txtPwdReg.Text, "0.0.0.0", 9876);
                 if (!DAL.DBAccess.PeerExists(peer))
                 {                   
-                    DAL.DBAccess.RegisterPeer(new DAL.Entities.DBPeer(txtUserNameReg.Text, txtPwdReg.Text, "", 0));
+                    DAL.DBAccess.RegisterPeer(new DAL.Entities.DBPeer(txtUserNameReg.Text, txtPwdReg.Text, "0.0.0.0", 9876));
                     lblMsg.ForeColor = System.Drawing.Color.Green;
                     lblMsg.Text = "User Registration successful";
                 }

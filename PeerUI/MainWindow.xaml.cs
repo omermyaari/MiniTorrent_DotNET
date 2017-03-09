@@ -168,9 +168,9 @@ namespace PeerUI {
             sharedFolderPath = textboxSharedFolder.Text;
             downloadFolderPath = textboxDownloadFolder.Text;
             serverIP = textboxServerIP.Text;
-            if (Int32.TryParse(textboxServerPort.Text, out serverPort))
+            if (!Int32.TryParse(textboxServerPort.Text, out serverPort))
                 serverPort = 9876;
-            if (Int32.TryParse(textboxLocalPort.Text, out localPort))
+            if (!Int32.TryParse(textboxLocalPort.Text, out localPort))
                 localPort = 9876;
         }
 

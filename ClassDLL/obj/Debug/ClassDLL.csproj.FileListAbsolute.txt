@@ -2,7 +2,6 @@ C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\ClassDLL\bin\Debug\ClassDLL.dll
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\ClassDLL\bin\Debug\ClassDLL.pdb
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\ClassDLL\obj\Debug\ClassDLL.dll
 C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\ClassDLL\obj\Debug\ClassDLL.pdb
-C:\Users\PC323\Source\Repos\MiniTorrent_DotNET\ClassDLL\obj\Debug\ClassDLL.csprojResolveAssemblyReference.cache
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\ClassDLL\bin\Debug\ClassDLL.dll
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\ClassDLL\bin\Debug\ClassDLL.pdb
 C:\Users\omer\Source\Repos\MiniTorrent_DotNET\ClassDLL\obj\Debug\ClassDLL.dll

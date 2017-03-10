@@ -45,19 +45,27 @@ namespace PeerUI {
                 this.serviceDataFile = serviceDataFile;
                 MainWindow.stopDownloadingEvent += stopDownloadingHandler;
                 wcfMessageEvent += messageDelegate;
+                Random random = new Random(DateTime.Now.Second);
                 DownloadFolder = folder;
                 transferProgressEvent += progressDelegate;
-                transferId = (new Random(DateTime.Now.Second)).Next();
+                transferId = random.Next();
                 downloadDone = new AutoResetEvent[serviceDataFile.PeerList.Count];
-                using (fileStream = new FileStream(folder + "\\" + serviceDataFile.Name, FileMode.Create, FileAccess.Write)) {
-                    DownloadFile();
-                }
+                //  If the file already exists
+                if (!File.Exists(folder + "\\" + serviceDataFile.Name))
+                    using (fileStream = new FileStream(folder + "\\" + serviceDataFile.Name, FileMode.Create, FileAccess.Write)) {
+                        DownloadFile();
+                    }
+                //  Create a new file with another name.
+                else
+                    using (fileStream = new FileStream(folder + "\\" + serviceDataFile.Name + random.Next(10000), FileMode.Create, FileAccess.Write)) {
+                        DownloadFile();
+                    }
             }
 
             //  IOException to catch if the fileStream cannot open the file for writing.
             catch (IOException ioException) {
                 wcfMessageEvent(true, Properties.Resources.errorDLManager1 + ioException.Message);
-                fileStream.Close();
+                //fileStream.Close();
             }
         }
 

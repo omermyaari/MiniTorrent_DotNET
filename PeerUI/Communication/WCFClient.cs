@@ -169,6 +169,9 @@ namespace PeerUI.Communication {
                 WcfMessageEvent(true, Properties.Resources.errorFileRequestTimeout);
                 return null;
             }
+            catch (CommunicationException) {
+                return null;
+            }
             //  DeSerialize the message received from the server.
             serviceMessage = DeSerializeMessage(xmlMessage);
             //  If the main server has returned an empty list of files, notify the user.
@@ -209,6 +212,9 @@ namespace PeerUI.Communication {
                 WcfMessageEvent(true, Properties.Resources.errorSignInTimeout);
                 return;
             }
+            catch (CommunicationException) {
+                return;
+            }
             //  DeSerialize the message received from the server.
             serviceMessage = DeSerializeMessage(xmlMessage);
             if (serviceMessage.Header == MessageHeader.ConnectionSuccessful) {
@@ -239,6 +245,9 @@ namespace PeerUI.Communication {
             }
             catch (TimeoutException) {
                 WcfMessageEvent(true, Properties.Resources.errorSignInTimeout);
+            }
+            catch (CommunicationException) {
+
             }
             userConnected = false;
         }

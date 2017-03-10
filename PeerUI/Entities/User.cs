@@ -52,6 +52,17 @@ namespace PeerUI {
 
         }
 
+        public User(string Name, string Password, string ServerIP, int ServerPort, 
+            int LocalPort, string SharedFolderPath, string DownloadFolderPath) {
+            this.Name = Name;
+            this.Password = Password;
+            this.ServerIP = ServerIP;
+            this.ServerPort = ServerPort;
+            this.LocalPort = LocalPort;
+            this.SharedFolderPath = SharedFolderPath;
+            this.DownloadFolderPath = DownloadFolderPath;
+        }
+
         public string this[string name] {
             get {
                 string result = null;

@@ -61,7 +61,7 @@ namespace PeerUI {
         /// <param name="position"></param>
         /// <param name="time"></param>
         /// <param name="type"></param>
-        public void updateDownloadProgress(int transferId, string fileName, long fileSize, long position, long time, TransferType type) {
+        public void updateTransferProgress(int transferId, string fileName, long fileSize, long position, long time, TransferType type) {
             try {
                 FileProgressProperty tempFileProgressProperty;
                 if ((tempFileProgressProperty = observableLibraryFile.Where(x => x.TransferId == transferId).FirstOrDefault()) == null) {
@@ -81,6 +81,7 @@ namespace PeerUI {
                         //  If the transfer has finished.
                         else {
                             tempFileProgressProperty.Progress = 100;
+                            displayWcfMessage(false, Properties.Resources.connectedString);
                         }
 
                     });
@@ -243,7 +244,7 @@ namespace PeerUI {
         private void Window_Loaded(object sender, RoutedEventArgs e) {
             buttonDownload.IsEnabled = false;
             listViewLibrary.ItemsSource = observableLibraryFile;
-            uploadManager = new UploadManager(new TransferProgressDelegate(updateDownloadProgress), displayWcfMessage);
+            uploadManager = new UploadManager(new TransferProgressDelegate(updateTransferProgress), displayWcfMessage);
             try {
                 //  If a configuration file exists.
                 if (File.Exists(Properties.Resources.configFileName)) {
@@ -308,7 +309,7 @@ namespace PeerUI {
                 foreach (ServiceDataFile sdf in searchResults) {
                     if (sdf.Name == searchFileProperty.Name && sdf.Size == searchFileProperty.Size)
                         new Thread(() => new DownloadManager(sdf, user.DownloadFolderPath,
-                            new TransferProgressDelegate(updateDownloadProgress),
+                            new TransferProgressDelegate(updateTransferProgress),
                             displayWcfMessage)).Start();
                 }
             }

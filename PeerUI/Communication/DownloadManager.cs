@@ -60,7 +60,7 @@ namespace PeerUI {
                     }
                 //  Create a new file with another name.
                 else
-                    using (fileStream = new FileStream(folder + "\\" + serviceDataFile.Name + random.Next(10000), FileMode.Create, FileAccess.Write)) {
+                    using (fileStream = new FileStream(folder + "\\" + random.Next(10000) + serviceDataFile.Name, FileMode.Create, FileAccess.Write)) {
                         DownloadFile();
                     }
             }
@@ -111,6 +111,7 @@ namespace PeerUI {
                 IPAddress ipAddress = IPAddress.Parse(peerAddress.Ip);
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, peerAddress.Port);
                 using (clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
+                    socketConnected[segment.Id] = new ManualResetEvent(false);
                     clientSocket.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), new SocketWithID(clientSocket, segment.Id));
                     socketConnected[segment.Id].WaitOne(5000, false);
                     //  Sends the uploading peer the requested file info.

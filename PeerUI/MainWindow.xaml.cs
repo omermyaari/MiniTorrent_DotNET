@@ -124,13 +124,14 @@ namespace PeerUI {
         private void buttonApply_Click(object sender, RoutedEventArgs e) {
             //  Retrieves the input settings given by the user.
             getDetailsFromFields();
+            new Thread(() => wcfClient.UpdateConfig(new User(username, password, serverIP, serverPort, 
+                localPort, sharedFolderPath, downloadFolderPath))).Start();
             user = new User(username, password, serverIP, serverPort, localPort, sharedFolderPath, downloadFolderPath);
             DataContext = user;
             //  Saves the settings to the config xml file.
             saveConfigToXml(user);
             //  Creates a connection with the information supplied by the user.
-            new Thread(() => { wcfClient.UpdateConfig(new User(username, password, serverIP, serverPort, localPort, sharedFolderPath, downloadFolderPath));
-            }).Start();
+
             //  Stop listening for new upload requests.
             if (uploadManagerThread.IsAlive)
                 uploadManager.StopListening();

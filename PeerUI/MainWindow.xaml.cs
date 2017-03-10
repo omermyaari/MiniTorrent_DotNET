@@ -74,7 +74,7 @@ namespace PeerUI {
                     Dispatcher.Invoke((Action)delegate {
                         //  If the transfer hasn't finished yet.
                         if (position != 0) {
-                            tempFileProgressProperty.Speed = (position / ((float)time / 1000)) / 1024 + "KB/s";
+                            tempFileProgressProperty.Speed = ((position / ((float)time / 1000)) / 1024).ToString("N2") + " KB/s";
                             tempFileProgressProperty.Progress = (((float)position / fileSize) * 100);
                             tempFileProgressProperty.ElapsedTime = time;
                         }

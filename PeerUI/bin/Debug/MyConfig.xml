@@ -4,7 +4,7 @@
   <Password>omer</Password>
   <ServerIP>10.0.0.1</ServerIP>
   <ServerPort>8089</ServerPort>
-  <LocalPort>9991</LocalPort>
+  <LocalPort>9993</LocalPort>
   <SharedFolderPath>C:\temp\share1</SharedFolderPath>
   <DownloadFolderPath>C:\temp\download1</DownloadFolderPath>
 </User>

@@ -19,6 +19,7 @@ namespace PeerUI {
             set; get;
         }
 
+        //  Manual reset event used to determine whether each downloading thread managed to connect to the uploading peers.
         private ManualResetEvent[] socketConnected;
         //  Stopwatch used to measure the time it takes to download the file.
         private static Stopwatch stopWatch = new Stopwatch();
@@ -113,7 +114,7 @@ namespace PeerUI {
                 using (clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
                     socketConnected[segment.Id] = new ManualResetEvent(false);
                     clientSocket.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), new SocketWithID(clientSocket, segment.Id));
-                    socketConnected[segment.Id].WaitOne(5000, false);
+                    socketConnected[segment.Id].WaitOne(10000, false);
                     //  Sends the uploading peer the requested file info.
                     SendFileInfo(segment, clientSocket, remoteEP);
                     //  Begins downloading the segment.
@@ -128,17 +129,7 @@ namespace PeerUI {
                 Thread.Yield();
             }
         }
-        /*
-        /// <summary>
-        /// Checks if the socket is connected.
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="socketConnected"></param>
-        private void IsSocketConnected(Socket s, ref bool socketConnected) {
-            Thread.Sleep(500);
-            socketConnected = !(s.Poll(0, SelectMode.SelectRead) && s.Available == 0);
-        }
-        */
+ 
         /// <summary>
         /// Connects to the uploading peer.
         /// </summary>

@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using PeerUI.Communication;
 
 namespace PeerUI {
 
@@ -12,6 +13,7 @@ namespace PeerUI {
     /// This class is responsible of upload files to other peers.
     /// </summary>
     public class UploadManager {
+
         //  Local port.
         private int localPort;
         //  Shared files folder path.
@@ -71,8 +73,8 @@ namespace PeerUI {
 
                 catch (SocketException socketException) {
                     wcfMessageEvent(true, Properties.Resources.errorULManager1 +  socketException.ToString());
-                    listener.Shutdown(SocketShutdown.Both);
-                    listener.Close(0);
+                    //listener.Shutdown(SocketShutdown.Both);
+                    //listener.Close(0);
                 }
             }
         }
@@ -90,19 +92,20 @@ namespace PeerUI {
             try {
                 Socket listener = (Socket)ar.AsyncState;
                 //  Get the socket that handles the client request.
-                handler = listener.EndAccept(ar);
-                //  Get requested file info from the downloading peer.
-                GetFileInfo(handler, segment);
-                //  Sends the requested file to the downloading peer.
-                SendFile(handler, segment);
+                using (handler = listener.EndAccept(ar)) {
+                    //  Get requested file info from the downloading peer.
+                    GetFileInfo(handler, segment);
+                    //  Sends the requested file to the downloading peer.
+                    SendFile(handler, segment);
+                }
             }
             catch (ObjectDisposedException objectDisposedException) { 
                 Console.WriteLine(objectDisposedException.Message);    
 
             }                                                       
             catch (SocketException) {
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
+                //handler.Shutdown(SocketShutdown.Both);
+                //handler.Close();
             }
 
         }
@@ -210,13 +213,8 @@ namespace PeerUI {
         /// <param name="s"></param>
         /// <param name="socketConnected"></param>
         private void IsSocketConnected(Socket s, ref bool socketConnected) {
-            Thread.Sleep(200);
-            bool part1 = s.Poll(1000, SelectMode.SelectRead);
-            bool part2 = (s.Available == 0);
-            if (part1 && part2)
-                socketConnected = false;
-            else
-                socketConnected = true;
+            Thread.Sleep(500);
+            socketConnected = !(s.Poll(0, SelectMode.SelectRead) && s.Available == 0);
         }
     }
 }

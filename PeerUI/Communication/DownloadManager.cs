@@ -19,6 +19,7 @@ namespace PeerUI {
             set; get;
         }
 
+        private ManualResetEvent[] socketConnected;
         //  Stopwatch used to measure the time it takes to download the file.
         private static Stopwatch stopWatch = new Stopwatch();
         //  Total bytes received from all peers the client is downloading from.
@@ -39,6 +40,7 @@ namespace PeerUI {
         //  Event delegate used by the DownloadManager to update the UI of the download progress.
         public static event TransferProgressDelegate transferProgressEvent;
 
+
         public DownloadManager(ServiceDataFile serviceDataFile, string folder, 
             TransferProgressDelegate progressDelegate, WcfMessageDelegate messageDelegate) {
             try {
@@ -50,6 +52,7 @@ namespace PeerUI {
                 transferProgressEvent += progressDelegate;
                 transferId = random.Next();
                 downloadDone = new AutoResetEvent[serviceDataFile.PeerList.Count];
+                socketConnected = new ManualResetEvent[serviceDataFile.PeerList.Count];
                 //  If the file already exists
                 if (!File.Exists(folder + "\\" + serviceDataFile.Name))
                     using (fileStream = new FileStream(folder + "\\" + serviceDataFile.Name, FileMode.Create, FileAccess.Write)) {
@@ -108,38 +111,33 @@ namespace PeerUI {
                 IPAddress ipAddress = IPAddress.Parse(peerAddress.Ip);
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, peerAddress.Port);
                 using (clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
-                    // Connect to the remote endpoint.
-                    clientSocket.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), clientSocket);
+                    clientSocket.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), new SocketWithID(clientSocket, segment.Id));
+                    socketConnected[segment.Id].WaitOne(5000, false);
                     //  Sends the uploading peer the requested file info.
-                    SendFileInfo(segment, clientSocket);
+                    SendFileInfo(segment, clientSocket, remoteEP);
                     //  Begins downloading the segment.
-                    GetFileSegment(segment, clientSocket);
+                    GetFileSegment(segment, clientSocket, remoteEP);
                 }
             }
 
             catch (SocketException socketException) {
                 wcfMessageEvent(true, Properties.Resources.errorDLManager2 + socketException.Message);
-                clientSocket.Shutdown(SocketShutdown.Both);
-                clientSocket.Close();
+                //clientSocket.Shutdown(SocketShutdown.Both);
+                //clientSocket.Close();
                 Thread.Yield();
             }
         }
-
+        /*
         /// <summary>
         /// Checks if the socket is connected.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="socketConnected"></param>
         private void IsSocketConnected(Socket s, ref bool socketConnected) {
-            Thread.Sleep(200);
-            bool part1 = s.Poll(1000, SelectMode.SelectRead);
-            bool part2 = (s.Available == 0);
-            if (part1 && part2)
-                socketConnected = false;
-            else
-                socketConnected = true;
+            Thread.Sleep(500);
+            socketConnected = !(s.Poll(0, SelectMode.SelectRead) && s.Available == 0);
         }
-
+        */
         /// <summary>
         /// Connects to the uploading peer.
         /// </summary>
@@ -147,9 +145,10 @@ namespace PeerUI {
         private void ConnectCallback(IAsyncResult ar) {
             try {
                 // Retrieve the socket from the state object.
-                Socket client = (Socket)ar.AsyncState;
+                SocketWithID client = (SocketWithID)ar.AsyncState;
                 // Complete the connection.
-                client.EndConnect(ar);  
+                client.Sock.EndConnect(ar);
+                socketConnected[client.Id].Set();
             }
             catch (Exception e) {
                 wcfMessageEvent(true, e.ToString());
@@ -161,12 +160,8 @@ namespace PeerUI {
         /// </summary>
         /// <param name="segment"></param>
         /// <param name="clientSocket"></param>
-        private void SendFileInfo(Segment segment, Socket clientSocket) {
-            bool socketConnected = false;
-            while (!socketConnected)
-                IsSocketConnected(clientSocket, ref socketConnected);
+        private void SendFileInfo(Segment segment, Socket clientSocket, IPEndPoint remoteEP) {
             NetworkStream nfs = null;
-
             try {
                 using (nfs = new NetworkStream(clientSocket)) {
                     StreamWriter streamWriter = new StreamWriter(nfs);
@@ -187,10 +182,7 @@ namespace PeerUI {
         /// </summary>
         /// <param name="segment"></param>
         /// <param name="clientSocket"></param>
-        private void GetFileSegment(Segment segment, Socket clientSocket) {
-            bool socketConnected = false;
-            while (!socketConnected)
-                IsSocketConnected(clientSocket, ref socketConnected);
+        private void GetFileSegment(Segment segment, Socket clientSocket, IPEndPoint remoteEP) {
             NetworkStream nfs = null;
 
             //  Current batch of bytes received.
